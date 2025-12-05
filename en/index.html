@@ -2,64 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Growy Child Development Timeline (Beta)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growy - Your Science-Based Parenting AI Partner</title>
     <style>
         :root {
-            /* 品牌主视觉 */
-            --brand-deep-green: #1B5E20; 
-            --brand-light-gray: #F5F7FA;
-            
-            --primary: var(--brand-deep-green);
-            --bg: var(--brand-light-gray);
-            --card-bg: #FFFFFF;
-
-            /* 紧迫性颜色尺 */
-            --green-critical: #1B5E20; /* 关键期 (Critical) - 暗绿 */
-            --green-sensitive: #43A047; /* 敏感期 (Sensitive) - 中绿 */
-            --green-open: #A5D6A7;     /* 发展期 (Open) - 浅绿 */
-            
-            --gray-bar: #f0f0f0;
-            --text-main: #2C3E50;
-            --text-sub: #607D8B;
+            --primary: #1B5E20;
+            --consult: #42657D;
+            --about: #546E7A;
+            --bg: #F5F7FA;
+            --text: #2C3E50;
+            --gray: #6b7280;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            margin: 0;
-            padding: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
         }
 
-        .container {
-            max-width: 900px;
-            width: 100%;
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            padding: 20px 15px;
-            box-sizing: border-box;
-        }
-
-        /* Header */
-        .header { text-align: center; margin-bottom: 20px; position: relative; }
-        
         /* Language Switcher */
         .lang-switcher {
-            position: absolute;
-            top: 0;
-            right: 0;
+            position: fixed;
+            top: 20px;
+            right: 20px;
             display: flex;
-            gap: 0;
             border: 1px solid #ddd;
             border-radius: 6px;
-            overflow: hidden;
             background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
         .lang-btn {
             padding: 6px 12px;
@@ -67,398 +43,244 @@
             font-weight: 600;
             border: none;
             background: white;
-            color: var(--text-sub);
+            color: var(--gray);
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .lang-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-        .lang-btn:hover:not(.active) {
-            background: #f5f5f5;
-        }
-        
-        /* 修复 Logo 显示样式 */
-        .logo-image { 
-            width: 40px; 
-            height: 40px; 
-            margin: 0 auto 10px; /* 居中并在下方留出空间 */
-            object-fit: contain;
-            display: block; /* 确保 Logo 可见 */
-        } 
+        .lang-btn.active { background: var(--primary); color: white; }
+        .lang-btn:hover:not(.active) { background: #f5f5f5; }
 
-        h1 { font-size: 1.4rem; margin: 0 0 5px 0; color: var(--primary); letter-spacing: -0.5px; }
-        .tagline { color: var(--text-sub); font-size: 0.8rem; line-height: 1.4; }
-
-        /* Control Panel */
-        .control-panel {
-            background: #fff;
-            border: 1px solid #eef2f5;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+        /* Header */
+        header {
+            padding: 2rem 1rem;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin: 0 auto 1.5rem;
+            padding: 8px;
+            display: block;
+        }
+        .logo-emoji { display: none; font-size: 2.5rem; }
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .tagline {
+            color: var(--gray);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .tagline span {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            display: block;
+            margin-top: 0.25rem;
         }
 
-        .age-row { display: flex; align-items: baseline; justify-content: center; margin-bottom: 5px; }
-        .age-display { font-size: 2.2rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1; margin-right: 5px; }
-        .age-unit { font-size: 0.9rem; font-weight: 500; color: var(--text-sub); }
-
-    input[type=range] { width: 100%; margin: 10px 0 15px 0; -webkit-appearance: none; appearance: none; background: transparent; }
-        input[type=range]:focus { outline: none; }
-        
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 24px;
-            width: 24px;
-            border-radius: 50%;
-            background: var(--green-critical);
-            cursor: pointer;
-            margin-top: -10px;
-            box-shadow: 0 2px 5px rgba(27, 94, 32, 0.3);
-            border: 3px solid white;
+        /* Cards */
+        main {
+            flex: 1;
+            max-width: 72rem;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            width: 100%;
         }
-
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; }
-
-        /* Top Focus Bar */
-        .top-focus-bar { min-height: 24px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
-        .mini-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; color: white; display: flex; align-items: center; gap: 4px; font-weight: 500; animation: fadeIn 0.3s ease; }
-
-        /* Chart Architecture */
-        .layer-section { margin-bottom: 15px; }
-        
-        .layer-header { display: flex; align-items: center; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #f0f0f0; }
-        .layer-icon { font-size: 1rem; margin-right: 6px; }
-        .layer-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #999; font-weight: 700; }
-
-        .chart-row {
+        .cards {
             display: grid;
-            grid-template-columns: 85px 1fr;
-            gap: 10px;
-            margin-bottom: 8px;
-            align-items: center;
-            min-height: 20px;
+            gap: 1.5rem;
         }
-
-        .skill-name {
-            text-align: left;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-main);
-            white-space: normal;
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
             overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1;
-            cursor: pointer; 
-            transition: color 0.2s;
-            max-height: 2em;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-            gap: 0.3em;
-        }
-        .skill-name:hover {
-            color: var(--green-critical);
-        }
-
-        .bar-track { position: relative; height: 12px; background: var(--gray-bar); border-radius: 6px; width: 100%; overflow: hidden; }
-        .active-bar { position: absolute; height: 100%; top: 0; border-radius: 6px; }
-
-        /* Indicator Line - Fixed Alignment */
-        .indicator-container { 
-            position: absolute; 
-            top: 0; 
-            bottom: 0; 
-            left: 95px; /* 85px label + 10px gap */ 
-            right: 0; 
-            pointer-events: none; 
-            z-index: 10; 
-        }
-        .indicator-line { 
-            position: absolute; 
-            top: -5px; 
-            bottom: -5px; 
-            width: 2px; 
-            background-color: var(--primary); 
-            opacity: 0.6; 
-            transition: left 0.1s linear; 
-        }
-
-        /* Info Panel */
-        .info-panel { margin-top: 25px; background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
-        .info-header { background: #fcfcfc; padding: 10px 15px; border-bottom: 1px solid #eee; font-weight: bold; font-size: 0.9rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        .info-content { padding: 15px; }
-
-        .advice-card { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #f0f0f0; }
-        .advice-card:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .advice-title-row { display: flex; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px;}
-        .advice-name { font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
-        .urgency-badge { font-size: 0.6rem; color: white; padding: 2px 6px; border-radius: 4px; font-weight: normal;}
-        .advice-desc { font-size: 0.85rem; color: #555; line-height: 1.5; margin-top: 4px;}
-
-        /* Footer Links */
-        .footer-links {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #f0f0f0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .footer-link-item {
-            font-size: 0.8rem;
-            color: var(--text-sub);
+            transition: all 0.3s;
             text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card.green::before { background: linear-gradient(to right, #66BB6A, var(--primary)); }
+        .card.blue::before { background: linear-gradient(to right, #6B8CA3, var(--consult)); }
+        .card.gray::before { background: linear-gradient(to right, #C5D3DC, var(--about)); }
+
+        .icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            margin: 0 auto 1.25rem;
             display: flex;
             align-items: center;
-            gap: 4px;
-            transition: color 0.2s;
+            justify-content: center;
+            transition: all 0.3s;
         }
-        .footer-link-item:hover { color: var(--primary); }
-        
-        /* Disclaimer */
-        .disclaimer { margin-top: 15px; font-size: 0.65rem; color: #bbb; text-align: center; line-height: 1.4; padding-bottom: 10px; }
+        .icon svg { width: 28px; height: 28px; stroke-width: 2; }
+        .card.green .icon { background: rgba(76,175,80,0.1); color: var(--primary); }
+        .card.green:hover .icon { background: var(--primary); color: white; }
+        .card.blue .icon { background: rgba(66,101,125,0.1); color: var(--consult); }
+        .card.blue:hover .icon { background: var(--consult); color: white; }
+        .card.gray .icon { background: rgba(197,211,220,0.3); color: var(--about); }
+        .card.gray:hover .icon { background: var(--about); color: white; }
 
-        /* Detail Card Style */
-        .detail-card-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center;
-            z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s;
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1f2937;
+            transition: color 0.3s;
         }
-        .detail-card-overlay.visible { opacity: 1; visibility: visible; }
-        .detail-card {
-            background: var(--card-bg); padding: 20px; margin: 20px; border-radius: 12px;
-            width: 90%; max-width: 400px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            transform: translateY(20px); transition: transform 0.3s;
+        .card.green:hover h3 { color: var(--primary); }
+        .card.blue:hover h3 { color: var(--consult); }
+        .card.gray:hover h3 { color: var(--about); }
+
+        .card p {
+            font-size: 0.875rem;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
-        .detail-card-overlay.visible .detail-card { transform: translateY(0); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px; }
-        .card-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
-        .card-close { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; line-height: 1; }
-        .card-content p { font-size: 0.9rem; line-height: 1.6; margin: 0 0 10px 0; color: var(--text-main); }
-        .theory-section { font-weight: 600; color: var(--text-main); margin-bottom: 5px; }
-        .advice-section { font-weight: normal; margin-top: 10px; color: #555; padding-left: 10px; border-left: 3px solid var(--green-sensitive); }
+
+        .action {
+            font-weight: 600;
+            font-size: 0.875rem;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s;
+        }
+        .card:hover .action {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .card.green .action { color: var(--primary); }
+        .card.blue .action { color: var(--consult); }
+        .card.gray .action { color: var(--about); }
+
+        /* Footer */
+        footer {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.875rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        .links a {
+            color: var(--gray);
+            text-decoration: underline;
+        }
+        .links a:hover { color: var(--primary); }
+
+        @media (min-width: 768px) {
+            header { padding: 3rem 1rem; }
+            .logo { width: 80px; height: 80px; }
+            h1 { font-size: 2.25rem; }
+            .tagline { font-size: 1.125rem; }
+            .tagline span { font-size: 1rem; }
+            .cards { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <!-- Language Switcher -->
-        <div class="lang-switcher">
-            <button class="lang-btn" id="langZh" onclick="switchLanguage('zh')">中文</button>
-            <button class="lang-btn active" id="langEn" onclick="switchLanguage('en')">English</button>
+    <div class="lang-switcher">
+        <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
+        <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+    </div>
+
+    <header>
+        <img src="images/logo.png" alt="Growy Logo" class="logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <span class="logo-emoji">🌱</span>
+        <h1>Growy</h1>
+        <p class="tagline">
+            Data-Driven Science-Based Parenting Assistant
+            <span>Empowering parents with science & AI</span>
+        </p>
+    </header>
+
+    <main>
+        <div class="cards">
+            
+            <a href="timeline.html" class="card green">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h3>Child Development Timeline</h3>
+                <p>An interactive timeline based on neuroscience and developmental psychology for ages 0-18. Identify critical periods to ease anxiety and seize golden windows of opportunity.</p>
+                <div class="action">Start Exploring →</div>
+            </a>
+
+            <a href="https://growyai.lovable.app" target="_blank" class="card blue">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                </div>
+                <h3>Growy AI Consultation</h3>
+                <p>Your 24/7 personal parenting consultant. Get personalized advice and reassurance based on evidence-based medicine and psychology for your specific parenting challenges.</p>
+                <div class="action">Consult Now ↗</div>
+            </a>
+
+            <a href="about.html" class="card gray">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3>About Growy</h3>
+                <p>Learn about our vision and mission. Why did we create Growy? How do we help parents return to the essence of parenting through technology?</p>
+                <div class="action">Learn More →</div>
+            </a>
+
         </div>
-        <!-- 重新添加 Logo 标签 -->
-    <img src="images/logo.png" alt="Growy Logo" class="logo-image" onerror="this.style.display='none'">
-    <h1>Growy Child Development Timeline (Beta)</h1>
-    <p class="tagline">A 0–18 timeline of child development based on neuroscience and developmental psychology. Drag the slider below to see what to focus on at your child's age.</p>
-    </div>
+    </main>
 
-    <div class="control-panel">
-        <div class="age-row">
-            <div class="age-display" id="ageVal">0</div>
-            <div class="age-unit">yrs</div>
+    <footer>
+        <div class="links">        
+            <a href="https://x.com/GrowyAI" target="_blank">Twitter</a>
+            <a href="https://growyai.substack.com" target="_blank">Substack</a>
+            <a href="https://github.com/GrowyAI" target="_blank">GitHub</a>
+            <a href="https://mp.weixin.qq.com/s/ftYUVkcBBGB3yZLWohW-uw" target="_blank">WeChat Official Account</a>
         </div>
-        <div id="topFocusBar" class="top-focus-bar"></div>
-        <input type="range" id="ageSlider" min="0" max="18" step="0.5" value="0">
-    </div>
+        <p>© 2025 GrowyAI. All rights reserved.</p>
+    </footer>
 
-    <div id="chartArea" style="position: relative;">
-        <div class="indicator-container">
-            <div id="indicator" class="indicator-line"></div>
-        </div>
-    </div>
-
-        <div class="info-panel" id="infoPanel">
-        <div class="info-header"><span>Current Age Recommendations (for reference only)</span></div>
-        <div class="info-content" id="infoContent"></div>
-    </div>
-
-    <!-- 新增：底部链接区域 -->
-        <div class="footer-links">
-        <a href="about.html" class="footer-link-item">ℹ️ About Growy</a>
-        <a href="https://x.com/GrowyAI" target="_blank" class="footer-link-item">𝕏 (X / Twitter)</a>
-        <a href="https://growyai.substack.com" target="_blank" class="footer-link-item">📝 Substack</a>
-        <a href="https://mp.weixin.qq.com/s/ftYUVkcBBGB3yZLWohW-uw" target="_blank" class="footer-link-item">💬 WeChat Official Account</a>
-        <a href="https://github.com/GrowyAI" target="_blank" class="footer-link-item">💻 GitHub</a>
-        <a href="https://forms.google.com" target="_blank" class="footer-link-item">📋 Feedback (coming soon)</a>
-    </div>
-
-    <div class="disclaimer">
-        <p>Disclaimer: This tool is for educational reference only and does not replace professional medical advice.</p>
-        <p>© 2025 GrowyAI · All rights reserved</p>
-    </div>
-</div>
-
-<!-- Detail Card Modal -->
-<div class="detail-card-overlay" id="detailCardOverlay">
-    <div class="detail-card">
-        <div class="card-header">
-            <div class="card-title" id="cardTitle"></div>
-            <button class="card-close" onclick="hideDetailCard()">×</button>
-        </div>
-        <div class="card-content" id="cardContent"></div>
-    </div>
-</div>
-
-<script>
-    // Language Switcher
-    function switchLanguage(lang) {
-        if (lang === 'zh') {
-            window.location.href = '../zh/index.html';
-        } else if (lang === 'en') {
-            window.location.href = './index.html';
+    <script>
+        function switchLanguage(lang) {
+            if (lang === 'zh') window.location.href = '../zh/index.html';
         }
-    }
+    </script>
 
-    // Data (English)
-    const layers = [
-        {
-            id: "L1", title: "Layer 1: Foundational Systems", icon: "🌱",
-            skills: [
-                { name: "Secure Attachment", start: 0, end: 1.5, urgency: 3, desc: "**[Bowlby - Critical Period]** Infants build the foundation of their internal working model through timely and consistent caregiver responses. *Recommendation: Establish a predictable soothing routine (secure base) and respond to crying rather than punish to build basic trust.*" },
-                { name: "Attachment Consolidation", start: 1.5, end: 3, urgency: 2, desc: "**[Erikson - Trust vs. Autonomy]** With secure attachment, children begin to explore the world and seek independence. *Recommendation: Encourage safe exploration near the secure base, offer choices, and support separation-related feelings.*" },
-                { name: "Self-Awareness", start: 1.5, end: 3, urgency: 2, desc: "**[Mirror Test]** Children start to distinguish self from others and form the sense of 'I'. *Recommendation: Use phrases like 'you did it' or 'how do you feel' to help build a positive self-description.*" },
-                { name: "Identity", start: 12, end: 18, urgency: 2, desc: "**[Erikson - Identity vs. Role Confusion]** Adolescents explore values and roles to answer 'Who am I?'. *Recommendation: Encourage participation, open discussion, and accept reasonable questioning and exploration.*" }
-            ]
-        },
-        {
-            id: "L2", title: "Layer 2: Operating System", icon: "🧠",
-            skills: [
-                { name: "Intrinsic Motivation", start: 0, end: 7, urgency: 3, desc: "**[Deci - Self-Determination]** Protect children's innate curiosity. *Recommendation: Use fewer material rewards, praise the process rather than outcomes, and emphasize autonomy.*" },
-                { name: "Inhibitory Control", start: 3, end: 6, urgency: 3, desc: "**[Core Executive Function]** The basis of attention and self-control. *Recommendation: Play rule games like 'Red Light, Green Light' and practice delayed gratification.*" },
-                { name: "Emotion Regulation", start: 3, end: 7, urgency: 2, desc: "**[Neural Plasticity]** Builds circuits to cope with negative emotions. *Recommendation: Validate emotions during meltdowns, then guide verbal expression rather than immediately stopping them.*" },
-                { name: "Perspective Taking", start: 4, end: 7, urgency: 2, desc: "**[Theory of Mind]** Understanding others' intentions. *Recommendation: Use stories and questions like 'Why is he crying?' to encourage perspective taking.*" }
-            ]
-        },
-        {
-            id: "L3", title: "Layer 3: Core Abilities", icon: "⚡",
-            skills: [
-                { name: "Language (Phonology)", start: 0, end: 7, urgency: 3, desc: "**[Synaptic Pruning]** Sensitivity to phonemes decreases. *Recommendation: Provide rich input; live parent-child conversation matters more than recordings.*" },
-                { name: "Concrete Logic", start: 7, end: 11, urgency: 2, desc: "**[Piaget - Concrete Operations]** Understanding conservation and classification. *Recommendation: Use hands-on experiments, sorting, and categorizing to teach properties of objects.*" },
-                { name: "Abstract Reasoning", start: 12, end: 18, urgency: 1, desc: "**[Piaget - Formal Operations]** Hypothetical-deductive reasoning. *Recommendation: Encourage debates and thinking about abstract or hypothetical topics.*" },
-                { name: "Financial Literacy Basics", start: 7, end: 18, urgency: 1, desc: "**[Behavioral Economics]** Understanding delayed gratification and opportunity cost. *Recommendation: Use allowance and clear jars to practice 'wants vs needs'.*" }
-            ]
-        },
-        {
-            id: "L4", title: "Layer 4: Observable Achievements", icon: "🏆",
-            skills: [
-                { name: "Drawing (Expression)", start: 3, end: 7, urgency: 2, desc: "**[Schema Phase]** Protect the desire to express. *Recommendation: Avoid judging accuracy; ask 'What did you draw?' instead.*" },
-                { name: "Drawing (Skill)", start: 9, end: 12, urgency: 2, desc: "**[Realistic Sensitivity Period]** Introduce observation techniques and skills. *Recommendation: Teach basic geometry and proportions to bridge perception and expression.*" },
-                { name: "Absolute Pitch", start: 3, end: 6, urgency: 3, desc: "**[Very Short Window]** Before auditory wiring is fixed. *Recommendation: Systematic pitch training early; difficulty rises exponentially if missed.*" },
-                { name: "Instrument Skills", start: 6, end: 10, urgency: 2, desc: "**[Fine Motor Peak]** Build muscle memory. *Recommendation: Choose instruments suited to hand development and practice short, regular sessions.*" },
-                { name: "Flexibility (Motor)", start: 5, end: 10, urgency: 2, desc: "**[Ligament Plasticity]** Before major skeletal growth. *Recommendation: Encourage gymnastics, dance, or martial arts for large-range movement.*" },
-                { name: "Strength (Motor)", start: 14, end: 18, urgency: 2, desc: "**[Physiological Adaptation Peak]** Skeletal maturity and hormonal changes. *Recommendation: Move from basic conditioning to higher-load strength training with professional guidance.*" }
-            ]
-        }
-    ];
-
-    // DOM Elements
-    const chartArea = document.getElementById('chartArea');
-    const indicator = document.getElementById('indicator');
-    const slider = document.getElementById('ageSlider');
-    const ageVal = document.getElementById('ageVal');
-    const infoContent = document.getElementById('infoContent');
-    const topFocusBar = document.getElementById('topFocusBar');
-    const detailCardOverlay = document.getElementById('detailCardOverlay');
-    const cardTitle = document.getElementById('cardTitle');
-    const cardContent = document.getElementById('cardContent');
-    const colors = { 3: 'var(--green-critical)', 2: 'var(--green-sensitive)', 1: 'var(--green-open)' };
-
-    function renderChart() {
-        chartArea.querySelectorAll('.layer-section').forEach(e => e.remove());
-        layers.forEach(layer => {
-            const section = document.createElement('div');
-            section.className = 'layer-section';
-            section.innerHTML = `<div class="layer-header"><span class="layer-icon">${layer.icon}</span><span class="layer-title">${layer.title}</span></div>`;
-            layer.skills.forEach(skill => {
-                const row = document.createElement('div');
-                row.className = 'chart-row';
-                const label = document.createElement('div');
-                label.className = 'skill-name';
-                label.innerText = skill.name;
-                label.addEventListener('click', () => showDetailCard(skill));
-                const track = document.createElement('div');
-                track.className = 'bar-track';
-                const startPct = (skill.start / 18) * 100;
-                const endPct = (Math.min(skill.end, 18) / 18) * 100;
-                const widthPct = Math.max(endPct - startPct, 0);
-                if (widthPct > 0) {
-                    const bar = document.createElement('div');
-                    bar.className = 'active-bar';
-                    bar.style.left = `${startPct}%`;
-                    bar.style.width = `${widthPct}%`;
-                    bar.style.backgroundColor = colors[skill.urgency];
-                    track.appendChild(bar);
-                }
-                row.appendChild(label);
-                row.appendChild(track);
-                section.appendChild(row);
-            });
-            chartArea.appendChild(section);
-        });
-    }
-
-    function getUrgencyText(urgency) { return urgency === 3 ? "Critical" : urgency === 2 ? "Sensitive" : "Open"; }
-
-    function showDetailCard(skill) {
-        cardTitle.innerText = skill.name;
-        const parts = skill.desc.split('*Recommendation:');
-        const theoryText = parts[0].trim().replace(/\*\*(.*?)\*\*/g, '$1');
-        let adviceText = parts.length > 1 ? parts[1].trim().replace(/\*/g, '') : '';
-        cardContent.innerHTML = `<div class="theory-section">Theory: ${theoryText}</div><div class="advice-section"><strong>Recommendation:</strong> ${adviceText}</div>`;
-        detailCardOverlay.classList.add('visible');
-    }
-    function hideDetailCard() { detailCardOverlay.classList.remove('visible'); }
-    detailCardOverlay.addEventListener('click', (e) => { if (e.target === detailCardOverlay) hideDetailCard(); });
-
-    function updateUI() {
-        const age = parseFloat(slider.value);
-        ageVal.innerText = age;
-        
-        // BUG FIX: Simple percentage positioning relative to the container
-        const pct = (age / 18) * 100;
-        indicator.style.left = `${pct}%`; // Removed the pixel offset calculation logic
-
-        let activeItems = [];
-        layers.forEach(layer => {
-            layer.skills.forEach(skill => {
-                let isActive = (age >= skill.start && age < skill.end);
-                if (skill.end === 18 && age === 18) isActive = true;
-                if (isActive) activeItems.push(skill);
-            });
-        });
-        activeItems.sort((a, b) => b.urgency - a.urgency);
-
-        const topBadges = activeItems.slice(0, 3);
-        topFocusBar.innerHTML = topBadges.length === 0 
-            ? `<span style="color:#aaa; font-size:0.75rem;">No specific critical window at this age (stable period)</span>` 
-            : topBadges.map(item => `<div class="mini-badge" style="background:${colors[item.urgency]}">${item.name} <span style="opacity:0.8; font-size:0.65rem;">(${getUrgencyText(item.urgency)})</span></div>`).join('');
-
-        if (activeItems.length === 0) {
-            infoContent.innerHTML = `<div style="text-align:center;color:#999;padding:10px;">We recommend consolidating basics and staying patient.</div>`;
-        } else {
-            infoContent.innerHTML = activeItems.map(item => {
-                let cleanDesc = item.desc.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                const adviceMatch = cleanDesc.match(/\*Recommendation:(.*?)\*/);
-                let adviceHtml = adviceMatch ? `<br><span style="color:#444;">Recommendation: ${adviceMatch[1].trim()}</span>` : '';
-                cleanDesc = cleanDesc.replace(/\*Recommendation:.*?\*/, '');
-                return `<div class="advice-card"><div class="advice-title-row"><span class="advice-name">${item.name}</span><span class="urgency-badge" style="background-color:${colors[item.urgency]}">${getUrgencyText(item.urgency)}</span></div><div class="advice-desc">${cleanDesc.trim()} ${adviceHtml}</div></div>`;
-            }).join('');
-        }
-    }
-
-    renderChart();
-    updateUI();
-    slider.addEventListener('input', updateUI);
-    window.addEventListener('resize', updateUI);
-</script>
 </body>
 </html>
