@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Growy儿童发展时间线(Beta)</title>
+    <style>
+        :root {
+            /* 品牌主视觉 */
+            --brand-deep-green: #1B5E20; 
+            --brand-light-gray: #F5F7FA;
+            
+            --primary: var(--brand-deep-green);
+            --bg: var(--brand-light-gray);
+            --card-bg: #FFFFFF;
+
+            /* 紧迫性颜色尺 */
+            --green-critical: #1B5E20; /* 关键期 (Critical) - 暗绿 */
+            --green-sensitive: #43A047; /* 敏感期 (Sensitive) - 中绿 */
+            --green-open: #A5D6A7;     /* 发展期 (Open) - 浅绿 */
+            
+            --gray-bar: #f0f0f0;
+            --text-main: #2C3E50;
+            --text-sub: #607D8B;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            padding: 20px 15px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* 返回首页链接 */
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 15px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            z-index: 10;
+        }
+        .back-link:hover { color: var(--primary); }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 20px; position: relative; padding-top: 10px; }
+        
+        /* Language Switcher */
+        .lang-switcher {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            gap: 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            background: white;
+        }
+        .lang-btn {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: none;
+            background: white;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .lang-btn:hover:not(.active) {
+            background: #f5f5f5;
+        }
+        
+        .logo-image { 
+            width: 40px; 
+            height: 40px; 
+            margin: 0 auto 10px; 
+            object-fit: contain;
+            display: block; 
+        } 
+
+        h1 { font-size: 1.4rem; margin: 0 0 5px 0; color: var(--primary); letter-spacing: -0.5px; }
+        .tagline { color: var(--text-sub); font-size: 0.8rem; line-height: 1.4; }
+
+        /* Control Panel */
+        .control-panel {
+            background: #fff;
+            border: 1px solid #eef2f5;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .age-row { display: flex; align-items: baseline; justify-content: center; margin-bottom: 5px; }
+        .age-display { font-size: 2.2rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1; margin-right: 5px; }
+        .age-unit { font-size: 0.9rem; font-weight: 500; color: var(--text-sub); }
+
+        input[type=range] { width: 100%; margin: 10px 0 15px 0; -webkit-appearance: none; appearance: none; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--green-critical);
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 2px 5px rgba(27, 94, 32, 0.3);
+            border: 3px solid white;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; }
+
+        /* Top Focus Bar */
+        .top-focus-bar { min-height: 24px; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+        .mini-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; color: white; display: flex; align-items: center; gap: 4px; font-weight: 500; animation: fadeIn 0.3s ease; }
+
+        /* Chart Architecture */
+        .layer-section { margin-bottom: 15px; }
+        
+        .layer-header { display: flex; align-items: center; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #f0f0f0; }
+        .layer-icon { font-size: 1rem; margin-right: 6px; }
+        .layer-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #999; font-weight: 700; }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 85px 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+            min-height: 20px;
+        }
+
+        .skill-name {
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1;
+            cursor: pointer; 
+            transition: color 0.2s;
+            max-height: 2em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            gap: 0.3em;
+        }
+        .skill-name:hover {
+            color: var(--green-critical);
+        }
+
+        .bar-track { position: relative; height: 12px; background: var(--gray-bar); border-radius: 6px; width: 100%; overflow: hidden; }
+        .active-bar { position: absolute; height: 100%; top: 0; border-radius: 6px; }
+
+        /* Indicator Line - Fixed Alignment */
+        .indicator-container { 
+            position: absolute; 
+            top: 0; 
+            bottom: 0; 
+            left: 95px; /* 85px label + 10px gap */ 
+            right: 0; 
+            pointer-events: none; 
+            z-index: 10; 
+        }
+        .indicator-line { 
+            position: absolute; 
+            top: -5px; 
+            bottom: -5px; 
+            width: 2px; 
+            background-color: var(--primary); 
+            opacity: 0.6; 
+            transition: left 0.1s linear; 
+        }
+
+        /* Info Panel */
+        .info-panel { margin-top: 25px; background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
+        .info-header { background: #fcfcfc; padding: 10px 15px; border-bottom: 1px solid #eee; font-weight: bold; font-size: 0.9rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .info-content { padding: 15px; }
+
+        .advice-card { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #f0f0f0; }
+        .advice-card:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .advice-title-row { display: flex; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 6px;}
+        .advice-name { font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+        .urgency-badge { font-size: 0.6rem; color: white; padding: 2px 6px; border-radius: 4px; font-weight: normal;}
+        .advice-desc { font-size: 0.85rem; color: #555; line-height: 1.5; margin-top: 4px;}
+
+        /* Footer Links */
+        .footer-links {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .footer-link-item {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        .footer-link-item:hover { color: var(--primary); }
+        
+        /* Disclaimer */
+        .disclaimer { margin-top: 15px; font-size: 0.65rem; color: #bbb; text-align: center; line-height: 1.4; padding-bottom: 10px; }
+
+        /* Detail Card Style */
+        .detail-card-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4); display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s;
+        }
+        .detail-card-overlay.visible { opacity: 1; visibility: visible; }
+        .detail-card {
+            background: var(--card-bg); padding: 20px; margin: 20px; border-radius: 12px;
+            width: 90%; max-width: 400px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px); transition: transform 0.3s;
+        }
+        .detail-card-overlay.visible .detail-card { transform: translateY(0); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px; }
+        .card-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .card-close { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; line-height: 1; }
+        .card-content p { font-size: 0.9rem; line-height: 1.6; margin: 0 0 10px 0; color: var(--text-main); }
+        .theory-section { font-weight: 600; color: var(--text-main); margin-bottom: 5px; }
+        .advice-section { font-weight: normal; margin-top: 10px; color: #555; padding-left: 10px; border-left: 3px solid var(--green-sensitive); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-link">← 返回首页</a>
+
+    <div class="header">
+        <div class="lang-switcher">
+            <button class="lang-btn active" id="langZh" onclick="switchLanguage('zh')">中文</button>
+            <button class="lang-btn" id="langEn" onclick="switchLanguage('en')">English</button>
+        </div>
+        <img src="images/logo.png" alt="Growy Logo" class="logo-image" onerror="this.style.display='none'">
+        <h1>Growy儿童发展时间线 (Beta)</h1>
+        <p class="tagline">基于脑科学与发展心理学的 0-18 岁能力培养时间线，拖动下方滑动条查看孩子当前年龄段关注重点</p>
+    </div>
+
+    <!-- ... Control Panel ... -->
+    <div class="control-panel">
+        <div class="age-row">
+            <div class="age-display" id="ageVal">0</div>
+            <div class="age-unit">岁</div>
+        </div>
+        <div id="topFocusBar" class="top-focus-bar"></div>
+        <input type="range" id="ageSlider" min="0" max="18" step="0.5" value="0">
+    </div>
+
+    <div id="chartArea" style="position: relative;">
+        <div class="indicator-container">
+            <div id="indicator" class="indicator-line"></div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <div class="info-header"><span>当前年龄建议 (仅供参考)</span></div>
+        <div class="info-content" id="infoContent"></div>
+    </div>
+
+    <div class="disclaimer">
+        <p>免责声明：本工具仅供教育参考，不替代专业医疗诊断。</p>
+        <p>© 2025 GrowyAI · 保留所有权利</p>
+    </div>
+</div>
+
+<!-- Detail Card Modal -->
+<div class="detail-card-overlay" id="detailCardOverlay">
+    <div class="detail-card">
+        <div class="card-header">
+            <div class="card-title" id="cardTitle"></div>
+            <button class="card-close" onclick="hideDetailCard()">×</button>
+        </div>
+        <div class="card-content" id="cardContent"></div>
+    </div>
+</div>
+
+<script>
+    // Language Switcher
+    function switchLanguage(lang) {
+        if (lang === 'zh') {
+            // Already here
+        } else if (lang === 'en') {
+            window.location.href = '../en/index.html';
+        }
+    }
+
+    // Data
+    const layers = [
+        {
+            id: "L1", title: "Layer 1: 基石系统", icon: "🌱",
+            skills: [
+                { name: "安全依恋", start: 0, end: 1.5, urgency: 3, desc: "**【Bowlby 关键期】** 婴儿通过主要养育者**及时且一致**的回应，构建“内部工作模型”的基石。*培养建议：建立固定的安抚模式（Secure Base），并回应哭泣而非惩罚，以建立基本信任。*" },
+                { name: "依恋巩固", start: 1.5, end: 3, urgency: 2, desc: "**【Erikson 信任 vs. 自主】** 在安全依恋基础上，孩子开始探索世界并寻求独立。*培养建议：鼓励孩子在“安全基地”附近自主探索，提供选择权，支持并接纳分离情绪。*" },
+                { name: "自我意识", start: 1.5, end: 3, urgency: 2, desc: "**【镜子实验】** 孩子开始区分自我与他人，出现“我”的概念。*培养建议：在日常对话中多使用“你做到了”或“你感觉如何”，帮助孩子建立积极的自我描述。*" },
+                { name: "身份认同", start: 12, end: 18, urgency: 2, desc: "**【Erikson 身份 vs. 迷失】** 青少年通过探索价值观和角色来回答“我是谁”。*培养建议：鼓励孩子参与各种活动，进行开放式讨论，接纳他们合理的质疑与探索。*" }
+            ]
+        },
+        {
+            id: "L2", title: "Layer 2: 操作系统", icon: "🧠",
+            skills: [
+                { name: "内在动机", start: 0, end: 7, urgency: 3, desc: "**【Deci 自决理论】** 保护孩子与生俱来的好奇心。*培养建议：少用金钱或物质奖励，多赞美“过程”而非“结果”，强调自主性。*" },
+                { name: "抑制控制", start: 3, end: 6, urgency: 3, desc: "**【执行功能核心】** 专注力与自律的基础。*培养建议：玩“红灯停、绿灯行”等规则游戏；使用延时满足策略。*" },
+                { name: "情绪调节", start: 3, end: 7, urgency: 2, desc: "**【神经可塑性】** 建立应对负面情绪的神经回路。*培养建议：情绪崩溃时先接纳，再引导用语言表达，而不是立即制止。*" },
+                { name: "观点采择", start: 4, end: 7, urgency: 2, desc: "**【心智理论】** 理解他人的意图。*培养建议：通过讲故事、提问（“他为什么哭？”）引导孩子换位思考。*" }
+            ]
+        },
+        {
+            id: "L3", title: "Layer 3: 核心能力", icon: "⚡",
+            skills: [
+                { name: "语言(语音)", start: 0, end: 7, urgency: 3, desc: "**【大脑修剪期】** 听觉对音素敏感度下降。*培养建议：提供丰富输入，口音越纯正越好；亲子对话比听音频更重要。*" },
+                { name: "具体逻辑", start: 7, end: 11, urgency: 2, desc: "**【Piaget 具体运算】** 理解守恒、分类。*培养建议：通过动手操作实验、收集与分类，理解事物属性。*" },
+                { name: "抽象逻辑", start: 12, end: 18, urgency: 1, desc: "**【Piaget 形式运算】** 假设-演绎推理。*培养建议：鼓励辩论、思考非现实和形而上的问题。*" },
+                { name: "财商基础", start: 7, end: 18, urgency: 1, desc: "**【经济心理学】** 理解延迟满足和机会成本。*培养建议：利用零花钱和透明罐子进行“想要”和“需要”的分类实践。*" }
+            ]
+        },
+        {
+            id: "L4", title: "Layer 4: 显性成就", icon: "🏆",
+            skills: [
+                { name: "绘画(表达)", start: 3, end: 7, urgency: 2, desc: "**【图式期】** 保护表达欲。*培养建议：不评价“像不像”，只提问：“你画的是什么？”*" },
+                { name: "绘画(技能)", start: 9, end: 12, urgency: 2, desc: "**【写实敏感期】** 引入观察法与技巧。*培养建议：教导基础几何结构和比例，帮助弥合视觉与表达的差距。*" },
+                { name: "绝对音感", start: 3, end: 6, urgency: 3, desc: "**【极短窗口】** 听觉神经连接固定前。*培养建议：进行系统性音高听辨训练，错过难度指数级上升。*" },
+                { name: "乐器技巧", start: 6, end: 10, urgency: 2, desc: "**【精细动作高峰】** 建立肌肉记忆。*培养建议：选择适合手部发育的乐器，规律短时练习。*" },
+                { name: "运动(柔韧)", start: 5, end: 10, urgency: 2, desc: "**【韧带可塑性】** 骨骼生长前。*培养建议：鼓励体操、舞蹈或武术等大范围运动。*" },
+                { name: "运动(力量)", start: 14, end: 18, urgency: 2, desc: "**【生理适应高峰】** 骨骼成熟与激素水平上升。*培养建议：从基础体能转向高负荷力量训练，需专业指导。*" }
+            ]
+        }
+    ];
+
+    // DOM Elements
+    const chartArea = document.getElementById('chartArea');
+    const indicator = document.getElementById('indicator');
+    const slider = document.getElementById('ageSlider');
+    const ageVal = document.getElementById('ageVal');
+    const infoContent = document.getElementById('infoContent');
+    const topFocusBar = document.getElementById('topFocusBar');
+    const detailCardOverlay = document.getElementById('detailCardOverlay');
+    const cardTitle = document.getElementById('cardTitle');
+    const cardContent = document.getElementById('cardContent');
+    const colors = { 3: 'var(--green-critical)', 2: 'var(--green-sensitive)', 1: 'var(--green-open)' };
+
+    function renderChart() {
+        chartArea.querySelectorAll('.layer-section').forEach(e => e.remove());
+        layers.forEach(layer => {
+            const section = document.createElement('div');
+            section.className = 'layer-section';
+            section.innerHTML = `<div class="layer-header"><span class="layer-icon">${layer.icon}</span><span class="layer-title">${layer.title}</span></div>`;
+            layer.skills.forEach(skill => {
+                const row = document.createElement('div');
+                row.className = 'chart-row';
+                const label = document.createElement('div');
+                label.className = 'skill-name';
+                label.innerText = skill.name;
+                label.addEventListener('click', () => showDetailCard(skill));
+                const track = document.createElement('div');
+                track.className = 'bar-track';
+                const startPct = (skill.start / 18) * 100;
+                const endPct = (Math.min(skill.end, 18) / 18) * 100;
+                const widthPct = Math.max(endPct - startPct, 0);
+                if (widthPct > 0) {
+                    const bar = document.createElement('div');
+                    bar.className = 'active-bar';
+                    bar.style.left = `${startPct}%`;
+                    bar.style.width = `${widthPct}%`;
+                    bar.style.backgroundColor = colors[skill.urgency];
+                    track.appendChild(bar);
+                }
+                row.appendChild(label);
+                row.appendChild(track);
+                section.appendChild(row);
+            });
+            chartArea.appendChild(section);
+        });
+    }
+
+    function getUrgencyText(urgency) { return urgency === 3 ? "关键期" : urgency === 2 ? "敏感期" : "发展期"; }
+
+    function showDetailCard(skill) {
+        cardTitle.innerText = skill.name;
+        const parts = skill.desc.split('*培养建议：');
+        const theoryText = parts[0].trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        let adviceText = parts.length > 1 ? parts[1].trim().replace(/\*/g, '') : '';
+        cardContent.innerHTML = `<div class="theory-section">理论基础: ${theoryText}</div><div class="advice-section"><strong>培养建议:</strong> ${adviceText}</div>`;
+        detailCardOverlay.classList.add('visible');
+    }
+    function hideDetailCard() { detailCardOverlay.classList.remove('visible'); }
+    detailCardOverlay.addEventListener('click', (e) => { if (e.target === detailCardOverlay) hideDetailCard(); });
+
+    function updateUI() {
+        const age = parseFloat(slider.value);
+        ageVal.innerText = age;
+        const pct = (age / 18) * 100;
+        indicator.style.left = `${pct}%`;
+
+        let activeItems = [];
+        layers.forEach(layer => {
+            layer.skills.forEach(skill => {
+                let isActive = (age >= skill.start && age < skill.end);
+                if (skill.end === 18 && age === 18) isActive = true;
+                if (isActive) activeItems.push(skill);
+            });
+        });
+        activeItems.sort((a, b) => b.urgency - a.urgency);
+
+        const topBadges = activeItems.slice(0, 3);
+        topFocusBar.innerHTML = topBadges.length === 0 
+            ? `<span style="color:#aaa; font-size:0.75rem;">当前无特定关键窗口 (平稳期)</span>` 
+            : topBadges.map(item => `<div class="mini-badge" style="background:${colors[item.urgency]}">${item.name} <span style="opacity:0.8; font-size:0.65rem;">(${getUrgencyText(item.urgency)})</span></div>`).join('');
+
+        if (activeItems.length === 0) {
+            infoContent.innerHTML = `<div style="text-align:center;color:#999;padding:10px;">建议巩固基础，保持耐心。</div>`;
+        } else {
+            infoContent.innerHTML = activeItems.map(item => {
+                let cleanDesc = item.desc.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                const adviceMatch = cleanDesc.match(/\*培养建议：(.*?)\*/);
+                let adviceHtml = adviceMatch ? `<br><span style="color:#444;">建议: ${adviceMatch[1].trim()}</span>` : '';
+                cleanDesc = cleanDesc.replace(/\*培养建议：.*?\*/, '');
+                return `<div class="advice-card"><div class="advice-title-row"><span class="advice-name">${item.name}</span><span class="urgency-badge" style="background-color:${colors[item.urgency]}">${getUrgencyText(item.urgency)}</span></div><div class="advice-desc">${cleanDesc.trim()} ${adviceHtml}</div></div>`;
+            }).join('');
+        }
+    }
+
+    renderChart();
+    updateUI();
+    slider.addEventListener('input', updateUI);
+    window.addEventListener('resize', updateUI);
+</script>
+</body>
+</html>
