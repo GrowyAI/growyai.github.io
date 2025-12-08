@@ -9,44 +9,110 @@
             --primary: #1B5E20;
             --bg: #F5F7FA;
             --text: #2C3E50;
+            --text-light: #607D8B;
+            --divider: #e0e0e0;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            line-height: 1.6;
         }
+        
         .card {
             background: white;
             padding: 40px 30px;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            max-width: 500px;
+            max-width: 650px;
+            width: 100%;
+        }
+        
+        .logo { 
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: contain;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
             text-align: center;
         }
-        h1 { color: var(--primary); margin-bottom: 10px; }
-        p { line-height: 1.6; color: #555; margin-bottom: 20px; }
-        .logo { 
-            width: 80px; height: 80px; background: #eee; 
-            border-radius: 16px; margin: 0 auto 20px; object-fit: contain;
-            display: block; /* 确保显示 */
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            font-style: italic;
         }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0;
+        }
+        
+        p {
+            margin-bottom: 0.8rem;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        .divider-green {
+            height: 2px;
+            background: var(--primary);
+            margin: 0 0 1.5rem 0;
+        }
+        
+        .divider-gray {
+            height: 1px;
+            background: var(--divider);
+            margin: 0 0 2rem 0;
+        }
+        
         .btn {
-            display: inline-block;
+            display: block;
             background-color: var(--primary);
             color: white;
             text-decoration: none;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border-radius: 50px;
-            font-weight: bold;
+            font-weight: 600;
+            text-align: center;
+            margin: 2rem auto 0;
+            max-width: 200px;
             transition: opacity 0.2s;
         }
         .btn:hover { opacity: 0.9; }
+        
+        @media (max-width: 640px) {
+            .card { padding: 30px 20px; }
+            h1 { font-size: 1.3rem; }
+            .section-title { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -54,18 +120,49 @@
         <img src="images/logo.png" alt="Growy Logo" class="logo" onerror="this.style.display='none'">
         
         <h1>关于 Growy</h1>
-        
-        <p>
-            <strong>Growy (Grow With You)</strong> 是一个致力于通过数据和科学证据，
-            赋能家长、减轻育儿焦虑的 AI 伙伴。
-        </p>
-        
-        <p style="text-align: left;">
-            我们的使命不是把孩子变成“神童”，而是帮助家长：<br>
-            ✅ 理解大脑发育的客观规律<br>
-            ✅ 识别真正的关键期与敏感期<br>
-            ✅ 在正确的时间，做正确的事
-        </p>
+        <p class="subtitle">Grow with you —— 彼此陪伴，共同新生</p>
+
+        <div class="section">
+            <div class="section-title">❤️ Growy 的理念</div>
+            <div class="divider-green"></div>
+            
+            <p><strong>育儿是生活的一部分，而不是你的全部。</strong><br>Growy 希望能让你的生活和孩子的成长，都多一些平衡。</p>
+            
+            <p>没有人是完美的父母。<br>但我们可以带着更多的平静、意图与温柔前行。<br>Growy 希望成为那份支持——<br><strong>不是替你做决定，而是帮你看得更清楚。</strong></p>
+            <div class="divider-gray"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">✨ Growy 能帮助你做什么</div>
+            <div class="divider-green"></div>
+            
+            <p><strong>儿童发展时间线 —— 抓住当下最重要的事</strong></p>
+            <p>按照年龄整理每个阶段最核心的发展重点。<br>它帮你从杂乱的信息中抽离，<br>在有限精力里，专注真正重要的部分。</p>
+            
+            <p><strong>Growy Chat —— 贴近你家庭的具体建议</strong></p>
+            <p>不是通用的大道理。<br>Growy 会根据你的孩子年龄、家庭情况、具体困惑，<br>给出清晰、温和、实用的指引——<br>尤其是在那些让人困惑或崩溃的当下。</p>
+            
+            <p><strong>更多工具即将上线</strong></p>
+            <p>围绕一个核心目标：<br>帮父母减轻负担，让家庭多一点从容。</p>
+            <div class="divider-gray"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🌱 Growy 的故事</div>
+            <div class="divider-green"></div>
+            
+            <p>我是孩子们的妈妈，也是一个喜欢思考、热爱创造的人。<br>但最重要的是，我始终相信：</p>
+            
+            <p><strong>育儿不是追求完美，而是一场彼此陪伴的成长之旅。</strong></p>
+            
+            <p>Growy 的起点，是我自己真实的困惑与压力——信息过载、观点冲突、内疚与焦虑……<br>以及那个反复出现的问题：<br>"我现在最该关注的，到底是什么？"</p>
+            
+            <p>作为习惯自己找答案的人，我开始阅读、总结、分析——<br>然后动手去做那些我过去"最希望早一点拥有"的工具。</p>
+            
+            <p>不是为了刻意做产品，而是为了做一个能帮助自己的东西：<br>能带来 <strong>力量</strong> 而不是压力，<br>能带来 <strong>方向</strong> 而不是评价。</p>
+            
+            <p>Growy 就来自这样的过程——<br>陪伴与新生：陪伴孩子，也陪伴作为父母的我们自己。</p>
+        </div>
 
         <a href="index.html" class="btn">返回首页</a>
     </div>

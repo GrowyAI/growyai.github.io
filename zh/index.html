@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growy - 您的科学育儿 AI 伙伴</title>
+    <title>Growy - 陪伴你和孩子共同成长</title>
     <style>
         :root {
             --primary: #1B5E20;
@@ -74,7 +74,7 @@
         .tagline {
             color: var(--gray);
             font-size: 1rem;
-            line-height: 1.6;
+            line-height: 1.0;
         }
         .tagline span {
             font-size: 0.875rem;
@@ -107,7 +107,8 @@
             transition: all 0.3s;
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -161,19 +162,16 @@
             font-size: 0.875rem;
             color: var(--gray);
             line-height: 1.6;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0;
+            flex: 1;
         }
 
         .action {
             font-weight: 600;
             font-size: 0.875rem;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: all 0.3s;
-        }
-        .card:hover .action {
             opacity: 1;
             transform: translateY(0);
+            margin-top: 1.0rem;
         }
         .card.green .action { color: var(--primary); }
         .card.blue .action { color: var(--consult); }
@@ -222,8 +220,7 @@
         <span class="logo-emoji">🌱</span>
         <h1>Growy</h1>
         <p class="tagline">
-            数据驱动的科学育儿助手
-            <span>Empowering parents with science & AI</span>
+            用科学与 AI 辅助你的育儿之路 —— 你陪孩子共同成长，我们陪你同行
         </p>
     </header>
 
@@ -237,7 +234,7 @@
                     </svg>
                 </div>
                 <h3>儿童发展时间线</h3>
-                <p>基于 0-18 岁脑科学与心理学的交互式图谱。识别关键期，不仅缓解焦虑，更抓住培养黄金窗口。</p>
+                <p>直观的告诉你0-18岁不同年龄段儿童发展的3-5个重点。帮助你在信息不过载的同时，抓住培养黄金窗口，在合适的时间做适合孩子的事。</p>
                 <div class="action">开始探索 →</div>
             </a>
 
@@ -247,9 +244,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
                 </div>
-                <h3>Growy AI 咨询</h3>
-                <p>您的 24/7 私人育儿顾问。针对具体育儿难题，提供基于循证医学和心理学的个性化建议与安抚。</p>
-                <div class="action">立即咨询 ↗</div>
+                <h3>Growy 咨询</h3>
+                <p>在与孩子互动过程中遇到了具体的问题？Growy 24/7 为你提供针对家庭情况和孩子信息的个性化建议，陪你一起思考。</p>
+                <div class="action">和Growy聊聊 →</div>
             </a>
 
             <a href="about.html" class="card gray">
@@ -259,7 +256,7 @@
                     </svg>
                 </div>
                 <h3>关于 Growy</h3>
-                <p>了解我们的愿景与使命。为什么我们要创立 Growy？我们如何通过科技帮助父母回归育儿的本质。</p>
+                <p>了解 Growy "辅助而不替代"的理念、Growy 如何帮助家长缓解迷茫和焦虑，以及 Growy 背后一位家长的个人故事。</p>
                 <div class="action">了解更多 →</div>
             </a>
 

@@ -9,44 +9,110 @@
             --primary: #1B5E20;
             --bg: #F5F7FA;
             --text: #2C3E50;
+            --text-light: #607D8B;
+            --divider: #e0e0e0;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            line-height: 1.6;
         }
+        
         .card {
             background: white;
             padding: 40px 30px;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            max-width: 500px;
+            max-width: 650px;
+            width: 100%;
+        }
+        
+        .logo { 
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            display: block;
+            object-fit: contain;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
             text-align: center;
         }
-        h1 { color: var(--primary); margin-bottom: 10px; }
-        p { line-height: 1.6; color: #555; margin-bottom: 20px; }
-        .logo { 
-            width: 80px; height: 80px; background: #eee; 
-            border-radius: 16px; margin: 0 auto 20px; object-fit: contain;
-            display: block;
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            font-style: italic;
         }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        
+        strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        .divider-green {
+            height: 2px;
+            background: var(--primary);
+            margin: 0 0 1.5rem 0;
+        }
+        
+        .divider-gray {
+            height: 1px;
+            background: var(--divider);
+            margin: 0 0 2rem 0;
+        }
+        
         .btn {
-            display: inline-block;
+            display: block;
             background-color: var(--primary);
             color: white;
             text-decoration: none;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border-radius: 50px;
-            font-weight: bold;
+            font-weight: 600;
+            text-align: center;
+            margin: 2rem auto 0;
+            max-width: 200px;
             transition: opacity 0.2s;
         }
         .btn:hover { opacity: 0.9; }
+        
+        @media (max-width: 640px) {
+            .card { padding: 30px 20px; }
+            h1 { font-size: 1.3rem; }
+            .section-title { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -54,18 +120,47 @@
         <img src="images/logo.png" alt="Growy Logo" class="logo" onerror="this.style.display='none'">
         
         <h1>About Growy</h1>
+        <p class="subtitle">Grow with you — Growing together, becoming our better selves</p>
 
-        <p>
-            <strong>Growy (Grow With You)</strong> is an AI companion that uses data and scientific evidence
-            to empower parents and reduce parenting anxiety.
-        </p>
+        <div class="section">
+            <div class="section-title">❤️ What We Believe</div>
+            <div class="divider-green"></div>
+            
+            <p><strong>Parenting is part of your life—not your whole identity.</strong><br>Growy hopes to bring more balance to both your life and your child's, even just a little more.</p>
+            
+            <p>There is no perfect parent.<br>But we can show up with more calm, more intention, and more compassion.<br>Growy is here to help you do exactly that—<br><strong>not by replacing your judgment, but by supporting it.</strong></p>
+            <div class="divider-gray"></div>
+        </div>
 
-        <p style="text-align: left;">
-            Our mission is not to create prodigies, but to help parents:
-            <br>✅ Understand the objective patterns of brain development
-            <br>✅ Identify real critical and sensitive periods
-            <br>✅ Do the right things at the right time
-        </p>
+        <div class="section">
+            <div class="section-title">✨ How Growy Helps</div>
+            <div class="divider-green"></div>
+            
+            <p><strong>The Development Timeline — what matters now</strong></p>
+            <p>A simple, age-based snapshot of the most important developmental priorities.<br>It cuts through noise and helps you focus on what truly matters at each stage.</p>
+            
+            <p><strong>Growy Chat — guidance for your real situation</strong></p>
+            <p>Not general advice.<br>Growy considers your child's age, context, and your family's needs to offer clear, grounded, gentle guidance—especially in messy or overwhelming moments.</p>
+            
+            <p><strong>More tools coming soon</strong></p>
+            <p>All built around one idea:<br>Less overload for parents. More clarity for families.</p>
+            <div class="divider-gray"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🌱 Growy's Story</div>
+            <div class="divider-green"></div>
+            
+            <p>I'm the mother of my children, a thinker, and a builder.<br>But above all, I'm someone who believes this deeply:</p>
+            
+            <p><strong>Parenting is not about perfection.<br>It's a journey of growing together.</strong></p>
+            
+            <p>Growy began from my own parenting struggles—information overload, conflicting advice, guilt, and the constant question:<br>"Am I focusing on the right things?"</p>
+            
+            <p>Over time, I learned to search, read, analyze, and build the tools I wished I had earlier.<br>Tools that bring <strong>clarity</strong>, not pressure.<br><strong>Direction</strong>, not judgment.</p>
+            
+            <p>Growy represents that journey—accompanying each other and becoming new together.</p>
+        </div>
 
         <a href="index.html" class="btn">Back to Home</a>
     </div>

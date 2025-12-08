@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growy - Your Science-Based Parenting AI Partner</title>
+    <title>Growy - Your Science-Based Parenting Partner</title>
     <style>
         :root {
             --primary: #1B5E20;
@@ -60,7 +60,7 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 1.0rem;
             padding: 8px;
             display: block;
         }
@@ -74,7 +74,7 @@
         .tagline {
             color: var(--gray);
             font-size: 1rem;
-            line-height: 1.6;
+            line-height: 1.0;
         }
         .tagline span {
             font-size: 0.875rem;
@@ -107,7 +107,8 @@
             transition: all 0.3s;
             text-decoration: none;
             color: inherit;
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -161,19 +162,16 @@
             font-size: 0.875rem;
             color: var(--gray);
             line-height: 1.6;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0;
+            flex: 1;
         }
 
         .action {
             font-weight: 600;
             font-size: 0.875rem;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: all 0.3s;
-        }
-        .card:hover .action {
             opacity: 1;
             transform: translateY(0);
+            margin-top: 1.0rem;
         }
         .card.green .action { color: var(--primary); }
         .card.blue .action { color: var(--consult); }
@@ -222,8 +220,7 @@
         <span class="logo-emoji">🌱</span>
         <h1>Growy</h1>
         <p class="tagline">
-            Data-Driven Science-Based Parenting Assistant
-            <span>Empowering parents with science & AI</span>
+            Support Your Parenting with Science and AI — You Grow with Your Child, We Grow with You
         </p>
     </header>
 
@@ -237,7 +234,7 @@
                     </svg>
                 </div>
                 <h3>Child Development Timeline</h3>
-                <p>An interactive timeline based on neuroscience and developmental psychology for ages 0-18. Identify critical periods to ease anxiety and seize golden windows of opportunity.</p>
+                <p>See 3-5 key developmental priorities at each age from 0-18. Cut through the noise, focus on what matters, and do the right things at the right time—without information overload.</p>
                 <div class="action">Start Exploring →</div>
             </a>
 
@@ -247,9 +244,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
                 </div>
-                <h3>Growy AI Consultation</h3>
-                <p>Your 24/7 personal parenting consultant. Get personalized advice and reassurance based on evidence-based medicine and psychology for your specific parenting challenges.</p>
-                <div class="action">Consult Now ↗</div>
+                <h3>Growy Chat</h3>
+                <p>Facing a specific parenting challenge? Growy is here 24/7 with personalized guidance tailored to your child's age and your family's situation—thinking alongside you, one question at a time.</p>
+                <div class="action">Consult Now →</div>
             </a>
 
             <a href="about.html" class="card gray">
@@ -259,7 +256,7 @@
                     </svg>
                 </div>
                 <h3>About Growy</h3>
-                <p>Learn about our vision and mission. Why did we create Growy? How do we help parents return to the essence of parenting through technology?</p>
+                <p>Learn about Growy's "support, not replace" philosophy, how we help ease overwhelm and anxiety, and the personal story of the parent behind Growy.</p>
                 <div class="action">Learn More →</div>
             </a>
 
