@@ -60,7 +60,7 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin: 0 auto 1.0rem;
+            margin: 0 auto 0.5rem;
             padding: 8px;
             display: block;
         }
@@ -74,7 +74,7 @@
         .tagline {
             color: var(--gray);
             font-size: 1rem;
-            line-height: 1.0;
+            line-height: 1.3;
         }
         .tagline span {
             font-size: 0.875rem;
@@ -88,7 +88,7 @@
             flex: 1;
             max-width: 72rem;
             margin: 0 auto;
-            padding: 0 1.5rem 4rem;
+            padding: 0 1.5rem 2rem;
             width: 100%;
         }
         .cards {
@@ -161,7 +161,7 @@
         .card p {
             font-size: 0.875rem;
             color: var(--gray);
-            line-height: 1.6;
+            line-height: 1.5;
             margin-bottom: 0;
             flex: 1;
         }
@@ -185,18 +185,34 @@
             font-size: 0.875rem;
             border-top: 1px solid #e5e7eb;
         }
+        /* Footer 链接容器 */
         .links {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 2rem;
-            margin-bottom: 0.75rem;
+            column-gap: 1.5rem; /* 横向间距 */
+            row-gap: 0.5rem;   /* 纵向间距 */
+            margin-bottom: 1rem;
         }
+        /* 链接转化为药丸按钮 */
         .links a {
-            color: var(--gray);
-            text-decoration: underline;
+            color: var(--text); /* 使用深一点的文字颜色 */
+            text-decoration: none; /* 去掉烦人的下划线 */
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 6px 16px;
+            background: white; /* 给链接一个背景 */
+            border: 1px solid #e5e7eb; /* 浅灰色边框 */
+            border-radius: 50px; /* 药丸形状 */
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02); /* 极轻微阴影增加浮动感 */
         }
-        .links a:hover { color: var(--primary); }
+        .links a:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: rgba(27, 94, 32, 0.05); /* 淡淡的品牌绿背景 */
+            transform: translateY(-1px);
+        }
 
         @media (min-width: 768px) {
             header { padding: 3rem 1rem; }
@@ -211,8 +227,8 @@
 <body>
 
     <div class="lang-switcher">
-        <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
-        <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+        <button class="lang-btn" onclick="switchLanguage('zh')">中</button>
+        <button class="lang-btn active" onclick="switchLanguage('en')">En</button>
     </div>
 
     <header>
@@ -246,7 +262,7 @@
                 </div>
                 <h3>Growy Chat</h3>
                 <p>Facing a specific parenting challenge? Growy is here 24/7 with personalized guidance tailored to your child's age and your family's situation—thinking alongside you, one question at a time.</p>
-                <div class="action">Consult Now →</div>
+                <div class="action">Chat with Growy →</div>
             </a>
 
             <a href="about.html" class="card gray">
@@ -265,10 +281,11 @@
 
     <footer>
         <div class="links">        
-            <a href="https://x.com/GrowyAI" target="_blank">Twitter</a>
-            <a href="https://growyai.substack.com" target="_blank">Substack</a>
-            <a href="https://github.com/GrowyAI" target="_blank">GitHub</a>
-            <a href="https://mp.weixin.qq.com/s/ftYUVkcBBGB3yZLWohW-uw" target="_blank">WeChat Official Account</a>
+            <a href="https://x.com/GrowyAI" target="_blank">𝕏 X/Twitter</a>
+            <a href="https://growyai.substack.com" target="_blank">✍️ Substack</a>
+            <a href="https://github.com/GrowyAI" target="_blank">💻 GitHub</a>
+            <a href="https://mp.weixin.qq.com/s/ftYUVkcBBGB3yZLWohW-uw" target="_blank">💬 WeChat</a>
+            <a href="https://forms.gle/apsWM1rhMNpKjVCe6" target="_blank">💡 Contact/Feedback</a>
         </div>
         <p>© 2025 GrowyAI. All rights reserved.</p>
     </footer>
