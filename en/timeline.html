@@ -12,8 +12,8 @@
             --bg: var(--brand-light-gray);
             --card-bg: #FFFFFF;
             --green-critical: #1B5E20;
-            --green-sensitive: #43A047;
-            --green-open: #A5D6A7;
+            --green-sensitive: #2E7D32;
+            --green-open: #7CB342;
             --gray-bar: #f0f0f0;
             --text-main: #2C3E50;
             --text-sub: #607D8B;
@@ -98,6 +98,12 @@
         h1 { font-size: 1.4rem; margin: 0 0 5px 0; color: var(--primary); letter-spacing: -0.5px; }
         .tagline { color: var(--text-sub); font-size: 0.8rem; line-height: 1.4; }
 
+        .tagline-instruction {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.75rem;
+        }
+
         .control-panel {
             background: #fff;
             border: 1px solid #eef2f5;
@@ -112,7 +118,22 @@
         .age-display { font-size: 2.2rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; line-height: 1; margin-right: 5px; }
         .age-unit { font-size: 0.9rem; font-weight: 500; color: var(--text-sub); }
 
-        input[type=range] { width: 100%; margin: 10px 0 15px 0; -webkit-appearance: none; appearance: none; background: transparent; }
+        /* Slider wrapper to match chart-row grid */
+        .slider-wrapper {
+            display: grid;
+            grid-template-columns: 85px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0 15px 0;
+        }
+
+        .slider-label {
+            font-size: 0.75rem;
+            color: transparent;
+            height: 0;
+        }
+
+        input[type=range] { width: calc(100% + 40px); margin: 0 -20px; -webkit-appearance: none; appearance: none; background: transparent; }
         input[type=range]:focus { outline: none; }
         
         input[type=range]::-webkit-slider-thumb {
@@ -220,6 +241,18 @@
         .card-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
         .card-close { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; line-height: 1; }
         .card-content p { font-size: 0.9rem; line-height: 1.6; margin: 0 0 10px 0; color: var(--text-main); }
+        .stage-divider { 
+            border-top: 2px solid #f0f0f0; 
+            margin: 15px 0; 
+            padding-top: 15px;
+        }
+        .stage-title {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .stage-content { margin-bottom: 10px; }
         .theory-section { font-weight: 600; color: var(--text-main); margin-bottom: 5px; }
         .advice-section { font-weight: normal; margin-top: 10px; color: #555; padding-left: 10px; border-left: 3px solid var(--green-sensitive); }
     </style>
@@ -236,7 +269,10 @@
         </div>
         <img src="images/logo.png" alt="Growy Logo" class="logo-image" onerror="this.style.display='none'">
         <h1>Growy Child Development Timeline (Beta)</h1>
-        <p class="tagline">A 0–18 timeline of child development based on neuroscience and developmental psychology. Drag the slider below to see what to focus on at your child's age.</p>
+        <p class="tagline">
+            A 0–18 timeline of child development based on neuroscience and developmental psychology.
+            <span class="tagline-instruction">👇 Drag the slider below to see what to focus on at your child's age.</span>
+        </p>
     </div>
 
     <div class="control-panel">
@@ -245,7 +281,10 @@
             <div class="age-unit">yrs</div>
         </div>
         <div id="topFocusBar" class="top-focus-bar"></div>
-        <input type="range" id="ageSlider" min="0" max="18" step="0.5" value="0">
+        <div class="slider-wrapper">
+            <div class="slider-label"></div>
+            <input type="range" id="ageSlider" min="0" max="18" step="0.5" value="0">
+        </div>
     </div>
 
     <div id="chartArea" style="position: relative;">
@@ -286,39 +325,105 @@
         {
             id: "L1", title: "Layer 1: Foundational Systems", icon: "🌱",
             skills: [
-                { name: "Secure Attachment", start: 0, end: 1.5, urgency: 3, desc: "**[Bowlby - Critical Period]** Infants build the foundation of their internal working model through timely and consistent caregiver responses. *Recommendation: Establish a predictable soothing routine (secure base) and respond to crying rather than punish to build basic trust.*" },
-                { name: "Attachment Consolidation", start: 1.5, end: 3, urgency: 2, desc: "**[Erikson - Trust vs. Autonomy]** With secure attachment, children begin to explore the world and seek independence. *Recommendation: Encourage safe exploration near the secure base, offer choices, and support separation-related feelings.*" },
-                { name: "Self-Awareness", start: 1.5, end: 3, urgency: 2, desc: "**[Mirror Test]** Children start to distinguish self from others and form the sense of 'I'. *Recommendation: Use phrases like 'you did it' or 'how do you feel' to help build a positive self-description.*" },
-                { name: "Identity", start: 12, end: 18, urgency: 2, desc: "**[Erikson - Identity vs. Role Confusion]** Adolescents explore values and roles to answer 'Who am I?'. *Recommendation: Encourage participation, open discussion, and accept reasonable questioning and exploration.*" }
+                { 
+                    name: "Physical Health", 
+                    segments: [
+                        { start: 0, end: 1, urgency: 3, desc: "**[Infancy 0-1 years: Critical Period]** Building basic health foundation. *Recommendation: 🍼 Sleep 12-16 hours. Establish fixed routine, maintain supine sleep. Pure breastmilk/formula 0-6 months; gradually introduce solids after 6 months (iron-fortified rice cereal first). Daily Tummy Time (prone position), encourage rolling and crawling.*" },
+                        { start: 1, end: 2, urgency: 3, desc: "**[Toddler 1-2 years: Critical Period]** Adapting to diverse nutrition. *Recommendation: 👧 Sleep 11-14 hours. Prevent separation anxiety regression. Introduce diverse family foods; 350-500ml full-fat milk daily. Daily 3-hour cumulative activity, practice running, throwing, climbing.*" },
+                        { start: 2, end: 3, urgency: 3, desc: "**[Preschool 2-3 years: Critical Period]** Establishing feeding and activity habits. *Recommendation: 🎈 Sleep 11-14 hours. Maintain dark, cool sleep environment. Prevent picky eating, limit sugary and processed foods, learn proper utensil use. Practice balance and coordination (single-leg hop, cycling); screen time <1 hour.*" },
+                        { start: 3, end: 6, urgency: 2, desc: "**[Early Childhood 3-6 years: Sensitive Period]** Exercise and regular sleep schedule. *Recommendation: 🏫 Sleep 10-13 hours. Establish regular bedtime routine before kindergarten. Ensure quality protein and whole grains, develop table manners. 60 minutes daily moderate-to-vigorous exercise, build flexibility. Screen time <1 hour, drink plain water, avoid sugar.*" },
+                        { start: 6, end: 12, urgency: 1, desc: "**[School Age 6-12 years: Maintenance Period]** Consolidate exercise and nutrition. *Recommendation: 📚 Sleep 9-12 hours. No electronics 1 hour before bed. Mandatory breakfast, supplement calcium and Vitamin D. Participate in sports; 3+ times weekly strength training (like climbing).*" },
+                        { start: 12, end: 18, urgency: 1, desc: "**[Adolescence 12-18 years: Maintenance Period]** Coping with physiological changes. *Recommendation: 👨 Sleep 8-10 hours. Beware sleep deprivation from late nights. Energy needs spike, prioritize iron and calcium supplementation, avoid dieting. Daily 60 minutes aerobic + resistance training, use exercise for stress relief. ⚠️ Seek medical help for severe developmental delays or sleep disorders.*" }
+                    ]
+                },
+                { 
+                    name: "Secure Attachment", 
+                    segments: [
+                        { start: 0, end: 1.5, urgency: 3, desc: "**[Bowlby - Critical Period]** Infants build the foundation of their internal working model through timely and consistent caregiver responses. *Recommendation: Establish a predictable soothing routine (secure base) and respond to crying rather than punish to build basic trust.*" },
+                        { start: 1.5, end: 3, urgency: 2, desc: "**[Erikson - Trust vs. Autonomy]** With secure attachment, children begin to explore the world and seek independence. *Recommendation: Encourage safe exploration near the secure base, offer choices, and support separation-related feelings.*" }
+                    ]
+                },
+                { 
+                    name: "Self-Awareness", 
+                    segments: [
+                        { start: 1.5, end: 3, urgency: 2, desc: "**[Mirror Test]** Children start to distinguish self from others and form the sense of 'I'. *Recommendation: Use phrases like 'you did it' or 'how do you feel' to help build a positive self-description.*" },
+                        { start: 12, end: 18, urgency: 2, desc: "**[Erikson - Identity vs. Role Confusion]** Adolescents explore values and roles to answer 'Who am I?'. *Recommendation: Encourage participation, open discussion, and accept reasonable questioning and exploration.*" }
+                    ]
+                }
             ]
         },
         {
             id: "L2", title: "Layer 2: Operating System", icon: "🧠",
             skills: [
-                { name: "Intrinsic Motivation", start: 0, end: 7, urgency: 3, desc: "**[Deci - Self-Determination]** Protect children's innate curiosity. *Recommendation: Use fewer material rewards, praise the process rather than outcomes, and emphasize autonomy.*" },
-                { name: "Inhibitory Control", start: 3, end: 6, urgency: 3, desc: "**[Core Executive Function]** The basis of attention and self-control. *Recommendation: Play rule games like 'Red Light, Green Light' and practice delayed gratification.*" },
-                { name: "Emotion Regulation", start: 3, end: 7, urgency: 2, desc: "**[Neural Plasticity]** Builds circuits to cope with negative emotions. *Recommendation: Validate emotions during meltdowns, then guide verbal expression rather than immediately stopping them.*" },
-                { name: "Perspective Taking", start: 4, end: 7, urgency: 2, desc: "**[Theory of Mind]** Understanding others' intentions. *Recommendation: Use stories and questions like 'Why is he crying?' to encourage perspective taking.*" }
+                { 
+                    name: "Intrinsic Motivation", 
+                    segments: [
+                        { start: 0, end: 7, urgency: 3, desc: "**[Deci - Self-Determination]** Protect children's innate curiosity. *Recommendation: Use fewer material rewards, praise the process rather than outcomes, and emphasize autonomy.*" }
+                    ]
+                },
+                { 
+                    name: "Inhibitory Control", 
+                    segments: [
+                        { start: 3, end: 6, urgency: 3, desc: "**[Core Executive Function]** The basis of attention and self-control. *Recommendation: Play rule games like 'Red Light, Green Light' and practice delayed gratification.*" }
+                    ]
+                },
+                { 
+                    name: "Emotion Regulation", 
+                    segments: [
+                        { start: 3, end: 7, urgency: 2, desc: "**[Neural Plasticity]** Builds circuits to cope with negative emotions. *Recommendation: Validate emotions during meltdowns, then guide verbal expression rather than immediately stopping them.*" }
+                    ]
+                },
+                { 
+                    name: "Perspective Taking", 
+                    segments: [
+                        { start: 4, end: 7, urgency: 2, desc: "**[Theory of Mind]** Understanding others' intentions. *Recommendation: Use stories and questions like 'Why is he crying?' to encourage perspective taking.*" }
+                    ]
+                }
             ]
         },
         {
-            id: "L3", title: "Layer 3: Core Abilities", icon: "⚡",
+            id: "L3", title: "Layer 3: Observable Achievements", icon: "⚡",
             skills: [
-                { name: "Language (Phonology)", start: 0, end: 7, urgency: 3, desc: "**[Synaptic Pruning]** Sensitivity to phonemes decreases. *Recommendation: Provide rich input; live parent-child conversation matters more than recordings.*" },
-                { name: "Concrete Logic", start: 7, end: 11, urgency: 2, desc: "**[Piaget - Concrete Operations]** Understanding conservation and classification. *Recommendation: Use hands-on experiments, sorting, and categorizing to teach properties of objects.*" },
-                { name: "Abstract Reasoning", start: 12, end: 18, urgency: 1, desc: "**[Piaget - Formal Operations]** Hypothetical-deductive reasoning. *Recommendation: Encourage debates and thinking about abstract or hypothetical topics.*" },
-                { name: "Financial Literacy Basics", start: 7, end: 18, urgency: 1, desc: "**[Behavioral Economics]** Understanding delayed gratification and opportunity cost. *Recommendation: Use allowance and clear jars to practice 'wants vs needs'.*" }
-            ]
-        },
-        {
-            id: "L4", title: "Layer 4: Observable Achievements", icon: "🏆",
-            skills: [
-                { name: "Drawing (Expression)", start: 3, end: 7, urgency: 2, desc: "**[Schema Phase]** Protect the desire to express. *Recommendation: Avoid judging accuracy; ask 'What did you draw?' instead.*" },
-                { name: "Drawing (Skill)", start: 9, end: 12, urgency: 2, desc: "**[Realistic Sensitivity Period]** Introduce observation techniques and skills. *Recommendation: Teach basic geometry and proportions to bridge perception and expression.*" },
-                { name: "Absolute Pitch", start: 3, end: 6, urgency: 3, desc: "**[Very Short Window]** Before auditory wiring is fixed. *Recommendation: Systematic pitch training early; difficulty rises exponentially if missed.*" },
-                { name: "Instrument Skills", start: 6, end: 10, urgency: 2, desc: "**[Fine Motor Peak]** Build muscle memory. *Recommendation: Choose instruments suited to hand development and practice short, regular sessions.*" },
-                { name: "Flexibility (Motor)", start: 5, end: 10, urgency: 2, desc: "**[Ligament Plasticity]** Before major skeletal growth. *Recommendation: Encourage gymnastics, dance, or martial arts for large-range movement.*" },
-                { name: "Strength (Motor)", start: 14, end: 18, urgency: 2, desc: "**[Physiological Adaptation Peak]** Skeletal maturity and hormonal changes. *Recommendation: Move from basic conditioning to higher-load strength training with professional guidance.*" }
+                { 
+                    name: "Language (Phonology)", 
+                    segments: [
+                        { start: 0, end: 7, urgency: 3, desc: "**[Synaptic Pruning]** Sensitivity to phonemes decreases. *Recommendation: Provide rich input; live parent-child conversation matters more than recordings.*" }
+                    ]
+                },
+                { 
+                    name: "Logic", 
+                    segments: [
+                        { start: 7, end: 11, urgency: 2, desc: "**[Piaget - Concrete Operations]** Understanding conservation and classification. *Recommendation: Use hands-on experiments, sorting, and categorizing to teach properties of objects.*" },
+                        { start: 12, end: 18, urgency: 1, desc: "**[Piaget - Formal Operations]** Hypothetical-deductive reasoning. *Recommendation: Encourage debates and thinking about abstract or hypothetical topics.*" }
+                    ]
+                },
+                { 
+                    name: "Financial Literacy Basics", 
+                    segments: [
+                        { start: 7, end: 18, urgency: 1, desc: "**[Behavioral Economics]** Understanding delayed gratification and opportunity cost. *Recommendation: Use allowance and clear jars to practice 'wants vs needs'.*" }
+                    ]
+                },
+                { 
+                    name: "Drawing", 
+                    segments: [
+                        { start: 3, end: 7, urgency: 2, desc: "**[Schema Phase]** Protect the desire to express. *Recommendation: Avoid judging accuracy; ask 'What did you draw?' instead.*" },
+                        { start: 9, end: 12, urgency: 2, desc: "**[Realistic Sensitivity Period]** Introduce observation techniques and skills. *Recommendation: Teach basic geometry and proportions to bridge perception and expression.*" }
+                    ]
+                },
+                { 
+                    name: "Music", 
+                    segments: [
+                        { start: 3, end: 6, urgency: 3, desc: "**[Very Short Window]** Before auditory wiring is fixed. Absolute pitch development critical window. *Recommendation: Systematic pitch training early; difficulty rises exponentially if missed.*" },
+                        { start: 6, end: 10, urgency: 2, desc: "**[Fine Motor Peak]** Build muscle memory. *Recommendation: Choose instruments suited to hand development and practice short, regular sessions.*" }
+                    ]
+                },
+                { 
+                    name: "Sports", 
+                    segments: [
+                        { start: 5, end: 10, urgency: 2, desc: "**[Ligament Plasticity]** Before major skeletal growth. *Recommendation: Encourage gymnastics, dance, or martial arts for large-range movement.*" },
+                        { start: 14, end: 18, urgency: 2, desc: "**[Physiological Adaptation Peak]** Skeletal maturity and hormonal changes. *Recommendation: Move from basic conditioning to higher-load strength training with professional guidance.*" }
+                    ]
+                }
             ]
         }
     ];
@@ -349,17 +454,22 @@
                 label.addEventListener('click', () => showDetailCard(skill));
                 const track = document.createElement('div');
                 track.className = 'bar-track';
-                const startPct = (skill.start / 18) * 100;
-                const endPct = (Math.min(skill.end, 18) / 18) * 100;
-                const widthPct = Math.max(endPct - startPct, 0);
-                if (widthPct > 0) {
-                    const bar = document.createElement('div');
-                    bar.className = 'active-bar';
-                    bar.style.left = `${startPct}%`;
-                    bar.style.width = `${widthPct}%`;
-                    bar.style.backgroundColor = colors[skill.urgency];
-                    track.appendChild(bar);
-                }
+                
+                // Render all segments for this skill
+                skill.segments.forEach(segment => {
+                    const startPct = (segment.start / 18) * 100;
+                    const endPct = (Math.min(segment.end, 18) / 18) * 100;
+                    const widthPct = Math.max(endPct - startPct, 0);
+                    if (widthPct > 0) {
+                        const bar = document.createElement('div');
+                        bar.className = 'active-bar';
+                        bar.style.left = `${startPct}%`;
+                        bar.style.width = `${widthPct}%`;
+                        bar.style.backgroundColor = colors[segment.urgency];
+                        track.appendChild(bar);
+                    }
+                });
+                
                 row.appendChild(label);
                 row.appendChild(track);
                 section.appendChild(row);
@@ -372,10 +482,25 @@
 
     function showDetailCard(skill) {
         cardTitle.innerText = skill.name;
-        const parts = skill.desc.split('*Recommendation:');
-        const theoryText = parts[0].trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        let adviceText = parts.length > 1 ? parts[1].trim().replace(/\*/g, '') : '';
-        cardContent.innerHTML = `<div class="theory-section">Theory: ${theoryText}</div><div class="advice-section"><strong>Recommendation:</strong> ${adviceText}</div>`;
+        let contentHtml = '';
+        
+        skill.segments.forEach((segment, index) => {
+            if (index > 0) {
+                contentHtml += '<div class="stage-divider"></div>';
+            }
+            contentHtml += `<div class="stage-title">${segment.start}-${segment.end} years</div>`;
+            
+            const parts = segment.desc.split('*Recommendation:');
+            const theoryText = parts[0].trim().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            let adviceText = parts.length > 1 ? parts[1].trim().replace(/\*/g, '') : '';
+            
+            contentHtml += `<div class="stage-content">
+                <div class="theory-section">${theoryText}</div>
+                <div class="advice-section"><strong>Recommendation:</strong> ${adviceText}</div>
+            </div>`;
+        });
+        
+        cardContent.innerHTML = contentHtml;
         detailCardOverlay.classList.add('visible');
     }
     function hideDetailCard() { detailCardOverlay.classList.remove('visible'); }
@@ -387,25 +512,46 @@
         const pct = (age / 18) * 100;
         indicator.style.left = `${pct}%`;
 
-        let activeItems = [];
+        let uniqueItems = [];
+        const seenSkills = new Set();
+        
         layers.forEach(layer => {
             layer.skills.forEach(skill => {
-                let isActive = (age >= skill.start && age < skill.end);
-                if (skill.end === 18 && age === 18) isActive = true;
-                if (isActive) activeItems.push(skill);
+                // Handle both segments (new) and direct start/end (old)
+                const segments = skill.segments || [{ start: skill.start, end: skill.end, urgency: skill.urgency, desc: skill.desc }];
+                
+                segments.forEach(segment => {
+                    let isActive = (age >= segment.start && age < segment.end);
+                    if (segment.end === 18 && age === 18) isActive = true;
+                    
+                    if (isActive) {
+                        const key = `${skill.name}-${segment.start}-${segment.end}`;
+                        if (!seenSkills.has(key)) {
+                            seenSkills.add(key);
+                            uniqueItems.push({
+                                name: skill.name,
+                                urgency: segment.urgency,
+                                desc: segment.desc
+                            });
+                        }
+                    }
+                });
             });
         });
-        activeItems.sort((a, b) => b.urgency - a.urgency);
+        
+        uniqueItems.sort((a, b) => b.urgency - a.urgency);
 
-        const topBadges = activeItems.slice(0, 3);
+        // Top badges - no parentheses
+        const topBadges = uniqueItems.slice(0, 3);
         topFocusBar.innerHTML = topBadges.length === 0 
             ? `<span style="color:#aaa; font-size:0.75rem;">No specific critical window at this age (stable period)</span>` 
-            : topBadges.map(item => `<div class="mini-badge" style="background:${colors[item.urgency]}">${item.name} <span style="opacity:0.8; font-size:0.65rem;">(${getUrgencyText(item.urgency)})</span></div>`).join('');
+            : topBadges.map(item => `<div class="mini-badge" style="background:${colors[item.urgency]}">${item.name}</div>`).join('');
 
-        if (activeItems.length === 0) {
+        // Bottom info panel
+        if (uniqueItems.length === 0) {
             infoContent.innerHTML = `<div style="text-align:center;color:#999;padding:10px;">We recommend consolidating basics and staying patient.</div>`;
         } else {
-            infoContent.innerHTML = activeItems.map(item => {
+            infoContent.innerHTML = uniqueItems.map(item => {
                 let cleanDesc = item.desc.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 const adviceMatch = cleanDesc.match(/\*Recommendation:(.*?)\*/);
                 let adviceHtml = adviceMatch ? `<br><span style="color:#444;">Recommendation: ${adviceMatch[1].trim()}</span>` : '';
