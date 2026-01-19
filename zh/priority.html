@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growy 第四代时间管理（职场父母版）</title>
+    <title>Growy 重要/不紧急时间管理（周计划）</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -57,28 +57,60 @@
             position: absolute;
             top: 2px;
             right: 2px;
-            font-size: 6px;
+            font-size: 8px;
             font-weight: 500;
             padding: 1px 3px;
             background: rgba(255, 255, 255, 0.25);
             border-radius: 2px;
             color: white;
             z-index: 10;
-            transform: translateY(-0.5em);
+            transform: translateY(-0.4em);
         }
         .export-title-text {
             width: 100%;
             padding: 0 4px;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             line-height: 1.2;
             text-align: center;
             color: white;
             z-index: 5;
             word-break: break-all;
-            transform: translateY(-0.5em);
+            transform: translateY(-0.2em);
+        }
+        
+        /* 返回首页按钮样式 */
+        .back-button {
+            display: inline-block;
+            border: 2px solid #2D5A5A;
+            color: #2D5A5A;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+        .back-button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* QR Code 容器 */
+        #qrCodeContainer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #qrCodeContainer canvas {
+            max-width: 100%;
+            max-height: 100%;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="importmap">
     {
       "imports": {
@@ -152,6 +184,28 @@
             const [schedule, setSchedule] = useState(DAYS.map(day => ({ day, tasks: [] })));
             const [isReflectionOpen, setIsReflectionOpen] = useState(false);
             const [isExporting, setIsExporting] = useState(false);
+            const [qrCodeUrl, setQrCodeUrl] = useState('');
+
+            // 生成二维码
+            React.useEffect(() => {
+                const container = document.createElement('div');
+                const qr = new QRCode(container, {
+                    text: 'https://growy.pages.dev/',
+                    width: 84,
+                    height: 84,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.L  // L = 最低纠错，二维码最简单
+                });
+                
+                // 等待二维码生成完成
+                setTimeout(() => {
+                    const canvas = container.querySelector('canvas');
+                    if (canvas) {
+                        setQrCodeUrl(canvas.toDataURL('image/png'));
+                    }
+                }, 100);
+            }, []);
 
             // 获取所有尚未分配的实例，并去重以便在下拉框展示
             const unscheduledInstances = useMemo(() => {
@@ -223,17 +277,17 @@
             return React.createElement('div', { className: 'min-h-screen pb-20' },
                 // Header
                 React.createElement('header', { className: 'py-12 px-6 text-center bg-white border-b border-[#E0E7ED]' },
-                    React.createElement(motion.h1, { initial: { opacity: 0, y: -10 }, animate: { opacity: 1, y: 0 }, className: 'text-2xl font-bold mb-2', style: { color: PRIMARY_COLOR } }, '每周「第二象限」时间块'),
-                    React.createElement('p', { className: 'text-gray-500 text-base' }, '把真正重要的事，固定放进你的生活里'),
-                    React.createElement('p', { className: 'text-gray-400 text-xs mt-1 italic' }, '职场父母版 · 重要不紧急')
+                    React.createElement(motion.h1, { initial: { opacity: 0, y: -10 }, animate: { opacity: 1, y: 0 }, className: 'text-2xl font-bold mb-2', style: { color: PRIMARY_COLOR } }, '「重要/不紧急」周计划'),
+                    React.createElement('p', { className: 'text-gray-700 text-base' }, '把真正重要但不紧急的事，先放进这一周'),
+                    React.createElement('p', { className: 'text-gray-600 text-sm mt-1' }, '不打卡 · 不监督 · 只是对自己的承诺')
                 ),
 
                 // Concept Intro (四象限图)
                 React.createElement('section', { className: 'px-6 py-8 max-w-lg mx-auto text-center' },
                     React.createElement('div', { className: 'bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-white/80 shadow-sm' },
-                        React.createElement('p', { className: 'text-gray-600 leading-relaxed text-base' }, 
-                            '多数焦虑是因为重要的事总被紧急的事挤掉。', React.createElement('br'),
-                            '把', React.createElement('span', { className: 'font-semibold', style: { color: PRIMARY_COLOR } }, '重要不紧急'), '的事提前占位。'
+                        React.createElement('p', { className: 'text-gray-700 leading-relaxed text-base' }, 
+                            '第四代时间管理的核心不是更高效，', React.createElement('br'),
+                            '而是先守住那些', React.createElement('span', { className: 'font-semibold', style: { color: PRIMARY_COLOR } }, '最容易被挤掉、却最重要的事'), '。'
                         ),
                         React.createElement('div', { className: 'mt-6 flex justify-center' },
                             React.createElement('div', { className: 'grid grid-cols-2 gap-1 w-48 h-48' },
@@ -251,6 +305,12 @@
                 // Main
                 React.createElement('main', { className: 'max-w-lg mx-auto px-4 mt-8 space-y-10' },
                     
+                    // 重要的事 - 引导文案
+                    React.createElement('section', { className: 'space-y-2' },
+                        React.createElement('h2', { className: 'text-lg font-bold px-1', style: { color: PRIMARY_COLOR } }, '重要的事'),
+                        React.createElement('p', { className: 'text-gray-700 text-sm px-1' }, '这一周，选几件你不想放弃的事，并为它们留出时间。')
+                    ),
+                    
                     // Roles & Tasks
                     React.createElement('section', { className: 'space-y-4' },
                         [RoleType.PARENT, RoleType.SELF].map(role => React.createElement('div', { key: role, className: 'bg-white p-5 rounded-3xl shadow-sm border border-[#E0E7ED]' },
@@ -261,7 +321,7 @@
                             
                             // Presets
                             React.createElement('div', { className: 'flex flex-wrap gap-2 mb-4' },
-                                PRESETS[role].map((p, idx) => React.createElement('button', { key: idx, onClick: () => addTask(role, p), className: 'text-xs px-2.5 py-1 rounded-full border border-gray-100 bg-gray-50 text-gray-500 hover:opacity-80 transition-all' }, `+ ${p.title}`))
+                                PRESETS[role].map((p, idx) => React.createElement('button', { key: idx, onClick: () => addTask(role, p), className: 'text-sm px-2.5 py-1 rounded-full border border-gray-100 bg-gray-50 text-gray-600 hover:opacity-80 transition-all' }, `+ ${p.title}`))
                             ),
                             
                             // Task List
@@ -269,24 +329,27 @@
                                 tasks.filter(t => t.role === role).map(t => React.createElement('div', { key: t.id, className: 'flex items-center gap-3 p-2 bg-gray-50/50 rounded-xl border border-gray-100' },
                                     React.createElement('input', { type: 'text', value: t.title, onChange: e => setTasks(prev => prev.map(x => x.id === t.id ? { ...x, title: e.target.value } : x)), className: 'flex-1 bg-transparent border-none outline-none text-base py-1 placeholder-gray-300', placeholder: '输入核心事项...' }),
                                     React.createElement('div', { className: 'flex items-center gap-2 border-l border-gray-200 pl-2' },
-                                        React.createElement('select', { value: t.frequency, onChange: e => setTasks(prev => prev.map(x => x.id === t.id ? { ...x, frequency: parseInt(e.target.value) } : x)), className: 'text-xs bg-white border border-gray-100 rounded px-1 py-0.5 outline-none' }, [1,2,3,4,5,6,7].map(n => React.createElement('option', { key: n, value: n }, `${n}次`))),
+                                                React.createElement('select', { value: t.frequency, onChange: e => setTasks(prev => prev.map(x => x.id === t.id ? { ...x, frequency: parseInt(e.target.value) } : x)), className: 'text-sm bg-white border border-gray-100 rounded px-1 py-0.5 outline-none' }, [1,2,3,4,5,6,7].map(n => React.createElement('option', { key: n, value: n }, `${n}次`))),
                                         React.createElement('button', { onClick: () => setTasks(prev => prev.filter(x => x.id !== t.id)), className: 'text-gray-300 hover:text-red-400 p-1' }, React.createElement(Icons.Delete))
                                     )
                                 )),
-                                React.createElement('button', { onClick: () => addTask(role), className: 'w-full py-2 border border-dashed border-gray-200 rounded-xl text-sm text-gray-400 hover:bg-gray-50 transition-colors' }, '+ 自定义')
+                                React.createElement('button', { onClick: () => addTask(role), className: 'w-full py-2 border border-dashed border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors' }, '+ 自定义')
                             )
                         ))
                     ),
 
                     // Weekly Grid
                     React.createElement('section', { className: 'space-y-4' },
-                        React.createElement('div', { className: 'flex justify-between items-center px-1' },
-                            React.createElement('h2', { className: 'text-lg font-bold', style: { color: PRIMARY_COLOR } }, '周计划'),
-                            React.createElement('button', { onClick: () => setIsReflectionOpen(true), className: 'text-xs text-gray-400 flex items-center gap-1 hover:text-gray-600 transition-colors' }, React.createElement(Icons.Help), '时间太满？')
+                        React.createElement('div', { className: 'space-y-2' },
+                            React.createElement('div', { className: 'flex justify-between items-center px-1' },
+                                React.createElement('h2', { className: 'text-lg font-bold', style: { color: PRIMARY_COLOR } }, '周计划'),
+                                React.createElement('button', { onClick: () => setIsReflectionOpen(true), className: 'text-sm text-gray-600 flex items-center gap-1 hover:text-gray-800 transition-colors' }, React.createElement(Icons.Help), '很难安排得下？')
+                            ),
+                            React.createElement('p', { className: 'text-gray-700 text-sm px-1' }, '把上面的事放入一周中的某一天。可选时段，不必具体到几点。')
                         ),
                         React.createElement('div', { className: 'space-y-2' },
                             schedule.map(day => React.createElement('div', { key: day.day, className: 'bg-white px-4 py-3 rounded-2xl shadow-sm border border-[#E0E7ED] flex items-center gap-4' },
-                                React.createElement('span', { className: 'font-bold text-sm text-gray-400 w-8' }, day.day),
+                                React.createElement('span', { className: 'font-bold text-sm text-gray-600 w-8' }, day.day),
                                 React.createElement('div', { className: 'flex-1 grid grid-cols-2 gap-2 h-14' },
                                     [0, 1].map(idx => {
                                         const t = day.tasks[idx];
@@ -304,7 +367,7 @@
                                                 uniqueOptions.length > 0 ? React.createElement('select', { 
                                                     value: '',
                                                     onChange: e => scheduleTaskByIndex(day.day, e.target.value),
-                                                    className: 'w-full h-full border border-dashed border-gray-200 bg-gray-50/50 rounded-xl text-xs text-gray-300 hover:bg-gray-100 transition-colors cursor-pointer px-2 outline-none text-center font-bold'
+                                                    className: 'w-full h-full border border-dashed border-gray-200 bg-gray-50/50 rounded-xl text-sm text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer px-2 outline-none text-center font-bold'
                                                 },
                                                     React.createElement('option', { value: "" }, '放入...'),
                                                     uniqueOptions.map((opt, i) => 
@@ -323,21 +386,22 @@
                     React.createElement('section', { className: 'text-center pt-4 pb-20' },
                         React.createElement('button', { onClick: handleExport, disabled: isExporting, className: 'w-full py-4 bg-[#2D5A5A] text-white font-bold rounded-2xl shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all' },
                             React.createElement(Icons.Download),
-                            React.createElement('span', null, isExporting ? '生成中...' : '保存为周计划卡片')
-                        )
+                            React.createElement('span', null, isExporting ? '生成中...' : '下载本周计划卡')
+                        ),
+                        React.createElement('a', { href: 'index.html', className: 'back-button' }, '← 返回首页')
                     )
                 ),
 
                 // Reflection Modal
                 isReflectionOpen && React.createElement('div', { className: 'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-6', onClick: () => setIsReflectionOpen(false) },
                     React.createElement('div', { className: 'bg-white p-8 rounded-3xl max-w-xs w-full shadow-2xl space-y-4', onClick: e => e.stopPropagation() },
-                        React.createElement('h3', { className: 'font-bold text-center mb-4 text-base', style: { color: PRIMARY_COLOR } }, '腾出时间的思考'),
+                        React.createElement('h3', { className: 'font-bold text-center mb-4 text-lg', style: { color: PRIMARY_COLOR } }, '腾出时间的思考'),
                         [
                             '1. 哪件事如果你停一周，其实也不会出大问题？',
                             '2. 如果只能让一件事"不完美"，你希望是哪一件？',
                             '3. 哪件事是你自己在坚持，还是别人默认你会坚持？'
-                        ].map((q, i) => React.createElement('p', { key: i, className: 'text-sm text-gray-600 leading-relaxed' }, q)),
-                        React.createElement('button', { onClick: () => setIsReflectionOpen(false), className: 'w-full py-3 bg-[#2D5A5A] text-white rounded-xl text-base font-bold mt-4' }, '明白了')
+                        ].map((q, i) => React.createElement('p', { key: i, className: 'text-base text-gray-700 leading-relaxed' }, q)),
+                        React.createElement('button', { onClick: () => setIsReflectionOpen(false), className: 'w-full py-3 bg-[#2D5A5A] text-white rounded-xl text-lg font-bold mt-4' }, '明白了')
                     )
                 ),
 
@@ -346,8 +410,8 @@
                     React.createElement('div', { id: 'export-card', className: 'w-[375px] h-[500px] bg-[#F0F4F8] p-6 flex flex-col justify-between shadow-none' },
                         React.createElement('div', { className: 'space-y-3' },
                             React.createElement('div', { className: 'text-center pb-4 border-b border-gray-200' },
-                                React.createElement('h1', { className: 'text-2xl font-bold', style: { color: PRIMARY_COLOR } }, 'Growy 周计划'),
-                                React.createElement('p', { className: 'text-[9px] text-gray-400 mt-1.5 uppercase tracking-[0.15em]' }, `守住第二象限 · ${new Date().toLocaleDateString('zh-CN')}`)
+                                React.createElement('h1', { className: 'text-2xl font-bold', style: { color: PRIMARY_COLOR } }, '我的「重要/不紧急」周计划'),
+                                React.createElement('p', { className: 'text-[12px] text-gray-500 mt-1.5 uppercase tracking-[0.15em]' }, `即使很忙，也要尽力去做的事 · ${new Date().toLocaleDateString('zh-CN')}`)
                             ),
                             React.createElement('div', { className: 'space-y-1.5' },
                                 schedule.map(day => React.createElement('div', { key: day.day, className: 'flex items-center gap-3' },
@@ -360,9 +424,9 @@
                                                 className: `flex-1 rounded-lg ${t ? 'shadow-sm' : 'border border-dashed border-gray-200'}`, 
                                                 style: t ? { backgroundColor: t.role === RoleType.PARENT ? COLOR_PARENT : COLOR_SELF } : {} 
                                             },
-                                                t ? React.createElement('div', { className: 'export-slot-container' },
+                                                t ? React.createElement('div', { className: 'export-slot-container flex flex-col items-center justify-center h-full relative', style: { transform: 'translateY(-4px)' } },
                                                     t.period !== TimePeriod.ANYTIME && React.createElement('div', { className: 'export-period-tag' }, t.period),
-                                                    React.createElement('div', { className: 'export-title-text' }, t.title)
+                                                    React.createElement('div', { className: 'export-title-text font-semibold' }, t.title)
                                                 ) : ''
                                             );
                                         })
@@ -370,14 +434,13 @@
                                 ))
                             )
                         ),
-                        React.createElement('div', { className: 'pt-4 border-t border-gray-200 flex justify-between items-end' },
-                            React.createElement('div', { className: 'space-y-0.5' },
-                                React.createElement('p', { className: 'text-[8.5px] text-gray-400' }, '允许不完美，但要守住最重要的事'),
-                                React.createElement('p', { className: 'text-[11.5px] font-bold text-gray-700' }, 'Growy | 职场父母的时间陪伴')
+                        React.createElement('div', { className: 'pt-4 border-t border-gray-200 flex justify-between items-center' },
+                            React.createElement('div', { className: 'space-y-1' },
+                                React.createElement('p', { className: 'text-[12px] text-gray-400' }, '允许不完美，但要守住最重要的事'),
+                                React.createElement('p', { className: 'text-[16px] font-bold text-gray-700' }, 'Growy | 彼此陪伴，共同新生')
                             ),
-                            React.createElement('div', { className: 'w-14 h-14 bg-white border border-gray-100 rounded-lg flex flex-col items-center justify-center text-[6px] text-gray-300' }, 
-                                React.createElement('div', { className: 'w-10 h-10 bg-gray-50 rounded flex items-center justify-center mb-0.5 font-bold' }, 'QR'),
-                                React.createElement('span', null, 'Growy')
+                            React.createElement('div', { className: 'w-20 h-20 bg-white border border-gray-100 rounded-lg flex flex-col items-center justify-center p-1' },
+                                qrCodeUrl ? React.createElement('img', { src: qrCodeUrl, alt: 'Growy QR Code', className: 'w-full h-full object-contain' }) : React.createElement('div', { className: 'text-gray-300 text-[6px]' }, '加载中...')
                             )
                         )
                     )
