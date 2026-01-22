@@ -9,6 +9,7 @@
             --primary: #1B5E20;
             --consult: #42657D;
             --about: #546E7A;
+            --priority: #6B5B95;
             --bg: #F5F7FA;
             --text: #2C3E50;
             --gray: #6b7280;
@@ -128,6 +129,7 @@
         .card.green::before { background: linear-gradient(to right, #66BB6A, var(--primary)); }
         .card.blue::before { background: linear-gradient(to right, #6B8CA3, var(--consult)); }
         .card.gray::before { background: linear-gradient(to right, #C5D3DC, var(--about)); }
+        .card.purple::before { background: linear-gradient(to right, #9C7BB8, var(--priority)); }
 
         .icon {
             width: 56px;
@@ -146,6 +148,8 @@
         .card.blue:hover .icon { background: var(--consult); color: white; }
         .card.gray .icon { background: rgba(197,211,220,0.3); color: var(--about); }
         .card.gray:hover .icon { background: var(--about); color: white; }
+        .card.purple .icon { background: rgba(107,91,149,0.1); color: var(--priority); }
+        .card.purple:hover .icon { background: var(--priority); color: white; }
 
         .card h3 {
             font-size: 1.25rem;
@@ -157,6 +161,7 @@
         .card.green:hover h3 { color: var(--primary); }
         .card.blue:hover h3 { color: var(--consult); }
         .card.gray:hover h3 { color: var(--about); }
+        .card.purple:hover h3 { color: var(--priority); }
 
         .card p {
             font-size: 0.875rem;
@@ -176,6 +181,7 @@
         .card.green .action { color: var(--primary); }
         .card.blue .action { color: var(--consult); }
         .card.gray .action { color: var(--about); }
+        .card.purple .action { color: var(--priority); }
 
         /* Footer */
         footer {
@@ -220,7 +226,7 @@
             h1 { font-size: 2.25rem; }
             .tagline { font-size: 1.125rem; }
             .tagline span { font-size: 1rem; }
-            .cards { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+            .cards { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
         }
     </style>
 </head>
@@ -252,6 +258,17 @@
                 <h3>Child Development Timeline</h3>
                 <p>See 3-5 key developmental priorities at each age from 0-18. Cut through the noise, focus on what matters, and do the right things at the right time—without information overload.</p>
                 <div class="action">Start Exploring →</div>
+            </a>
+
+            <a href="priority.html" class="card purple">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <h3>Important/Non-Urgent Weekly Plan</h3>
+                <p>Make space for what truly matters—before it gets crowded out. Plan a few important, non-urgent things into your week. No tracking. No pressure.</p>
+                <div class="action">Start Planning →</div>
             </a>
 
             <a href="https://growyai.lovable.app" target="_blank" class="card blue">
