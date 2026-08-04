@@ -34,18 +34,49 @@
             background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
         }
 
+        .back-nav {
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 22px;
+            text-align: left;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background-color: rgba(133, 121, 110, 0.07);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .back-link:active {
+            background-color: rgba(133, 121, 110, 0.13);
+            transform: scale(0.97);
+        }
+
         header {
             width: 100%;
             max-width: 480px;
             margin-bottom: 36px;
-            text-align: left;
+            text-align: center;
         }
 
         h1 {
-            font-size: 30px;
-            font-weight: 650;
-            color: #221f1c;
+            font-size: 32px;
+            font-weight: 750;
             letter-spacing: -0.01em;
+            display: inline-block;
+            /* 暖色渐变字体，呼应卡片配色，活泼但不刺眼 */
+            background-image: linear-gradient(90deg, #e0975a 0%, #d6708a 45%, #7c8fc4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         p.subtitle {
@@ -207,8 +238,7 @@
         }
 
         footer {
-            margin-top: auto;
-            padding-top: 48px;
+            margin-top: 28px;
             font-size: 13.5px;
             color: #a89e92;
             font-weight: 500;
@@ -217,6 +247,10 @@
 </head>
 <body>
 
+    <div class="back-nav">
+        <a href="/zh/" class="back-link">🏠 返回首页</a>
+    </div>
+
     <header>
         <h1>边玩边学</h1>
         <p class="subtitle">安静、轻松的日常认知与数学练习</p>
@@ -224,7 +258,7 @@
 
     <main>
         <!-- 游戏 1: 生活中的词汇 -->
-        <a href="words/index.html" class="game-card">
+        <a href="/zh/games/words/index.html" class="game-card">
             <div class="card-icon icon-words">
                 <div class="icon-grid">
                     <span>🍎</span><span>🚗</span>
@@ -242,7 +276,7 @@
         </a>
 
         <!-- 游戏 2: 数字点点 -->
-        <a href="math-click/index.html" class="game-card">
+        <a href="/zh/games/math-click/index.html" class="game-card">
             <div class="card-icon icon-click">
                 <div class="icon-number">
                     <span class="big-num">3</span>
@@ -260,7 +294,7 @@
         </a>
 
         <!-- 游戏 3: 数学挑战 (小猫吃鱼) -->
-        <a href="math-challenge/index.html" class="game-card">
+        <a href="/zh/games/math-challenge/index.html" class="game-card">
             <div class="card-icon icon-challenge">
                 <div class="icon-cat">
                     <span class="cat-face">🐱</span>
