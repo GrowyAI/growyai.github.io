@@ -111,13 +111,15 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- ⚠️ 修复点：修改成了稳定且真实存在的依赖版本 -->
     <script type="importmap">
     {
       "imports": {
-        "react": "https://esm.sh/react@19.2.3",
-        "react-dom": "https://esm.sh/react-dom@19.2.3",
-        "react-dom/client": "https://esm.sh/react-dom@19.2.3/client",
-        "framer-motion": "https://esm.sh/framer-motion@12.26.2",
+        "react": "https://esm.sh/react@18.3.1",
+        "react-dom": "https://esm.sh/react-dom@18.3.1",
+        "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "framer-motion": "https://esm.sh/framer-motion@11.11.0?external=react,react-dom",
         "html2canvas": "https://esm.sh/html2canvas@1.4.1"
       }
     }
@@ -135,8 +137,8 @@
 
         // --- 常量与更深的配色 ---
         const PRIMARY_COLOR = '#2D5A5A'; 
-        const COLOR_PARENT = '#3E664A'; // 更加深沉、高饱和的嫩绿
-        const COLOR_SELF = '#4A6B82';   // 更加深沉、高饱和的深蓝
+        const COLOR_PARENT = '#3E664A'; 
+        const COLOR_SELF = '#4A6B82';   
         
         const DAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
         const RoleType = { PARENT: 'PARENT', SELF: 'SELF' };
@@ -195,10 +197,9 @@
                     height: 84,
                     colorDark: '#000000',
                     colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.L  // L = 最低纠错，二维码最简单
+                    correctLevel: QRCode.CorrectLevel.L
                 });
                 
-                // 等待二维码生成完成
                 setTimeout(() => {
                     const canvas = container.querySelector('canvas');
                     if (canvas) {
@@ -207,7 +208,6 @@
                 }, 100);
             }, []);
 
-            // 获取所有尚未分配的实例，并去重以便在下拉框展示
             const unscheduledInstances = useMemo(() => {
                 const all = [];
                 tasks.forEach(t => {
@@ -275,14 +275,12 @@
             };
 
             return React.createElement('div', { className: 'min-h-screen pb-20' },
-                // Header
                 React.createElement('header', { className: 'py-12 px-6 text-center bg-white border-b border-[#E0E7ED]' },
                     React.createElement(motion.h1, { initial: { opacity: 0, y: -10 }, animate: { opacity: 1, y: 0 }, className: 'text-2xl font-bold mb-2', style: { color: PRIMARY_COLOR } }, '「重要/不紧急」周计划'),
                     React.createElement('p', { className: 'text-gray-700 text-base' }, '把真正重要但不紧急的事，先放进这一周'),
                     React.createElement('p', { className: 'text-gray-600 text-sm mt-1' }, '不打卡 · 不监督 · 只是对自己的承诺')
                 ),
 
-                // Concept Intro (四象限图)
                 React.createElement('section', { className: 'px-6 py-8 max-w-lg mx-auto text-center' },
                     React.createElement('div', { className: 'bg-white/50 backdrop-blur-sm p-6 rounded-2xl border border-white/80 shadow-sm' },
                         React.createElement('p', { className: 'text-gray-700 leading-relaxed text-base' }, 
@@ -302,16 +300,12 @@
                     )
                 ),
 
-                // Main
                 React.createElement('main', { className: 'max-w-lg mx-auto px-4 mt-8 space-y-10' },
-                    
-                    // 重要的事 - 引导文案
                     React.createElement('section', { className: 'space-y-2' },
                         React.createElement('h2', { className: 'text-lg font-bold px-1', style: { color: PRIMARY_COLOR } }, '重要的事'),
                         React.createElement('p', { className: 'text-gray-700 text-sm px-1' }, '这一周，选几件你不想放弃的事，并为它们留出时间。')
                     ),
                     
-                    // Roles & Tasks
                     React.createElement('section', { className: 'space-y-4' },
                         [RoleType.PARENT, RoleType.SELF].map(role => React.createElement('div', { key: role, className: 'bg-white p-5 rounded-3xl shadow-sm border border-[#E0E7ED]' },
                             React.createElement('div', { className: 'flex items-center gap-2 mb-4' },
@@ -319,12 +313,10 @@
                                 React.createElement('span', { className: 'font-bold text-gray-700 text-base' }, role === RoleType.PARENT ? '作为父母的我' : '作为自己的我')
                             ),
                             
-                            // Presets
                             React.createElement('div', { className: 'flex flex-wrap gap-2 mb-4' },
                                 PRESETS[role].map((p, idx) => React.createElement('button', { key: idx, onClick: () => addTask(role, p), className: 'text-sm px-2.5 py-1 rounded-full border border-gray-100 bg-gray-50 text-gray-600 hover:opacity-80 transition-all' }, `+ ${p.title}`))
                             ),
                             
-                            // Task List
                             React.createElement('div', { className: 'space-y-2' },
                                 tasks.filter(t => t.role === role).map(t => React.createElement('div', { key: t.id, className: 'flex items-center gap-3 p-2 bg-gray-50/50 rounded-xl border border-gray-100' },
                                     React.createElement('input', { type: 'text', value: t.title, onChange: e => setTasks(prev => prev.map(x => x.id === t.id ? { ...x, title: e.target.value } : x)), className: 'flex-1 bg-transparent border-none outline-none text-base py-1 placeholder-gray-300', placeholder: '输入核心事项...' }),
@@ -338,7 +330,6 @@
                         ))
                     ),
 
-                    // Weekly Grid
                     React.createElement('section', { className: 'space-y-4' },
                         React.createElement('div', { className: 'space-y-2' },
                             React.createElement('div', { className: 'flex justify-between items-center px-1' },
@@ -382,7 +373,6 @@
                         )
                     ),
 
-                    // Download Button
                     React.createElement('section', { className: 'text-center pt-4 pb-20' },
                         React.createElement('button', { onClick: handleExport, disabled: isExporting, className: 'w-full py-4 bg-[#2D5A5A] text-white font-bold rounded-2xl shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all' },
                             React.createElement(Icons.Download),
@@ -392,7 +382,6 @@
                     )
                 ),
 
-                // Reflection Modal
                 isReflectionOpen && React.createElement('div', { className: 'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-6', onClick: () => setIsReflectionOpen(false) },
                     React.createElement('div', { className: 'bg-white p-8 rounded-3xl max-w-xs w-full shadow-2xl space-y-4', onClick: e => e.stopPropagation() },
                         React.createElement('h3', { className: 'font-bold text-center mb-4 text-lg', style: { color: PRIMARY_COLOR } }, '腾出时间的思考'),
@@ -405,7 +394,6 @@
                     )
                 ),
 
-                // Hidden Export Card (3:4 Ratio, Fully Centered Content) - 此处代码未改变以保证下载图片排版
                 React.createElement('div', { className: 'fixed -left-[5000px] top-0' },
                     React.createElement('div', { id: 'export-card', className: 'w-[375px] h-[500px] bg-[#F0F4F8] p-5 flex flex-col justify-between shadow-none' },
                         React.createElement('div', { className: 'space-y-2' },
