@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>儿童数学小游戏 - 小猫吃鱼</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #87CEEB;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  #gameContainer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    touch-action: none;
+  }
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  #topBar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-size: 15px;
+    font-weight: bold;
+    color: #34495e;
+    z-index: 10;
+    pointer-events: none;
+  }
+  #topBar span {
+    margin-right: 10px;
+    white-space: nowrap;
+    background: rgba(255,255,255,0.5);
+    padding: 4px 10px;
+    border-radius: 14px;
+  }
+  #uiScore { color: #E67E22; }
+  #uiTime { color: #E74C3C; }
+  #uiTarget { color: #27AE60; }
+  #uiMode { color: #8E44AD; }
+  .modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+  }
+  .hidden {
+    display: none !important;
+  }
+  .panel {
+    background: #fffef8;
+    border-radius: 24px;
+    padding: 32px 26px;
+    text-align: center;
+    width: 78%;
+    max-width: 360px;
+    max-height: 82vh;
+    overflow-y: auto;
+    box-shadow: 0 14px 34px rgba(0,0,0,0.32);
+    border: 4px solid #FFE0B2;
+    box-sizing: border-box;
+  }
+  .panel h1 {
+    margin: 0 0 10px 0;
+    font-size: 27px;
+    color: #E67E22;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  .panel p {
+    margin: 6px 0 22px 0;
+    color: #666;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .panel button {
+    background: linear-gradient(180deg,#FFC15E,#FF8C42);
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 13px 36px;
+    border-radius: 30px;
+    box-shadow: 0 5px 0 #E06B1A, 0 8px 14px rgba(255,140,66,0.4);
+  }
+  .panel button:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #E06B1A, 0 4px 8px rgba(255,140,66,0.4);
+  }
+  .optionList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .optionBtn {
+    width: 100%;
+    background: linear-gradient(180deg,#FFF3E0,#FFE0B2);
+    border: 2px solid #FFCC80;
+    color: #A85D1F;
+    font-size: 17px;
+    font-weight: bold;
+    padding: 13px 10px;
+    border-radius: 18px;
+    box-shadow: 0 3px 0 #E8A857;
+    box-sizing: border-box;
+  }
+  .optionBtn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #E8A857;
+  }
+  .secondaryBtn {
+    background: #EEE !important;
+    color: #888 !important;
+    box-shadow: 0 4px 0 #ccc, 0 6px 10px rgba(0,0,0,0.15) !important;
+    font-size: 15px !important;
+    padding: 10px 28px !important;
+  }
+  .secondaryBtn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #ccc !important;
+  }
+  .endBtnRow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .endBtnRow button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #nextLevelBtn {
+    background: linear-gradient(180deg,#7EE0A8,#27AE60);
+    box-shadow: 0 5px 0 #1E8449, 0 8px 14px rgba(39,174,96,0.4);
+  }
+  #nextLevelBtn:active {
+    box-shadow: 0 2px 0 #1E8449, 0 4px 8px rgba(39,174,96,0.4);
+  }
+  #successToast {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(180deg, rgba(88, 214, 141, 0.95), rgba(39, 174, 96, 0.95));
+    color: #fff;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 22px 44px;
+    border-radius: 24px;
+    z-index: 30;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    border: 3px solid rgba(255,255,255,0.6);
+    text-align: center;
+  }
+  #successToast .toastScore {
+    display: block;
+    font-size: 17px;
+    font-weight: normal;
+    margin-top: 6px;
+    opacity: 0.95;
+  }
+</style>
+</head>
+<body>
+
+<div id="gameContainer">
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="topBar">
+    <span id="uiMode">选择模式开始游戏</span>
+    <span id="uiScore">分数：0</span>
+    <span id="uiTarget">目标：50</span>
+    <span id="uiTime">时间：30</span>
+  </div>
+
+  <div id="startModal" class="modal">
+    <div class="panel">
+      <h1>🐱 小猫吃鱼</h1>
+      <p>拖动小猫吃掉数字不大于小猫头顶数字的鱼！<br>吃对 +10 分，吃错 -20 分。<br>30 秒内拿到 50 分即可闯关成功！</p>
+      <button id="startBtn">开始游戏</button>
+    </div>
+  </div>
+
+  <div id="modeSelectModal" class="modal hidden">
+    <div class="panel">
+      <h1>选择游戏模式</h1>
+      <p>请选择想要挑战的数学玩法</p>
+      <div id="modeList" class="optionList"></div>
+    </div>
+  </div>
+
+  <div id="levelSelectModal" class="modal hidden">
+    <div class="panel">
+      <h1 id="levelSelectTitle">选择难度</h1>
+      <p>选择后立即开始游戏</p>
+      <div id="levelList" class="optionList"></div>
+      <button id="backToModeBtn" class="secondaryBtn">返回</button>
+    </div>
+  </div>
+
+  <div id="endModal" class="modal hidden">
+    <div class="panel">
+      <h1 id="endTitle">挑战失败</h1>
+      <p id="endDesc">再接再厉！</p>
+      <div class="endBtnRow">
+        <button id="nextLevelBtn" class="hidden">挑战下一关</button>
+        <button id="restartBtn">重新挑战本关</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="successToast" class="hidden">
+    闯关成功 🎉
+    <span id="successScoreText" class="toastScore"></span>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ========================= Config ========================= */
+const GameConfig = {
+  timeLimit: 30,          // seconds
+  targetScore: 50,
+  maxFish: 8,              // 屏幕内鱼的数量上限（调小）
+  catNumberRange: [5, 10], // 仅用于尚未选择关卡时的初始/预览小猫
+  catRadius: 34,           // 小猫直径调小
+  fishBaseRadius: 20,
+  fishRadiusMin: 16,
+  fishRadiusMax: 30,
+  fishSpeedRange: [25, 55],   // px / second（速度调小）
+  fishSpawnMargin: 40,        // 新鱼生成在屏幕外多远
+  fishDespawnMargin: 60,      // 鱼游出屏幕多远后视为消失
+  grabRadius: 80,
+  scoreCorrect: 10,
+  scoreWrong: -20,
+  successHoldTime: 1000,      // ms
+  catNumberFontSize: 18,
+  fishNumberFontSize: 16
+};
+
+/* ========================= Utils ========================= */
+const Utils = {
+  randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+  randFloat(min, max) {
+    return Math.random() * (max - min) + min;
+  },
+  choice(arr) {
+    return arr[Utils.randInt(0, arr.length - 1)];
+  },
+  dist(x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
+  },
+  clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  },
+  randomSign() {
+    return Math.random() < 0.5 ? -1 : 1;
+  },
+  easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  },
+  easeOutBack(t) {
+    const c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  },
+  // 通用"数值满足关系"生成器：relation='le' 时生成 <= reference 的值，
+  // relation='gt' 时生成 > reference 的值，结果被限制在 [min,max] 内。
+  // 对负数区间同样成立（依赖 JS 原生数值比较，无需为每种关卡单独写逻辑）。
+  compareValueGenerator(relation, reference, min, max) {
+    if (relation === 'le') {
+      const hi = Utils.clamp(reference, min, max);
+      return Utils.randInt(min, hi);
+    } else {
+      const lo = Utils.clamp(reference + 1, min, max);
+      if (lo > max) return max;
+      return Utils.randInt(lo, max);
+    }
+  }
+};
+
+/* ========================= Levels & Modes =========================
+   数学玩法的全部差异都收敛在这里的"配置 + 生成函数"里。
+   FishManager / CollisionManager / Renderer / GameLoop 完全不关心
+   当前是哪种模式、哪个难度，只认 { display, answer } 和 relation。
+   以后新增难度：只需调用 makeRangeLevel(...) 或写一个新的 level 对象。
+   以后新增模式（加法/减法/分数/偶数/质数...）：只需在 GAME_MODES 里
+   新增一个 { id, name, icon, levels:[...] } 配置对象。
+========================================================================= */
+
+// 工厂函数：适用于"在某个数值区间内比大小"的一大类关卡（含负数区间）
+function makeRangeLevel(id, name, min, max, catRange) {
+  return {
+    id: id,
+    name: name,
+    valueRange: [min, max],
+    generateCatNumber: () => Utils.randInt(catRange[0], catRange[1]),
+    generate: (relation, catNumber) => {
+      const value = Utils.compareValueGenerator(relation, catNumber, min, max);
+      return { display: String(value), answer: value };
+    }
+  };
+}
+
+// 平方数关卡：鱼显示 "15²"，真实比较的是平方后的结果
+const squareNumberLevel = {
+  id: 'squareNumber',
+  name: '平方数',
+  valueRange: [1, 625],
+  generateCatNumber: () => {
+    const base = Utils.randInt(5, 15);
+    return base * base;
+  },
+  generate: (relation, catNumber) => {
+    const BASE_MIN = 1, BASE_MAX = 25;
+    const sqrtOfCat = Math.sqrt(Math.max(catNumber, 0));
+    let base;
+    if (relation === 'le') {
+      const hiBase = Utils.clamp(Math.floor(sqrtOfCat), BASE_MIN, BASE_MAX);
+      base = Utils.randInt(BASE_MIN, hiBase);
+    } else {
+      const loBase = Utils.clamp(Math.floor(sqrtOfCat) + 1, BASE_MIN, BASE_MAX);
+      base = loBase > BASE_MAX ? BASE_MAX : Utils.randInt(loBase, BASE_MAX);
+    }
+    return { display: base + '²', answer: base * base };
+  }
+};
+
+// 平方根关卡：鱼显示 "√225"，真实比较的是开方后的结果
+const squareRootLevel = {
+  id: 'squareRoot',
+  name: '平方根',
+  valueRange: [1, 25],
+  generateCatNumber: () => Utils.randInt(5, 15),
+  generate: (relation, catNumber) => {
+    const n = Utils.compareValueGenerator(relation, catNumber, 1, 25);
+    return { display: '√' + (n * n), answer: n };
+  }
+};
+
+const GAME_MODES = [
+  {
+    id: 'compareNumber',
+    name: '比大小',
+    icon: '🐱',
+    levels: [
+      makeRangeLevel('within10', '10以内', 0, 10, [3, 8]),
+      makeRangeLevel('within20', '20以内', 0, 20, [5, 15]),
+      makeRangeLevel('within50', '50以内', 0, 50, [15, 40]),
+      makeRangeLevel('within100', '100以内', 0, 100, [30, 80]),
+      makeRangeLevel('within1000', '1000以内', 0, 1000, [300, 800]),
+      makeRangeLevel('negative', '负整数', -99, -1, [-60, -10]),
+      squareNumberLevel,
+      squareRootLevel
+    ]
+  }
+  // 未来新增模式示例（不在第一版实现），只需追加对象，无需改动引擎：
+  // { id:'addition', name:'加法', icon:'➕', levels:[ ... ] },
+  // { id:'subtraction', name:'减法', icon:'➖', levels:[ ... ] },
+  // { id:'multiplication', name:'乘法', icon:'✖️', levels:[ ... ] },
+  // { id:'division', name:'除法', icon:'➗', levels:[ ... ] },
+  // { id:'evenNumber', name:'找偶数', icon:'🔵', levels:[ ... ] },
+  // { id:'primeNumber', name:'找质数', icon:'⭐', levels:[ ... ] },
+];
+
+// 将所有模式的所有难度按顺序展开成一条"关卡序列"，用于"挑战下一关"。
+// 新增模式/难度时无需修改这里，会自动纳入序列。
+const LEVEL_SEQUENCE = [];
+for (const mode of GAME_MODES) {
+  for (const level of mode.levels) {
+    LEVEL_SEQUENCE.push({ mode, level });
+  }
+}
+
+function getNextLevelStep(mode, level) {
+  const idx = LEVEL_SEQUENCE.findIndex(
+    step => step.mode.id === mode.id && step.level.id === level.id
+  );
+  if (idx === -1 || idx === LEVEL_SEQUENCE.length - 1) return null;
+  return LEVEL_SEQUENCE[idx + 1];
+}
+
+/* ========================= QuestionGenerator =========================
+   与游戏引擎完全解耦：只负责调用当前关卡自己的 generate() 方法。
+   没有任何按模式/难度区分的 if/else —— 全部由配置对象自带的函数决定。
+========================================================================= */
+class QuestionGenerator {
+  generate(level, context) {
+    if (!level || typeof level.generate !== 'function') {
+      throw new Error('Invalid level config: missing generate()');
+    }
+    return level.generate(context.relation, context.reference);
+  }
+}
+
+/* ========================= GameState ========================= */
+class GameState {
+  constructor(config) {
+    this.config = config;
+    this.reset(null);
+  }
+
+  reset(level) {
+    this.status = 'idle'; // idle | playing | success | fail
+    this.score = 0;
+    this.timeRemaining = this.config.timeLimit;
+    const catNumber = level
+      ? level.generateCatNumber()
+      : Utils.randInt(this.config.catNumberRange[0], this.config.catNumberRange[1]);
+    this.cat = {
+      x: 0,
+      y: 0,
+      radius: this.config.catRadius,
+      number: catNumber,
+      // 视觉动画状态（挤压/弹跳），与游戏逻辑无关
+      squash: 1,
+      squashTarget: 1,
+      bobPhase: Math.random() * Math.PI * 2,
+      blinkTimer: Utils.randFloat(2, 5),
+      tailPhase: Math.random() * Math.PI * 2
+    };
+  }
+
+  addScore(delta) {
+    this.score = Math.max(0, this.score + delta);
+  }
+}
+
+/* ========================= FishManager =========================
+   鱼的生命周期：从屏幕外生成 -> 游进屏幕 -> 被吃掉，或游出屏幕外消失。
+   消失的鱼会在下一帧由 fillToMax 自动补充新鱼，保持约50%/50%的比例。
+========================================================================= */
+class FishManager {
+  constructor(config, questionGenerator) {
+    this.config = config;
+    this.questionGenerator = questionGenerator;
+    this.fishList = [];
+    this.spawnCounter = 0; // 持续递增的生成计数器，用于稳定控制 le/gt 各半
+    this.palettes = [
+      { body: '#4FC3F7', bodyDark: '#0288D1', belly: '#B3E5FC' },
+      { body: '#FF8A65', bodyDark: '#E64A19', belly: '#FFCCBC' },
+      { body: '#BA68C8', bodyDark: '#7B1FA2', belly: '#E1BEE7' },
+      { body: '#4DD0E1', bodyDark: '#00838F', belly: '#B2EBF2' },
+      { body: '#FFD54F', bodyDark: '#F57F17', belly: '#FFF9C4' }
+    ];
+  }
+
+  reset() {
+    this.fishList = [];
+    this.spawnCounter = 0;
+  }
+
+  // 在屏幕边缘外的随机一边生成一个位置，并给出一个大致指向屏幕内部的运动方向
+  _pickEdgeSpawn(radius, bounds) {
+    const margin = this.config.fishSpawnMargin + radius;
+    const edge = Utils.randInt(0, 3); // 0上 1右 2下 3左
+    const coneSpread = Math.PI / 3.2; // 入场方向的随机摆动范围
+    let x, y, baseAngle;
+
+    if (edge === 0) { // 上边缘外，朝下进入
+      x = Utils.randFloat(radius, Math.max(radius, bounds.width - radius));
+      y = -margin;
+      baseAngle = Math.PI / 2;
+    } else if (edge === 1) { // 右边缘外，朝左进入
+      x = bounds.width + margin;
+      y = Utils.randFloat(radius + 60, Math.max(radius + 60, bounds.height - radius));
+      baseAngle = Math.PI;
+    } else if (edge === 2) { // 下边缘外，朝上进入
+      x = Utils.randFloat(radius, Math.max(radius, bounds.width - radius));
+      y = bounds.height + margin;
+      baseAngle = -Math.PI / 2;
+    } else { // 左边缘外，朝右进入
+      x = -margin;
+      y = Utils.randFloat(radius + 60, Math.max(radius + 60, bounds.height - radius));
+      baseAngle = 0;
+    }
+
+    const angle = baseAngle + Utils.randFloat(-coneSpread, coneSpread);
+    return { x, y, angle };
+  }
+
+  spawnOne(level, catNumber, bounds, relation) {
+    const question = this.questionGenerator.generate(
+      level,
+      { reference: catNumber, relation: relation }
+    );
+
+    const value = question.answer;
+    const [vmin, vmax] = level.valueRange || [0, catNumber + 10];
+    const t = Utils.clamp((value - vmin) / ((vmax - vmin) || 1), 0, 1);
+    const radius = this.config.fishRadiusMin +
+      t * (this.config.fishRadiusMax - this.config.fishRadiusMin);
+
+    const speed = Utils.randFloat(this.config.fishSpeedRange[0], this.config.fishSpeedRange[1]);
+    const spawnPos = this._pickEdgeSpawn(radius, bounds);
+    const palette = Utils.choice(this.palettes);
+
+    const fish = {
+      x: spawnPos.x,
+      y: spawnPos.y,
+      vx: Math.cos(spawnPos.angle) * speed,
+      vy: Math.sin(spawnPos.angle) * speed,
+      radius: radius,
+      display: question.display,
+      answer: question.answer,
+      angle: spawnPos.angle,
+      palette: palette,
+      wigglePhase: Math.random() * Math.PI * 2,
+      spawnT: 0 // 出生缩放动画计时
+    };
+    this.fishList.push(fish);
+    this.spawnCounter++;
+  }
+
+  fillToMax(level, catNumber, bounds) {
+    while (this.fishList.length < this.config.maxFish) {
+      // 用持续递增的计数器交替生成两类鱼，避免因鱼不断消失/补充导致比例失衡
+      const relation = (this.spawnCounter % 2 === 0) ? 'le' : 'gt';
+      this.spawnOne(level, catNumber, bounds, relation);
+    }
+  }
+
+  update(dt, bounds) {
+    const despawnMargin = this.config.fishDespawnMargin;
+    for (const fish of this.fishList) {
+      fish.x += fish.vx * dt;
+      fish.y += fish.vy * dt;
+
+      fish.wigglePhase += dt * 6;
+      if (fish.spawnT < 1) fish.spawnT = Math.min(1, fish.spawnT + dt * 4);
+    }
+
+    // 游出屏幕足够远的鱼直接消失，留出空位给下一条新鱼
+    this.fishList = this.fishList.filter(fish => {
+      const m = fish.radius + despawnMargin;
+      const outOfBounds =
+        fish.x < -m || fish.x > bounds.width + m ||
+        fish.y < -m || fish.y > bounds.height + m;
+      return !outOfBounds;
+    });
+  }
+
+  removeFish(fish) {
+    const idx = this.fishList.indexOf(fish);
+    if (idx !== -1) this.fishList.splice(idx, 1);
+  }
+}
+
+/* ========================= CollisionManager =========================
+   碰撞规则与计分规则单独封装，与具体数学模式完全无关（只比较 answer）
+========================================================================= */
+class CollisionManager {
+  constructor(config) {
+    this.config = config;
+  }
+
+  checkAndResolve(catState, fishManager, onEat) {
+    const cat = catState.cat;
+    const eaten = [];
+
+    for (const fish of fishManager.fishList) {
+      const d = Utils.dist(cat.x, cat.y, fish.x, fish.y);
+      if (d < cat.radius * 0.75 + fish.radius * 0.6) {
+        eaten.push(fish);
+      }
+    }
+
+    for (const fish of eaten) {
+      const isCorrect = fish.answer <= cat.number;
+      const delta = isCorrect ? this.config.scoreCorrect : this.config.scoreWrong;
+      catState.addScore(delta);
+      fishManager.removeFish(fish);
+      // 触发小猫挤压弹跳动画
+      cat.squash = isCorrect ? 1.25 : 0.8;
+      if (onEat) onEat(fish, isCorrect, delta);
+    }
+  }
+}
+
+/* ========================= EffectsManager =========================
+   纯视觉效果层：加分/减分飘字 + 吃鱼粒子爆裂。
+   与数学规则、碰撞规则完全无关，未来新增效果不影响核心逻辑。
+========================================================================= */
+class EffectsManager {
+  constructor() {
+    this.floatingTexts = [];
+    this.particles = [];
+    this.ripples = [];
+  }
+
+  spawnScoreText(x, y, delta) {
+    this.floatingTexts.push({
+      x, y,
+      startY: y,
+      text: (delta > 0 ? '+' : '') + delta,
+      color: delta > 0 ? '#2ECC71' : '#E74C3C',
+      life: 0,
+      maxLife: 0.9
+    });
+  }
+
+  spawnEatBurst(x, y, colorHex, isCorrect) {
+    const count = isCorrect ? 10 : 14;
+    for (let i = 0; i < count; i++) {
+      const angle = Utils.randFloat(0, Math.PI * 2);
+      const speed = Utils.randFloat(60, 180);
+      this.particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: Utils.randFloat(2, 5),
+        color: colorHex,
+        life: 0,
+        maxLife: Utils.randFloat(0.4, 0.7)
+      });
+    }
+    this.ripples.push({ x, y, life: 0, maxLife: 0.5, isCorrect });
+  }
+
+  update(dt) {
+    for (const ft of this.floatingTexts) {
+      ft.life += dt;
+      ft.y = ft.startY - Utils.easeOutCubic(Math.min(1, ft.life / ft.maxLife)) * 46;
+    }
+    this.floatingTexts = this.floatingTexts.filter(f => f.life < f.maxLife);
+
+    for (const p of this.particles) {
+      p.life += dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 220 * dt; // 重力
+      p.vx *= 0.96;
+    }
+    this.particles = this.particles.filter(p => p.life < p.maxLife);
+
+    for (const r of this.ripples) {
+      r.life += dt;
+    }
+    this.ripples = this.ripples.filter(r => r.life < r.maxLife);
+  }
+
+  render(ctx) {
+    // 涟漪
+    for (const r of this.ripples) {
+      const t = r.life / r.maxLife;
+      const radius = 10 + t * 50;
+      ctx.save();
+      ctx.globalAlpha = (1 - t) * 0.6;
+      ctx.strokeStyle = r.isCorrect ? '#2ECC71' : '#E74C3C';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // 粒子
+    for (const p of this.particles) {
+      const t = p.life / p.maxLife;
+      ctx.save();
+      ctx.globalAlpha = 1 - t;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius * (1 - t * 0.4), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 飘字
+    for (const ft of this.floatingTexts) {
+      const t = ft.life / ft.maxLife;
+      const scale = t < 0.25 ? Utils.easeOutBack(t / 0.25) : 1;
+      const alpha = t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
+      ctx.save();
+      ctx.globalAlpha = Utils.clamp(alpha, 0, 1);
+      ctx.translate(ft.x, ft.y);
+      ctx.scale(scale, scale);
+      ctx.font = 'bold 26px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+      ctx.strokeText(ft.text, 0, 0);
+      ctx.fillStyle = ft.color;
+      ctx.fillText(ft.text, 0, 0);
+      ctx.restore();
+    }
+  }
+}
+
+/* ========================= InputManager ========================= */
+class InputManager {
+  constructor(canvas, config, getCat) {
+    this.canvas = canvas;
+    this.config = config;
+    this.getCat = getCat;
+    this.dragging = false;
+    this.activeTouchId = null;
+
+    this._bind();
+  }
+
+  _getCanvasPos(touch) {
+    const rect = this.canvas.getBoundingClientRect();
+    return {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top
+    };
+  }
+
+  _bind() {
+    this.canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (this.activeTouchId !== null) return;
+      const touch = e.changedTouches[0];
+      const pos = this._getCanvasPos(touch);
+      const cat = this.getCat();
+      if (!cat) return;
+      const d = Utils.dist(pos.x, pos.y, cat.x, cat.y);
+      if (d <= this.config.grabRadius) {
+        this.dragging = true;
+        this.activeTouchId = touch.identifier;
+      }
+    }, { passive: false });
+
+    this.canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!this.dragging) return;
+      for (const touch of e.changedTouches) {
+        if (touch.identifier === this.activeTouchId) {
+          const pos = this._getCanvasPos(touch);
+          const cat = this.getCat();
+          if (cat) {
+            cat.x = pos.x;
+            cat.y = pos.y;
+          }
+        }
+      }
+    }, { passive: false });
+
+    const endHandler = (e) => {
+      e.preventDefault();
+      for (const touch of e.changedTouches) {
+        if (touch.identifier === this.activeTouchId) {
+          this.dragging = false;
+          this.activeTouchId = null;
+        }
+      }
+    };
+
+    this.canvas.addEventListener('touchend', endHandler, { passive: false });
+    this.canvas.addEventListener('touchcancel', endHandler, { passive: false });
+
+    // 阻止整页滚动/缩放等默认行为
+    document.body.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+  }
+
+  clampCatToBounds(cat, bounds) {
+    cat.x = Utils.clamp(cat.x, cat.radius, bounds.width - cat.radius);
+    cat.y = Utils.clamp(cat.y, 60 + cat.radius, bounds.height - cat.radius);
+  }
+}
+
+/* ========================= Renderer =========================
+   Renderer 只负责绘制，只使用 display 字段显示数字，不关心数学规则
+========================================================================= */
+class Renderer {
+  constructor(ctx, config) {
+    this.ctx = ctx;
+    this.config = config;
+    this.time = 0;
+    this.bubbles = [];
+    for (let i = 0; i < 18; i++) {
+      this.bubbles.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: Utils.randFloat(2, 6),
+        speed: Utils.randFloat(8, 22),
+        drift: Utils.randFloat(-0.3, 0.3)
+      });
+    }
+  }
+
+  clear(width, height, dt) {
+    const ctx = this.ctx;
+    this.time += dt;
+
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
+    grad.addColorStop(0, '#7FD8FF');
+    grad.addColorStop(0.5, '#3FA9F5');
+    grad.addColorStop(1, '#0B6FB0');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+
+    // 波光条纹
+    ctx.save();
+    ctx.globalAlpha = 0.10;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+      const yOff = ((this.time * 18 + i * 140) % (height + 100)) - 50;
+      ctx.beginPath();
+      ctx.moveTo(0, yOff);
+      for (let x = 0; x <= width; x += 40) {
+        ctx.lineTo(x, yOff + Math.sin(x * 0.02 + this.time + i) * 10);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 气泡
+    ctx.save();
+    for (const b of this.bubbles) {
+      b.y -= (b.speed * dt) / height;
+      if (b.y < -0.02) {
+        b.y = 1.02;
+        b.x = Math.random();
+      }
+      const bx = (b.x + Math.sin(this.time * 0.5 + b.x * 10) * b.drift * 0.02) * width;
+      const by = b.y * height;
+      ctx.globalAlpha = 0.28;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(bx, by, b.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  _drawShadow(x, y, rx, ry) {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = '#00243D';
+    ctx.beginPath();
+    ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  drawFish(fish) {
+    const ctx = this.ctx;
+    const spawnScale = Utils.easeOutBack(fish.spawnT);
+    const wiggle = Math.sin(fish.wigglePhase) * 0.35;
+    const p = fish.palette;
+
+    // 阴影（投射在下方水面，简化为鱼身正下方一点）
+    this._drawShadow(fish.x, fish.y + fish.radius * 0.9, fish.radius * 0.8, fish.radius * 0.25);
+
+    ctx.save();
+    ctx.translate(fish.x, fish.y);
+    ctx.rotate(fish.angle);
+    ctx.scale(spawnScale, spawnScale);
+
+    // 尾巴（摆动的三角形，带渐变）
+    ctx.save();
+    ctx.translate(-fish.radius * 0.95, 0);
+    ctx.rotate(wiggle);
+    const tailGrad = ctx.createLinearGradient(0, -fish.radius * 0.7, 0, fish.radius * 0.7);
+    tailGrad.addColorStop(0, p.body);
+    tailGrad.addColorStop(1, p.bodyDark);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(-fish.radius * 0.5, -fish.radius * 0.75, -fish.radius * 0.95, -fish.radius * 0.55);
+    ctx.quadraticCurveTo(-fish.radius * 0.55, 0, -fish.radius * 0.95, fish.radius * 0.55);
+    ctx.quadraticCurveTo(-fish.radius * 0.5, fish.radius * 0.75, 0, 0);
+    ctx.closePath();
+    ctx.fillStyle = tailGrad;
+    ctx.fill();
+    ctx.restore();
+
+    // 背鳍
+    ctx.save();
+    ctx.rotate(wiggle * 0.4);
+    ctx.beginPath();
+    ctx.moveTo(-fish.radius * 0.05, -fish.radius * 0.55);
+    ctx.quadraticCurveTo(fish.radius * 0.15, -fish.radius * 1.05, fish.radius * 0.35, -fish.radius * 0.5);
+    ctx.closePath();
+    ctx.fillStyle = p.bodyDark;
+    ctx.globalAlpha = 0.85;
+    ctx.fill();
+    ctx.restore();
+
+    // 身体（椭圆，带渐变+高光）
+    const bodyGrad = ctx.createRadialGradient(
+      -fish.radius * 0.25, -fish.radius * 0.35, fish.radius * 0.1,
+      0, 0, fish.radius * 1.2
+    );
+    bodyGrad.addColorStop(0, p.belly);
+    bodyGrad.addColorStop(0.5, p.body);
+    bodyGrad.addColorStop(1, p.bodyDark);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, fish.radius, fish.radius * 0.68, 0, 0, Math.PI * 2);
+    ctx.fillStyle = bodyGrad;
+    ctx.fill();
+    ctx.strokeStyle = p.bodyDark;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 腹部高光弧线
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = fish.radius * 0.14;
+    ctx.beginPath();
+    ctx.ellipse(fish.radius * 0.05, fish.radius * 0.25, fish.radius * 0.55, fish.radius * 0.22, 0, Math.PI * 0.15, Math.PI * 0.85);
+    ctx.stroke();
+    ctx.restore();
+
+    // 侧鳍
+    ctx.save();
+    ctx.rotate(Math.sin(fish.wigglePhase * 1.3) * 0.25 + 0.3);
+    ctx.beginPath();
+    ctx.moveTo(-fish.radius * 0.05, fish.radius * 0.3);
+    ctx.quadraticCurveTo(-fish.radius * 0.15, fish.radius * 0.75, fish.radius * 0.15, fish.radius * 0.6);
+    ctx.closePath();
+    ctx.fillStyle = p.bodyDark;
+    ctx.globalAlpha = 0.8;
+    ctx.fill();
+    ctx.restore();
+
+    // 腮
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = p.bodyDark;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(fish.radius * 0.42, fish.radius * 0.05, fish.radius * 0.22, Math.PI * 0.65, Math.PI * 1.35);
+    ctx.stroke();
+    ctx.restore();
+
+    // 眼睛（大眼萌感）
+    ctx.beginPath();
+    ctx.arc(fish.radius * 0.55, -fish.radius * 0.1, fish.radius * 0.18, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(fish.radius * 0.6, -fish.radius * 0.1, fish.radius * 0.1, 0, Math.PI * 2);
+    ctx.fillStyle = '#2C3E50';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(fish.radius * 0.64, -fish.radius * 0.15, fish.radius * 0.035, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // 微笑嘴
+    ctx.save();
+    ctx.strokeStyle = p.bodyDark;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(fish.radius * 0.85, fish.radius * 0.05, fish.radius * 0.18, Math.PI * 0.1, Math.PI * 0.5);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.restore();
+
+    // 数字气泡背景 + 数字（水平显示，不随鱼旋转；宽度按文本自适应）
+    ctx.save();
+    const ty = fish.y - fish.radius * spawnScale - 14;
+    ctx.globalAlpha = spawnScale;
+    ctx.font = `bold ${this.config.fishNumberFontSize}px sans-serif`;
+    const textW = ctx.measureText(fish.display).width;
+    const bubbleRx = Math.max(fish.radius * 0.55 + 6, textW / 2 + 9);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.ellipse(fish.x, ty, bubbleRx, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = p.bodyDark;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(fish.display, fish.x, ty);
+    ctx.restore();
+  }
+
+  drawCat(cat) {
+    const ctx = this.ctx;
+    const bob = Math.sin(cat.bobPhase) * 2;
+    const sq = cat.squash;
+    const isBlinking = cat.blinkTimer < 0.12;
+
+    this._drawShadow(cat.x, cat.y + cat.radius * 0.95, cat.radius * 0.85, cat.radius * 0.28);
+
+    ctx.save();
+    ctx.translate(cat.x, cat.y + bob);
+    ctx.scale(1 / Math.sqrt(sq), sq); // 挤压拉伸动画（吃到食物时触发）
+
+    // 尾巴（摆动）
+    ctx.save();
+    ctx.translate(cat.radius * 0.55, cat.radius * 0.55);
+    ctx.rotate(Math.sin(cat.tailPhase) * 0.35 + 0.4);
+    ctx.strokeStyle = '#FF8C42';
+    ctx.lineWidth = cat.radius * 0.22;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(cat.radius * 0.7, cat.radius * 0.1, cat.radius * 0.75, -cat.radius * 0.55);
+    ctx.stroke();
+    ctx.restore();
+
+    // 耳朵（外+内粉色）
+    const earGrad = ctx.createLinearGradient(0, -cat.radius * 1.2, 0, -cat.radius * 0.5);
+    earGrad.addColorStop(0, '#FFB066');
+    earGrad.addColorStop(1, '#FF8C42');
+
+    ctx.fillStyle = earGrad;
+    ctx.beginPath();
+    ctx.moveTo(-cat.radius * 0.62, -cat.radius * 0.55);
+    ctx.lineTo(-cat.radius * 0.18, -cat.radius * 1.22);
+    ctx.lineTo(cat.radius * 0.08, -cat.radius * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-cat.radius * 0.5, -cat.radius * 0.62);
+    ctx.lineTo(-cat.radius * 0.24, -cat.radius * 1.02);
+    ctx.lineTo(-cat.radius * 0.08, -cat.radius * 0.56);
+    ctx.closePath();
+    ctx.fillStyle = '#FFD1B0';
+    ctx.fill();
+
+    ctx.fillStyle = earGrad;
+    ctx.beginPath();
+    ctx.moveTo(cat.radius * 0.62, -cat.radius * 0.55);
+    ctx.lineTo(cat.radius * 0.18, -cat.radius * 1.22);
+    ctx.lineTo(-cat.radius * 0.08, -cat.radius * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(cat.radius * 0.5, -cat.radius * 0.62);
+    ctx.lineTo(cat.radius * 0.24, -cat.radius * 1.02);
+    ctx.lineTo(cat.radius * 0.08, -cat.radius * 0.56);
+    ctx.closePath();
+    ctx.fillStyle = '#FFD1B0';
+    ctx.fill();
+
+    // 身体（圆形，带渐变+高光）
+    const bodyGrad = ctx.createRadialGradient(
+      -cat.radius * 0.3, -cat.radius * 0.4, cat.radius * 0.1,
+      0, 0, cat.radius * 1.15
+    );
+    bodyGrad.addColorStop(0, '#FFD199');
+    bodyGrad.addColorStop(0.55, '#FFA652');
+    bodyGrad.addColorStop(1, '#F08425');
+    ctx.beginPath();
+    ctx.arc(0, 0, cat.radius, 0, Math.PI * 2);
+    ctx.fillStyle = bodyGrad;
+    ctx.fill();
+    ctx.strokeStyle = '#E07B27';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 花纹（额头条纹）
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = '#E07B27';
+    ctx.lineWidth = cat.radius * 0.08;
+    ctx.lineCap = 'round';
+    for (const dx of [-0.22, 0, 0.22]) {
+      ctx.beginPath();
+      ctx.moveTo(cat.radius * dx, -cat.radius * 0.9);
+      ctx.lineTo(cat.radius * dx * 1.3, -cat.radius * 0.55);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 腮红
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = '#FF9E9E';
+    ctx.beginPath();
+    ctx.ellipse(-cat.radius * 0.55, cat.radius * 0.2, cat.radius * 0.16, cat.radius * 0.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cat.radius * 0.55, cat.radius * 0.2, cat.radius * 0.16, cat.radius * 0.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // 胡须
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 1.4;
+    ctx.lineCap = 'round';
+    for (const s of [-1, 1]) {
+      for (let i = 0; i < 3; i++) {
+        const yy = cat.radius * (0.12 + i * 0.1);
+        ctx.beginPath();
+        ctx.moveTo(s * cat.radius * 0.35, yy);
+        ctx.lineTo(s * cat.radius * (0.9 + i * 0.08), yy - cat.radius * 0.05 + i * cat.radius * 0.04);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // 眼睛（萌大眼，带眨眼动画）
+    const eyeY = -cat.radius * 0.05;
+    for (const s of [-1, 1]) {
+      ctx.save();
+      ctx.translate(s * cat.radius * 0.33, eyeY);
+      if (isBlinking) {
+        ctx.strokeStyle = '#3A2416';
+        ctx.lineWidth = cat.radius * 0.05;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-cat.radius * 0.1, 0);
+        ctx.lineTo(cat.radius * 0.1, 0);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, cat.radius * 0.11, cat.radius * 0.14, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#3A2416';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(-cat.radius * 0.03, -cat.radius * 0.05, cat.radius * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // 鼻子
+    ctx.beginPath();
+    ctx.moveTo(-cat.radius * 0.04, cat.radius * 0.13);
+    ctx.lineTo(cat.radius * 0.04, cat.radius * 0.13);
+    ctx.lineTo(0, cat.radius * 0.19);
+    ctx.closePath();
+    ctx.fillStyle = '#D35400';
+    ctx.fill();
+
+    // 嘴巴（w形萌嘴）
+    ctx.save();
+    ctx.strokeStyle = '#B4552A';
+    ctx.lineWidth = 1.6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, cat.radius * 0.19);
+    ctx.quadraticCurveTo(-cat.radius * 0.08, cat.radius * 0.3, -cat.radius * 0.18, cat.radius * 0.22);
+    ctx.moveTo(0, cat.radius * 0.19);
+    ctx.quadraticCurveTo(cat.radius * 0.08, cat.radius * 0.3, cat.radius * 0.18, cat.radius * 0.22);
+    ctx.stroke();
+    ctx.restore();
+
+    // 爪子（身体下方两个小圆）
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = '#FFB066';
+    ctx.beginPath();
+    ctx.ellipse(-cat.radius * 0.4, cat.radius * 0.88, cat.radius * 0.2, cat.radius * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cat.radius * 0.4, cat.radius * 0.88, cat.radius * 0.2, cat.radius * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+
+    // 数字气泡背景 + 数字（宽度按文本自适应，避免大数字/负数溢出）
+    ctx.save();
+    const ty = cat.y + bob - cat.radius * sq - 18;
+    ctx.font = `bold ${this.config.catNumberFontSize}px sans-serif`;
+    const numText = String(cat.number);
+    const textW = ctx.measureText(numText).width;
+    const bubbleRx = Math.max(20, textW / 2 + 10);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.strokeStyle = '#FF8C42';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(cat.x, ty, bubbleRx, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#E67E22';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(numText, cat.x, ty);
+    ctx.restore();
+  }
+
+  updateCatAnim(cat, dt) {
+    cat.bobPhase += dt * 2;
+    cat.tailPhase += dt * 2.2;
+    cat.squash += (cat.squashTarget - cat.squash) * Math.min(1, dt * 10);
+    if (Math.abs(cat.squash - cat.squashTarget) < 0.01 && cat.squashTarget !== 1) {
+      cat.squashTarget = 1;
+    }
+    cat.blinkTimer -= dt;
+    if (cat.blinkTimer < -0.15) {
+      cat.blinkTimer = Utils.randFloat(2.5, 5.5);
+    }
+  }
+
+  render(width, height, dt, fishManager, cat, effects) {
+    this.clear(width, height, dt);
+    for (const fish of fishManager.fishList) {
+      this.drawFish(fish);
+    }
+    this.updateCatAnim(cat, dt);
+    this.drawCat(cat);
+    effects.render(this.ctx);
+  }
+}
+
+/* ========================= UI ========================= */
+class UI {
+  constructor(config) {
+    this.config = config;
+    this.elMode = document.getElementById('uiMode');
+    this.elScore = document.getElementById('uiScore');
+    this.elTarget = document.getElementById('uiTarget');
+    this.elTime = document.getElementById('uiTime');
+
+    this.startModal = document.getElementById('startModal');
+    this.modeSelectModal = document.getElementById('modeSelectModal');
+    this.levelSelectModal = document.getElementById('levelSelectModal');
+    this.endModal = document.getElementById('endModal');
+    this.endTitle = document.getElementById('endTitle');
+    this.endDesc = document.getElementById('endDesc');
+    this.successToast = document.getElementById('successToast');
+    this.successScoreText = document.getElementById('successScoreText');
+
+    this.modeListEl = document.getElementById('modeList');
+    this.levelListEl = document.getElementById('levelList');
+    this.levelSelectTitle = document.getElementById('levelSelectTitle');
+
+    this.startBtn = document.getElementById('startBtn');
+    this.restartBtn = document.getElementById('restartBtn');
+    this.nextLevelBtn = document.getElementById('nextLevelBtn');
+    this.backToModeBtn = document.getElementById('backToModeBtn');
+
+    this.elTarget.textContent = '目标：' + this.config.targetScore;
+  }
+
+  updateHUD(state) {
+    this.elScore.textContent = '分数：' + state.score;
+    this.elTime.textContent = '时间：' + Math.ceil(state.timeRemaining);
+  }
+
+  setModeLabel(mode, level) {
+    this.elMode.textContent = mode.icon + ' ' + mode.name + ' · ' + level.name;
+  }
+
+  showStart() {
+    this.startModal.classList.remove('hidden');
+    this.modeSelectModal.classList.add('hidden');
+    this.levelSelectModal.classList.add('hidden');
+    this.endModal.classList.add('hidden');
+    this.successToast.classList.add('hidden');
+  }
+
+  hideStart() {
+    this.startModal.classList.add('hidden');
+  }
+
+  // 根据 GAME_MODES 配置动态生成模式按钮，未来新增模式无需改动此函数
+  renderModeList(modes, onSelect) {
+    this.modeListEl.innerHTML = '';
+    for (const mode of modes) {
+      const btn = document.createElement('button');
+      btn.className = 'optionBtn';
+      btn.textContent = mode.icon + ' ' + mode.name;
+      btn.addEventListener('click', () => onSelect(mode));
+      this.modeListEl.appendChild(btn);
+    }
+  }
+
+  // 根据某个模式下的 levels 配置动态生成难度按钮
+  renderLevelList(mode, onSelect) {
+    this.levelSelectTitle.textContent = mode.icon + ' ' + mode.name;
+    this.levelListEl.innerHTML = '';
+    for (const level of mode.levels) {
+      const btn = document.createElement('button');
+      btn.className = 'optionBtn';
+      btn.textContent = level.name;
+      btn.addEventListener('click', () => onSelect(level));
+      this.levelListEl.appendChild(btn);
+    }
+  }
+
+  showModeSelect() {
+    this.modeSelectModal.classList.remove('hidden');
+    this.levelSelectModal.classList.add('hidden');
+    this.endModal.classList.add('hidden');
+  }
+
+  hideModeSelect() {
+    this.modeSelectModal.classList.add('hidden');
+  }
+
+  showLevelSelect() {
+    this.levelSelectModal.classList.remove('hidden');
+    this.modeSelectModal.classList.add('hidden');
+  }
+
+  hideLevelSelect() {
+    this.levelSelectModal.classList.add('hidden');
+  }
+
+  showSuccessToast(score) {
+    this.successScoreText.textContent = '得分：' + score + ' 分';
+    this.successToast.classList.remove('hidden');
+  }
+
+  hideSuccessToast() {
+    this.successToast.classList.add('hidden');
+  }
+
+  // success: 本关是否通关；hasNextLevel: 是否存在下一关
+  // 通关时展示"重新挑战本关"+"挑战下一关"；未通关时只展示"重新挑战本关"
+  showEnd(success, score, hasNextLevel) {
+    this.endModal.classList.remove('hidden');
+    this.restartBtn.textContent = '重新挑战本关';
+    if (success) {
+      this.endTitle.textContent = '闯关成功';
+      this.endDesc.textContent = '最终得分：' + score + ' 分，太棒了！';
+      if (hasNextLevel) {
+        this.nextLevelBtn.classList.remove('hidden');
+      } else {
+        this.nextLevelBtn.classList.add('hidden');
+      }
+    } else {
+      this.endTitle.textContent = '挑战失败';
+      this.endDesc.textContent = '最终得分：' + score + ' 分（目标 ' + this.config.targetScore + ' 分），再接再厉！';
+      this.nextLevelBtn.classList.add('hidden');
+    }
+  }
+
+  hideEnd() {
+    this.endModal.classList.add('hidden');
+  }
+
+  bindStart(handler) {
+    this.startBtn.addEventListener('click', handler);
+  }
+
+  bindRestart(handler) {
+    this.restartBtn.addEventListener('click', handler);
+  }
+
+  bindNextLevel(handler) {
+    this.nextLevelBtn.addEventListener('click', handler);
+  }
+
+  bindBackToMode(handler) {
+    this.backToModeBtn.addEventListener('click', handler);
+  }
+}
+
+/* ========================= GameLoop / App ========================= */
+class MathCatGame {
+  constructor() {
+    this.config = GameConfig;
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+
+    this.questionGenerator = new QuestionGenerator();
+    this.state = new GameState(this.config);
+    this.fishManager = new FishManager(this.config, this.questionGenerator);
+    this.collisionManager = new CollisionManager(this.config);
+    this.renderer = new Renderer(this.ctx, this.config);
+    this.ui = new UI(this.config);
+    this.effects = new EffectsManager();
+    this.input = new InputManager(this.canvas, this.config, () => this.state.cat);
+
+    this.currentMode = null;
+    this.currentLevel = null;
+
+    this.bounds = { width: 0, height: 0 };
+    this.lastTime = null;
+    this.successTimer = null;
+
+    this._resize();
+    window.addEventListener('resize', () => this._resize());
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => this._resize(), 200);
+    });
+
+    // 流程：开始说明 -> 选择模式 -> 选择难度 -> 开始游戏 -> 结算(重新挑战本关/下一关)
+    this.ui.bindStart(() => this._goModeSelect());
+    this.ui.bindBackToMode(() => this._goModeSelect());
+    this.ui.bindRestart(() => this._retryCurrentLevel());
+    this.ui.bindNextLevel(() => this._goNextLevel());
+
+    this.ui.showStart();
+    this._loop = this._loop.bind(this);
+    requestAnimationFrame(this._loop);
+  }
+
+  _goModeSelect() {
+    this.ui.hideStart();
+    this.ui.hideEnd();
+    this.ui.renderModeList(GAME_MODES, (mode) => this._goLevelSelect(mode));
+    this.ui.showModeSelect();
+  }
+
+  _goLevelSelect(mode) {
+    this.currentMode = mode;
+    this.ui.renderLevelList(mode, (level) => this.startGame(mode, level));
+    this.ui.showLevelSelect();
+  }
+
+  _retryCurrentLevel() {
+    if (this.currentMode && this.currentLevel) {
+      this.startGame(this.currentMode, this.currentLevel);
+    } else {
+      this._goModeSelect();
+    }
+  }
+
+  _goNextLevel() {
+    const next = getNextLevelStep(this.currentMode, this.currentLevel);
+    if (next) {
+      this.startGame(next.mode, next.level);
+    } else {
+      // 已经是最后一关，回到模式选择
+      this._goModeSelect();
+    }
+  }
+
+  _resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.bounds.width = w;
+    this.bounds.height = h;
+
+    if (this.state.status !== 'playing') {
+      this.state.cat.x = w / 2;
+      this.state.cat.y = h / 2;
+    } else {
+      this.input.clampCatToBounds(this.state.cat, this.bounds);
+    }
+  }
+
+  startGame(mode, level) {
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+      this.successTimer = null;
+    }
+    this.currentMode = mode;
+    this.currentLevel = level;
+
+    this.state.reset(level);
+    this.state.cat.x = this.bounds.width / 2;
+    this.state.cat.y = this.bounds.height / 2;
+    this.fishManager.reset();
+    this.fishManager.fillToMax(level, this.state.cat.number, this.bounds);
+    this.effects.floatingTexts = [];
+    this.effects.particles = [];
+    this.effects.ripples = [];
+
+    this.state.status = 'playing';
+    this.ui.setModeLabel(mode, level);
+    this.ui.hideStart();
+    this.ui.hideModeSelect();
+    this.ui.hideLevelSelect();
+    this.ui.hideEnd();
+    this.ui.hideSuccessToast();
+    this.lastTime = null;
+  }
+
+  // 通关规则：仅在计时结束时结算一次。
+  // 30 秒内分数 >= 目标分即为通关，否则失败；不再提前于游戏中途判定。
+  endGame(success) {
+    this.state.status = success ? 'success' : 'fail';
+    const hasNextLevel = !!getNextLevelStep(this.currentMode, this.currentLevel);
+    if (success) {
+      this.ui.showSuccessToast(this.state.score);
+      this.successTimer = setTimeout(() => {
+        this.ui.hideSuccessToast();
+        this.ui.showEnd(true, this.state.score, hasNextLevel);
+      }, this.config.successHoldTime);
+    } else {
+      this.ui.showEnd(false, this.state.score, hasNextLevel);
+    }
+  }
+
+  _update(dt) {
+    if (this.state.status !== 'playing') return;
+
+    this.input.clampCatToBounds(this.state.cat, this.bounds);
+
+    this.fishManager.update(dt, this.bounds);
+    this.fishManager.fillToMax(this.currentLevel, this.state.cat.number, this.bounds);
+
+    this.collisionManager.checkAndResolve(this.state, this.fishManager, (fish, isCorrect, delta) => {
+      this.effects.spawnScoreText(fish.x, fish.y - fish.radius, delta);
+      this.effects.spawnEatBurst(fish.x, fish.y, fish.palette.body, isCorrect);
+    });
+
+    this.effects.update(dt);
+
+    this.state.timeRemaining -= dt;
+    if (this.state.timeRemaining <= 0) {
+      this.state.timeRemaining = 0;
+      const success = this.state.score >= this.config.targetScore;
+      this.endGame(success);
+    }
+  }
+
+  _render(dt) {
+    this.renderer.render(this.bounds.width, this.bounds.height, dt, this.fishManager, this.state.cat, this.effects);
+    this.ui.updateHUD(this.state);
+  }
+
+  _loop(timestamp) {
+    if (this.lastTime === null) this.lastTime = timestamp;
+    const dt = Math.min(0.05, (timestamp - this.lastTime) / 1000);
+    this.lastTime = timestamp;
+
+    this._update(dt);
+    this._render(dt);
+
+    requestAnimationFrame(this._loop);
+  }
+}
+
+window.addEventListener('load', () => {
+  new MathCatGame();
+});
+</script>
+</body>
+</html>;

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>游戏大厅 - 认知与数学</title>
+    <style>
+        :root {
+            /* 更暖、更安静的底色 */
+            --bg-top: #fdfbf7;
+            --bg-bottom: #f5f6f2;
+            --card-bg: #ffffff;
+            --text-main: #2b2622;   /* 暖调深棕 */
+            --text-muted: #85796e;  /* 暖灰 */
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            -webkit-font-smoothing: antialiased;
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+        }
+
+        header {
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 36px;
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 650;
+            color: #221f1c;
+            letter-spacing: -0.01em;
+        }
+
+        p.subtitle {
+            font-size: 15.5px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        main {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 游戏卡片 */
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 22px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 6px 20px rgba(120, 108, 90, 0.07);
+            border: 1px solid rgba(120, 108, 90, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .game-card:active {
+            transform: scale(0.97);
+            box-shadow: 0 3px 10px rgba(120, 108, 90, 0.05);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 果物底色 */
+        .icon-words { background-color: #fdf1ed; }     /* 淡杏粉 */
+        .icon-click { background-color: #fbeef0; }      /* 淡粉 */
+        .icon-challenge { background-color: #eef2f6; }  /* 淡雾蓝 */
+
+        /* 图标 1: 缩小字号并增加外围 Padding，使四宫格内聚且边距舒适 */
+        .icon-grid {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            padding: 12px;
+        }
+        .icon-grid span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        /* 图标 2: 优化数字与草莓比例，与外框保持平衡呼吸感 */
+        .icon-number {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+        }
+        .icon-number .big-num {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+            color: #d6708a;
+        }
+        .icon-number .berry-row {
+            display: flex;
+            gap: 1px;
+            font-size: 15px;
+            line-height: 1;
+            letter-spacing: -2px;
+            margin-top: 2px;
+        }
+
+        /* 图标 3: 优化猫咪尺寸与爱心贴合位置，避免贴近外边框 */
+        .icon-cat {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .icon-cat .cat-face {
+            font-size: 42px;
+            line-height: 1;
+        }
+        .icon-cat .heart {
+            position: absolute;
+            line-height: 1;
+        }
+        .icon-cat .heart-1 { top: 12px; right: 14px; font-size: 14px; }
+        .icon-cat .heart-2 { top: 20px; right: 23px; font-size: 11px; opacity: 0.85; }
+
+        .card-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            gap: 8px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #221f1c;
+        }
+
+        .age-badge {
+            font-size: 12.5px;
+            padding: 3px 9px;
+            border-radius: 8px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-words { background-color: #f6e3da; color: #a2694a; }
+        .badge-click { background-color: #f4dde1; color: #a25868; }
+        .badge-challenge { background-color: #dde5ee; color: #55688a; }
+
+        .card-desc {
+            font-size: 14.5px;
+            color: #8a7f74;
+            line-height: 1.5;
+        }
+
+        .arrow {
+            color: #d8d0c6;
+            font-size: 18px;
+            margin-left: 2px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        footer {
+            margin-top: auto;
+            padding-top: 48px;
+            font-size: 13.5px;
+            color: #a89e92;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>边玩边学</h1>
+        <p class="subtitle">安静、轻松的日常认知与数学练习</p>
+    </header>
+
+    <main>
+        <!-- 游戏 1: 生活中的词汇 -->
+        <a href="words/index.html" class="game-card">
+            <div class="card-icon icon-words">
+                <div class="icon-grid">
+                    <span>🍎</span><span>🚗</span>
+                    <span>🐶</span><span>🛝</span>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <span class="card-title">生活中的词汇</span>
+                    <span class="age-badge badge-words">3-6 岁</span>
+                </div>
+                <div class="card-desc">基础日常词汇与语言启蒙</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+
+        <!-- 游戏 2: 数字点点 -->
+        <a href="math-click/index.html" class="game-card">
+            <div class="card-icon icon-click">
+                <div class="icon-number">
+                    <span class="big-num">3</span>
+                    <span class="berry-row">🍓🍓🍓</span>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <span class="card-title">数字点点</span>
+                    <span class="age-badge badge-click">3-6 岁</span>
+                </div>
+                <div class="card-desc">认识数字、数数与基础运算</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+
+        <!-- 游戏 3: 数学挑战 (小猫吃鱼) -->
+        <a href="math-challenge/index.html" class="game-card">
+            <div class="card-icon icon-challenge">
+                <div class="icon-cat">
+                    <span class="cat-face">🐱</span>
+                    <span class="heart heart-1">❤️</span>
+                    <span class="heart heart-2">❤️</span>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <span class="card-title">数学挑战</span>
+                    <span class="age-badge badge-challenge">6-12 岁</span>
+                </div>
+                <div class="card-desc">拖动小猫吃掉正确的鱼，喂饱它</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+    </main>
+
+    <footer>
+        <p>Growy · 陪伴与新生</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>词汇卡片 · 点按复位</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #f7f4f0;
+            min-height: 100vh;
+            font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        /* 去掉外层"卡中卡"的圆角、阴影和大留白，让内容区域撑满整个屏幕，
+           这样列表页能一屏显示更多分类，而不是被四周的空白挤掉 */
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            padding: 14px 14px 22px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .home-page {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .home-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding-bottom: 4px;
+            border-bottom: 3px solid #f0ebe4;
+            flex-wrap: wrap;
+        }
+        .home-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-align: center;
+        }
+        .settings-btn {
+            background: #f0ebe4;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 15px;
+            cursor: pointer;
+            touch-action: manipulation;
+            color: #555;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .settings-btn:active {
+            transform: scale(0.94);
+            background: #e0d8ce;
+        }
+
+        .category-section {
+            margin-bottom: 4px;
+        }
+        .category-label {
+            font-size: 17px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-label span {
+            background: #f0ebe4;
+            border-radius: 20px;
+            padding: 0 10px;
+            font-size: 13px;
+            color: #888;
+        }
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 8px;
+        }
+        .word-card {
+            background: #fcfaf8;
+            border-radius: 18px;
+            padding: 8px 4px;
+            text-align: center;
+            border: 2px solid #f0ebe4;
+            cursor: pointer;
+            touch-action: manipulation;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 68px;
+        }
+        .word-card:active {
+            transform: scale(0.94);
+            background: #f5f0ea;
+        }
+        .word-card .emoji-big {
+            font-size: 30px;
+            line-height: 1.2;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .word-card img.card-image {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 2px;
+        }
+        .word-card .word-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-top: 2px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 90%;
+        }
+        .word-card .word-text.word-en {
+            font-size: 15px;
+            text-transform: lowercase;
+            white-space: nowrap;
+            max-width: 90%;
+        }
+        .expand-card {
+            background: #f5f0ea;
+            border-style: dashed;
+        }
+        .expand-card .expand-icon {
+            font-size: 20px;
+            line-height: 1.2;
+            color: #aaa;
+        }
+        .expand-card .word-text {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .number-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f2994a;
+            color: #fff;
+            font-weight: 700;
+            font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+            line-height: 1;
+        }
+        .number-badge.num-card {
+            width: 32px;
+            height: 32px;
+            font-size: 15px;
+        }
+        .number-badge.num-display {
+            width: 110px;
+            height: 110px;
+            font-size: 50px;
+        }
+        .number-badge.num-strip {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+        }
+
+        .reset-row {
+            text-align: center;
+            margin-top: 2px;
+        }
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 13px;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .learn-page {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            flex: 1;
+        }
+        .learn-page.active {
+            display: flex;
+        }
+        .learn-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .back-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            align-self: flex-start;
+            padding: 4px 8px;
+            color: #888;
+            touch-action: manipulation;
+        }
+        .learn-lang-toggle {
+            background: #f0ebe4;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .learn-lang-toggle:active {
+            transform: scale(0.94);
+            background: #e0d8ce;
+        }
+        .learn-lang-toggle .lang-zh,
+        .learn-lang-toggle .lang-en {
+            transition: color 0.2s, font-weight 0.2s;
+        }
+        .learn-lang-toggle .lang-zh {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .learn-lang-toggle .lang-en {
+            color: #bbb;
+            font-weight: 400;
+        }
+        .learn-lang-toggle.en-active .lang-zh {
+            color: #bbb;
+            font-weight: 400;
+        }
+        .learn-lang-toggle.en-active .lang-en {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .display-area {
+            text-align: center;
+            padding: 12px 0 8px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .display-emoji-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .display-emoji {
+            font-size: 110px;
+            line-height: 1.2;
+            display: block;
+            transition: opacity 0.4s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .display-emoji img {
+            max-width: 140px;
+            max-height: 140px;
+            object-fit: contain;
+            border-radius: 16px;
+        }
+        .display-emoji.dim {
+            opacity: 0.3;
+        }
+        .display-emoji.pop {
+            animation: popAnim 0.6s ease;
+        }
+        @keyframes popAnim {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.25); }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .speak-btn {
+            position: absolute;
+            bottom: 0;
+            right: -46px;
+            background: #f0ebe4;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+            cursor: pointer;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.15s;
+            z-index: 5;
+        }
+        .speak-btn.speak-hidden {
+            display: none !important;
+        }
+        .speak-btn:active {
+            transform: scale(0.88);
+            background: #e0d8ce;
+        }
+        .speak-btn.speaking {
+            background: #d4c9b8;
+            animation: speakPulse 0.5s ease infinite alternate;
+        }
+        @keyframes speakPulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.12); }
+        }
+
+        .puzzle-area {
+            position: relative;
+            flex: 1;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            margin: 8px 0 10px;
+        }
+        .slots-row {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            min-height: 60px;
+        }
+        .slot-placeholder {
+            border: 2px dashed #e0dad4;
+            border-radius: 18px;
+            background: #fcfbf9;
+            box-sizing: border-box;
+        }
+        .intact-word {
+            font-size: 40px;
+            font-weight: 700;
+            color: #1a1a1a;
+            background: #fcfbf9;
+            border-radius: 20px;
+            padding: 12px 28px;
+            border: 2px dashed #e0dad4;
+            letter-spacing: 2px;
+        }
+        .completed-word {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a1a;
+            background: #f1f8ea;
+            border-radius: 20px;
+            padding: 10px 28px;
+            border: 2px solid #b8d4a8;
+            letter-spacing: 2px;
+        }
+        .scramble-container {
+            flex: 1;
+            min-height: 180px;
+            background: #fcfbf9;
+            border-radius: 32px;
+            border: 2px dashed #e0dad4;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .tiles-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .tile {
+            position: absolute;
+            pointer-events: auto;
+            font-weight: 600;
+            color: #1a1a1a;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: left 0.35s cubic-bezier(0.34, 1.2, 0.64, 1), top 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+            text-align: center;
+            will-change: left, top;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .tile:active {
+            transform: scale(0.92);
+        }
+        .tile.placed {
+            border-color: #b8d4a8;
+            background: #f1f8ea;
+            opacity: 0.9;
+        }
+        .tile.wrong {
+            border-color: #ffb3a6;
+            background: #fff0ed;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 2px;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 60px;
+            font-size: 20px;
+            font-weight: 500;
+            background: #f0ebe4;
+            color: #555;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .btn:active {
+            transform: scale(0.94);
+            background: #e0d8ce;
+        }
+        .btn-primary {
+            background: #d4c9b8;
+            color: #1a1a1a;
+            font-weight: 600;
+            padding: 12px 32px;
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .status-hint {
+            text-align: center;
+            font-size: 16px;
+            color: #999;
+            margin-top: 6px;
+            min-height: 26px;
+        }
+
+        .word-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 4px 2px;
+            margin-top: 6px;
+            border-top: 2px solid #f0ebe4;
+            -webkit-overflow-scrolling: touch;
+        }
+        .strip-item {
+            flex: 0 0 auto;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #fcfaf8;
+            border: 2px solid #f0ebe4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .strip-item.active {
+            border-color: #b8d4a8;
+            background: #f1f8ea;
+        }
+        .strip-item img.strip-image {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .custom-input-area {
+            margin-top: 12px;
+            border-top: 2px solid #f0ebe4;
+            padding-top: 12px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .custom-input-area input[type="text"] {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px 12px;
+            border: 2px solid #e0dad4;
+            border-radius: 40px;
+            font-size: 16px;
+            outline: none;
+            background: #fcfaf8;
+        }
+        .custom-input-area input[type="text"]:focus {
+            border-color: #b8d4a8;
+        }
+        .custom-input-area input.en-input {
+            flex: 0.6;
+            min-width: 70px;
+            font-size: 14px;
+            padding: 10px 10px;
+        }
+        .image-upload-btn,
+        .emoji-pick-btn {
+            background: #f0ebe4;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            touch-action: manipulation;
+        }
+        .image-upload-btn:active,
+        .emoji-pick-btn:active {
+            transform: scale(0.9);
+            background: #e0d8ce;
+        }
+        .custom-input-area .btn {
+            flex: 0 0 auto;
+            padding: 10px 18px;
+            font-size: 16px;
+        }
+        .selected-image-preview {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #b8d4a8;
+        }
+        .selected-emoji-preview {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .home-hidden {
+            display: none !important;
+        }
+
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .settings-overlay.show {
+            display: flex;
+        }
+        .settings-panel {
+            background: white;
+            border-radius: 32px;
+            padding: 24px 22px 28px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .settings-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .settings-panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .settings-panel-close {
+            background: #f0ebe4;
+            border: none;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .settings-section-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .settings-option-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .settings-option-btn {
+            flex: 1;
+            min-width: 60px;
+            padding: 10px 14px;
+            border: 2px solid #e0dad4;
+            border-radius: 24px;
+            background: #fcfaf8;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            touch-action: manipulation;
+            color: #555;
+            text-align: center;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .settings-option-btn:active {
+            transform: scale(0.95);
+            background: #f5f0ea;
+        }
+        .settings-option-btn.active {
+            border-color: #b8d4a8;
+            background: #f1f8ea;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .emoji-panel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 999;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .emoji-panel-overlay.show {
+            display: flex;
+        }
+        .emoji-panel {
+            background: white;
+            border-radius: 28px 28px 0 0;
+            padding: 16px 14px 28px;
+            width: 100%;
+            max-width: 440px;
+            max-height: 55vh;
+            overflow-y: auto;
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.1);
+        }
+        .emoji-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .emoji-panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .emoji-panel-close {
+            background: #f0ebe4;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .emoji-panel-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .emoji-panel-item {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #fcfaf8;
+            border: 2px solid #f0ebe4;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            transition: all 0.12s;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .emoji-panel-item:active {
+            transform: scale(0.88);
+            background: #f5f0ea;
+            border-color: #b8d4a8;
+        }
+        .preview-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f0ebe4;
+            border-radius: 14px;
+            padding: 2px 8px;
+            font-size: 14px;
+            flex-shrink: 0;
+            max-width: 60px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div id="homePage" class="home-page">
+            <div class="home-title-row">
+                <div class="home-title">📚 我的词汇卡</div>
+                <button class="settings-btn" id="homeSettingsBtn">⚙️ 设置</button>
+            </div>
+            <div id="categoryList"></div>
+            <div class="custom-input-area">
+                <input type="text" id="newWordInput" placeholder="输入新词（最多6字）" maxlength="6">
+                <input type="text" id="newEnInput" class="en-input" placeholder="英文(可选)" maxlength="20">
+                <input type="file" id="imageInput" accept="image/*" style="display:none">
+                <button class="emoji-pick-btn" id="pickEmojiBtn" title="选择emoji图标">😊</button>
+                <button class="image-upload-btn" id="pickImageBtn" title="选择图片">🖼️</button>
+                <span class="preview-badge" id="iconPreview" style="display:none;"></span>
+                <button class="btn btn-primary" id="addWordBtn">➕ 添加</button>
+            </div>
+            <div style="font-size:12px; color:#ccc; text-align:center; margin-top:2px;">可上传图片或选emoji，词汇保存在本地</div>
+            <div class="reset-row"><button class="reset-btn" id="resetBtn">🗑️ 清空本地词库并恢复默认</button></div>
+        </div>
+        <div id="learnPage" class="learn-page">
+            <div class="learn-top-bar">
+                <button class="back-btn" id="backBtn">‹ 返回</button>
+                <button class="learn-lang-toggle" id="learnLangToggle"><span class="lang-zh">中</span>/<span class="lang-en">EN</span></button>
+            </div>
+            <div class="display-area">
+                <div class="display-emoji-wrapper" id="displayWrapper">
+                    <div class="display-emoji" id="displayEmoji">🚂</div>
+                    <button class="speak-btn" id="speakBtn" title="发音">🔊</button>
+                </div>
+            </div>
+            <div class="puzzle-area" id="puzzleArea">
+                <div class="slots-row" id="slotsRow"></div>
+                <div class="scramble-container" id="scrambleContainer"></div>
+                <div class="tiles-layer" id="tilesLayer"></div>
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary" id="actionBtn">🔀 打乱</button>
+            </div>
+            <div class="status-hint" id="statusHint">点击"打乱"开始挑战</div>
+            <div class="word-strip" id="wordStrip"></div>
+        </div>
+    </div>
+
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-panel-header">
+                <span class="settings-panel-title">⚙️ 设置</span>
+                <button class="settings-panel-close" id="settingsPanelClose">✕</button>
+            </div>
+            <div>
+                <div class="settings-section-label">🌐 语言</div>
+                <div class="settings-option-row" id="settingsLangRow">
+                    <button class="settings-option-btn active" data-lang="zh">中文</button>
+                    <button class="settings-option-btn" data-lang="en">English</button>
+                </div>
+            </div>
+            <div>
+                <div class="settings-section-label">🔊 音效</div>
+                <div class="settings-option-row" id="settingsSoundRow">
+                    <button class="settings-option-btn" data-sound="mute">🔇 静音</button>
+                    <button class="settings-option-btn active" data-sound="manual">🔊 手动</button>
+                    <button class="settings-option-btn" data-sound="auto">🎵 自动</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="emoji-panel-overlay" id="emojiPanelOverlay">
+        <div class="emoji-panel" id="emojiPanel">
+            <div class="emoji-panel-header">
+                <span class="emoji-panel-title">选择一个图标</span>
+                <button class="emoji-panel-close" id="emojiPanelClose">✕</button>
+            </div>
+            <div class="emoji-panel-grid" id="emojiPanelGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // 手动预设的英文拆分（按发音/单词）
+        // 注：'orange'（橙子/橙色）和 'star'（星星/星形）在不同分类下共用同一个英文单词，
+        // 因此这里只需要一份拆分即可，两处引用会自动保持一致。
+        const EN_CHUNKS = {
+            'one': ['o','ne'], 'two': ['t','wo'], 'three': ['th','ree'], 'four': ['f','our'], 'five': ['f','ive'],
+            'six': ['s','ix'], 'seven': ['se','ven'], 'eight': ['e','ight'], 'nine': ['n','ine'], 'ten': ['t','en'],
+            'apple': ['ap','ple'], 'banana': ['ba','na','na'], 'grape': ['gr','ape'], 'strawberry': ['straw','ber','ry'],
+            'orange': ['or','ange'], 'watermelon': ['wa','ter','mel','on'], 'peach': ['p','each'], 'pear': ['p','ear'],
+            'cherry': ['cher','ry'], 'lemon': ['lem','on'], 'mango': ['man','go'], 'pineapple': ['pine','ap','ple'],
+            'kiwi': ['ki','wi'],
+            'cat': ['c','at'], 'dog': ['d','og'], 'bird': ['b','ird'], 'fish': ['f','ish'], 'rabbit': ['rab','bit'],
+            'elephant': ['el','e','phant'], 'tiger': ['ti','ger'], 'lion': ['li','on'], 'giraffe': ['gi','raffe'],
+            'monkey': ['mon','key'], 'bear': ['b','ear'], 'panda': ['pan','da'], 'pig': ['p','ig'], 'cow': ['c','ow'],
+            'sheep': ['sh','eep'], 'horse': ['h','orse'], 'frog': ['fr','og'], 'duck': ['d','uck'],
+            'chicken': ['chick','en'], 'butterfly': ['but','ter','fly'], 'ladybug': ['la','dy','bug'],
+            'spider': ['spi','der'], 'bee': ['b','ee'], 'fly': ['f','ly'], 'dolphin': ['dol','phin'],
+            'whale': ['wh','ale'],
+            'train': ['tr','ain'], 'airplane': ['air','plane'], 'ship': ['sh','ip'], 'car': ['c','ar'],
+            'bicycle': ['bi','cy','cle'], 'bus': ['b','us'], 'taxi': ['tax','i'], 'ambulance': ['am','bu','lance'],
+            'firetruck': ['fire','truck'], 'police car': ['po','lice','car'], 'motorcycle': ['mo','tor','cy','cle'],
+            'rocket': ['rock','et'], 'helicopter': ['hel','i','cop','ter'], 'tractor': ['trac','tor'],
+            'sailboat': ['sail','boat'],
+            'bread': ['br','ead'], 'cake': ['c','ake'], 'cookie': ['cook','ie'], 'pizza': ['piz','za'],
+            'hamburger': ['ham','bur','ger'], 'fries': ['fr','ies'], 'noodles': ['noo','dles'], 'rice': ['r','ice'],
+            'dumpling': ['dump','ling'], 'egg': ['e','gg'], 'milk': ['m','ilk'], 'chicken leg': ['chick','en','leg'],
+            'ice cream': ['ice','cream'], 'chocolate': ['choc','o','late'], 'popcorn': ['pop','corn'],
+            'sushi': ['su','shi'], 'fortune cookie': ['fortune','cookie'],
+            'slide': ['sl','ide'], 'balloon': ['bal','loon'], 'teddy bear': ['teddy','bear'],
+            'yo-yo': ['yo-','yo'], 'gift': ['g','ift'],
+            'red': ['r','ed'], 'blue': ['bl','ue'], 'green': ['gr','een'], 'yellow': ['yel','low'],
+            'purple': ['pur','ple'], 'black': ['bl','ack'], 'white': ['wh','ite'],
+            'pink': ['p','ink'], 'brown': ['br','own'],
+            'sun': ['s','un'], 'moon': ['m','oon'], 'star': ['st','ar'], 'cloud': ['cl','oud'],
+            'rain': ['r','ain'], 'snow': ['sn','ow'], 'wind': ['w','ind'], 'rainbow': ['rain','bow'],
+            'lightning': ['light','ning'], 'fog': ['f','og'],
+            'dad': ['d','ad'], 'mom': ['m','om'], 'big brother': ['big','brother'], 'big sister': ['big','sister'],
+            'little brother': ['little','brother'], 'little sister': ['little','sister'],
+            'grandpa': ['grand','pa'], 'grandma': ['grand','ma'], 'uncle': ['un','cle'], 'aunt': ['aunt'],
+            'circle': ['cir','cle'], 'square': ['s','quare'], 'triangle': ['tri','an','gle'],
+            'heart': ['h','eart'], 'diamond': ['di','a','mond'], 'cross': ['cr','oss'],
+            'run': ['r','un'], 'walk': ['w','alk'], 'stand': ['st','and'], 'sit': ['s','it'],
+            'sleep': ['sl','eep'], 'laugh': ['l','augh'], 'cry': ['cr','y'], 'clap': ['cl','ap'],
+            'wave': ['w','ave'], 'hug': ['h','ug'], 'sing': ['s','ing'], 'dance': ['d','ance'],
+            'school': ['sch','ool'], 'river': ['riv','er'], 'mountain': ['moun','tain'],
+            'farm': ['f','arm'], 'beach': ['b','each']
+        };
+
+        const DEFAULT_WORDS = {
+            '数字': [
+                { word: '一', en: 'one', en_chunks: EN_CHUNKS['one'], emoji: '1', isNumber: true },
+                { word: '二', en: 'two', en_chunks: EN_CHUNKS['two'], emoji: '2', isNumber: true },
+                { word: '三', en: 'three', en_chunks: EN_CHUNKS['three'], emoji: '3', isNumber: true },
+                { word: '四', en: 'four', en_chunks: EN_CHUNKS['four'], emoji: '4', isNumber: true },
+                { word: '五', en: 'five', en_chunks: EN_CHUNKS['five'], emoji: '5', isNumber: true },
+                { word: '六', en: 'six', en_chunks: EN_CHUNKS['six'], emoji: '6', isNumber: true },
+                { word: '七', en: 'seven', en_chunks: EN_CHUNKS['seven'], emoji: '7', isNumber: true },
+                { word: '八', en: 'eight', en_chunks: EN_CHUNKS['eight'], emoji: '8', isNumber: true },
+                { word: '九', en: 'nine', en_chunks: EN_CHUNKS['nine'], emoji: '9', isNumber: true },
+                { word: '十', en: 'ten', en_chunks: EN_CHUNKS['ten'], emoji: '10', isNumber: true }
+            ],
+            '水果': [
+                { word: '苹果', en: 'apple', en_chunks: EN_CHUNKS['apple'], emoji: '🍎' },
+                { word: '香蕉', en: 'banana', en_chunks: EN_CHUNKS['banana'], emoji: '🍌' },
+                { word: '葡萄', en: 'grape', en_chunks: EN_CHUNKS['grape'], emoji: '🍇' },
+                { word: '草莓', en: 'strawberry', en_chunks: EN_CHUNKS['strawberry'], emoji: '🍓' },
+                { word: '橙子', en: 'orange', en_chunks: EN_CHUNKS['orange'], emoji: '🍊' },
+                { word: '西瓜', en: 'watermelon', en_chunks: EN_CHUNKS['watermelon'], emoji: '🍉' },
+                { word: '桃子', en: 'peach', en_chunks: EN_CHUNKS['peach'], emoji: '🍑' },
+                { word: '梨', en: 'pear', en_chunks: EN_CHUNKS['pear'], emoji: '🍐' },
+                { word: '樱桃', en: 'cherry', en_chunks: EN_CHUNKS['cherry'], emoji: '🍒' },
+                { word: '柠檬', en: 'lemon', en_chunks: EN_CHUNKS['lemon'], emoji: '🍋' },
+                { word: '芒果', en: 'mango', en_chunks: EN_CHUNKS['mango'], emoji: '🥭' },
+                { word: '菠萝', en: 'pineapple', en_chunks: EN_CHUNKS['pineapple'], emoji: '🍍' },
+                { word: '猕猴桃', en: 'kiwi', en_chunks: EN_CHUNKS['kiwi'], emoji: '🥝' }
+            ],
+            '动物': [
+                { word: '猫', en: 'cat', en_chunks: EN_CHUNKS['cat'], emoji: '🐱' },
+                { word: '狗', en: 'dog', en_chunks: EN_CHUNKS['dog'], emoji: '🐶' },
+                { word: '鸟', en: 'bird', en_chunks: EN_CHUNKS['bird'], emoji: '🐦' },
+                { word: '鱼', en: 'fish', en_chunks: EN_CHUNKS['fish'], emoji: '🐟' },
+                { word: '兔子', en: 'rabbit', en_chunks: EN_CHUNKS['rabbit'], emoji: '🐰' },
+                { word: '大象', en: 'elephant', en_chunks: EN_CHUNKS['elephant'], emoji: '🐘' },
+                { word: '老虎', en: 'tiger', en_chunks: EN_CHUNKS['tiger'], emoji: '🐯' },
+                { word: '狮子', en: 'lion', en_chunks: EN_CHUNKS['lion'], emoji: '🦁' },
+                { word: '长颈鹿', en: 'giraffe', en_chunks: EN_CHUNKS['giraffe'], emoji: '🦒' },
+                { word: '猴子', en: 'monkey', en_chunks: EN_CHUNKS['monkey'], emoji: '🐒' },
+                { word: '熊', en: 'bear', en_chunks: EN_CHUNKS['bear'], emoji: '🐻' },
+                { word: '熊猫', en: 'panda', en_chunks: EN_CHUNKS['panda'], emoji: '🐼' },
+                { word: '猪', en: 'pig', en_chunks: EN_CHUNKS['pig'], emoji: '🐷' },
+                { word: '牛', en: 'cow', en_chunks: EN_CHUNKS['cow'], emoji: '🐮' },
+                { word: '羊', en: 'sheep', en_chunks: EN_CHUNKS['sheep'], emoji: '🐑' },
+                { word: '马', en: 'horse', en_chunks: EN_CHUNKS['horse'], emoji: '🐴' },
+                { word: '青蛙', en: 'frog', en_chunks: EN_CHUNKS['frog'], emoji: '🐸' },
+                { word: '鸭子', en: 'duck', en_chunks: EN_CHUNKS['duck'], emoji: '🦆' },
+                { word: '鸡', en: 'chicken', en_chunks: EN_CHUNKS['chicken'], emoji: '🐔' },
+                { word: '蝴蝶', en: 'butterfly', en_chunks: EN_CHUNKS['butterfly'], emoji: '🦋' },
+                { word: '瓢虫', en: 'ladybug', en_chunks: EN_CHUNKS['ladybug'], emoji: '🐞' },
+                { word: '蜘蛛', en: 'spider', en_chunks: EN_CHUNKS['spider'], emoji: '🕷️' },
+                { word: '蜜蜂', en: 'bee', en_chunks: EN_CHUNKS['bee'], emoji: '🐝' },
+                { word: '苍蝇', en: 'fly', en_chunks: EN_CHUNKS['fly'], emoji: '🪰' },
+                { word: '海豚', en: 'dolphin', en_chunks: EN_CHUNKS['dolphin'], emoji: '🐬' },
+                { word: '鲸鱼', en: 'whale', en_chunks: EN_CHUNKS['whale'], emoji: '🐋' }
+            ],
+            '交通工具': [
+                { word: '火车', en: 'train', en_chunks: EN_CHUNKS['train'], emoji: '🚂' },
+                { word: '飞机', en: 'airplane', en_chunks: EN_CHUNKS['airplane'], emoji: '✈️' },
+                { word: '轮船', en: 'ship', en_chunks: EN_CHUNKS['ship'], emoji: '🚢' },
+                { word: '汽车', en: 'car', en_chunks: EN_CHUNKS['car'], emoji: '🚗' },
+                { word: '自行车', en: 'bicycle', en_chunks: EN_CHUNKS['bicycle'], emoji: '🚲' },
+                { word: '公交车', en: 'bus', en_chunks: EN_CHUNKS['bus'], emoji: '🚌' },
+                { word: '出租车', en: 'taxi', en_chunks: EN_CHUNKS['taxi'], emoji: '🚕' },
+                { word: '救护车', en: 'ambulance', en_chunks: EN_CHUNKS['ambulance'], emoji: '🚑' },
+                { word: '消防车', en: 'firetruck', en_chunks: EN_CHUNKS['firetruck'], emoji: '🚒' },
+                { word: '警车', en: 'police car', en_chunks: EN_CHUNKS['police car'], emoji: '🚓' },
+                { word: '摩托车', en: 'motorcycle', en_chunks: EN_CHUNKS['motorcycle'], emoji: '🏍️' },
+                { word: '火箭', en: 'rocket', en_chunks: EN_CHUNKS['rocket'], emoji: '🚀' },
+                { word: '直升机', en: 'helicopter', en_chunks: EN_CHUNKS['helicopter'], emoji: '🚁' },
+                { word: '拖拉机', en: 'tractor', en_chunks: EN_CHUNKS['tractor'], emoji: '🚜' },
+                { word: '帆船', en: 'sailboat', en_chunks: EN_CHUNKS['sailboat'], emoji: '⛵' }
+            ],
+            '食物': [
+                { word: '面包', en: 'bread', en_chunks: EN_CHUNKS['bread'], emoji: '🍞' },
+                { word: '蛋糕', en: 'cake', en_chunks: EN_CHUNKS['cake'], emoji: '🍰' },
+                { word: '饼干', en: 'cookie', en_chunks: EN_CHUNKS['cookie'], emoji: '🍪' },
+                { word: '披萨', en: 'pizza', en_chunks: EN_CHUNKS['pizza'], emoji: '🍕' },
+                { word: '汉堡', en: 'hamburger', en_chunks: EN_CHUNKS['hamburger'], emoji: '🍔' },
+                { word: '薯条', en: 'fries', en_chunks: EN_CHUNKS['fries'], emoji: '🍟' },
+                { word: '面条', en: 'noodles', en_chunks: EN_CHUNKS['noodles'], emoji: '🍜' },
+                { word: '米饭', en: 'rice', en_chunks: EN_CHUNKS['rice'], emoji: '🍚' },
+                { word: '饺子', en: 'dumpling', en_chunks: EN_CHUNKS['dumpling'], emoji: '🥟' },
+                { word: '鸡蛋', en: 'egg', en_chunks: EN_CHUNKS['egg'], emoji: '🥚' },
+                { word: '牛奶', en: 'milk', en_chunks: EN_CHUNKS['milk'], emoji: '🥛' },
+                { word: '鸡腿', en: 'chicken leg', en_chunks: EN_CHUNKS['chicken leg'], emoji: '🍗' },
+                { word: '冰淇淋', en: 'ice cream', en_chunks: EN_CHUNKS['ice cream'], emoji: '🍦' },
+                { word: '巧克力', en: 'chocolate', en_chunks: EN_CHUNKS['chocolate'], emoji: '🍫' },
+                { word: '爆米花', en: 'popcorn', en_chunks: EN_CHUNKS['popcorn'], emoji: '🍿' },
+                { word: '寿司', en: 'sushi', en_chunks: EN_CHUNKS['sushi'], emoji: '🍣' },
+                { word: '幸运饼干', en: 'fortune cookie', en_chunks: EN_CHUNKS['fortune cookie'], emoji: '🥠' }
+            ],
+            '玩具': [
+                { word: '滑梯', en: 'slide', en_chunks: EN_CHUNKS['slide'], emoji: '🛝' },
+                { word: '气球', en: 'balloon', en_chunks: EN_CHUNKS['balloon'], emoji: '🎈' },
+                { word: '泰迪熊', en: 'teddy bear', en_chunks: EN_CHUNKS['teddy bear'], emoji: '🧸' },
+                { word: '溜溜球', en: 'yo-yo', en_chunks: EN_CHUNKS['yo-yo'], emoji: '🪀' },
+                { word: '礼物', en: 'gift', en_chunks: EN_CHUNKS['gift'], emoji: '🎁' }
+            ],
+            '颜色': [
+                { word: '红色', en: 'red', en_chunks: EN_CHUNKS['red'], emoji: '🔴' },
+                { word: '蓝色', en: 'blue', en_chunks: EN_CHUNKS['blue'], emoji: '🔵' },
+                { word: '绿色', en: 'green', en_chunks: EN_CHUNKS['green'], emoji: '🟢' },
+                { word: '黄色', en: 'yellow', en_chunks: EN_CHUNKS['yellow'], emoji: '🟡' },
+                { word: '橙色', en: 'orange', en_chunks: EN_CHUNKS['orange'], emoji: '🟠' },
+                { word: '紫色', en: 'purple', en_chunks: EN_CHUNKS['purple'], emoji: '🟣' },
+                { word: '黑色', en: 'black', en_chunks: EN_CHUNKS['black'], emoji: '⚫' },
+                { word: '白色', en: 'white', en_chunks: EN_CHUNKS['white'], emoji: '⚪' },
+                { word: '粉色', en: 'pink', en_chunks: EN_CHUNKS['pink'], emoji: '💗' },
+                { word: '棕色', en: 'brown', en_chunks: EN_CHUNKS['brown'], emoji: '🟤' }
+            ],
+            '天气': [
+                { word: '太阳', en: 'sun', en_chunks: EN_CHUNKS['sun'], emoji: '☀️' },
+                { word: '月亮', en: 'moon', en_chunks: EN_CHUNKS['moon'], emoji: '🌙' },
+                { word: '星星', en: 'star', en_chunks: EN_CHUNKS['star'], emoji: '⭐' },
+                { word: '云', en: 'cloud', en_chunks: EN_CHUNKS['cloud'], emoji: '☁️' },
+                { word: '雨', en: 'rain', en_chunks: EN_CHUNKS['rain'], emoji: '🌧️' },
+                { word: '雪', en: 'snow', en_chunks: EN_CHUNKS['snow'], emoji: '❄️' },
+                { word: '风', en: 'wind', en_chunks: EN_CHUNKS['wind'], emoji: '💨' },
+                { word: '彩虹', en: 'rainbow', en_chunks: EN_CHUNKS['rainbow'], emoji: '🌈' },
+                { word: '闪电', en: 'lightning', en_chunks: EN_CHUNKS['lightning'], emoji: '⚡' },
+                { word: '雾', en: 'fog', en_chunks: EN_CHUNKS['fog'], emoji: '🌫️' }
+            ],
+            '家庭成员': [
+                { word: '爸爸', en: 'dad', en_chunks: EN_CHUNKS['dad'], emoji: '👨' },
+                { word: '妈妈', en: 'mom', en_chunks: EN_CHUNKS['mom'], emoji: '👩' },
+                { word: '哥哥', en: 'big brother', en_chunks: EN_CHUNKS['big brother'], emoji: '👦' },
+                { word: '姐姐', en: 'big sister', en_chunks: EN_CHUNKS['big sister'], emoji: '👧' },
+                { word: '弟弟', en: 'little brother', en_chunks: EN_CHUNKS['little brother'], emoji: '👶' },
+                { word: '妹妹', en: 'little sister', en_chunks: EN_CHUNKS['little sister'], emoji: '👧' },
+                { word: '爷爷', en: 'grandpa', en_chunks: EN_CHUNKS['grandpa'], emoji: '👴' },
+                { word: '奶奶', en: 'grandma', en_chunks: EN_CHUNKS['grandma'], emoji: '👵' },
+                { word: '叔叔', en: 'uncle', en_chunks: EN_CHUNKS['uncle'], emoji: '🧔' },
+                { word: '阿姨', en: 'aunt', en_chunks: EN_CHUNKS['aunt'], emoji: '👩\u200d🦰' }
+            ],
+            '形状': [
+                { word: '圆形', en: 'circle', en_chunks: EN_CHUNKS['circle'], emoji: '⚪' },
+                { word: '正方形', en: 'square', en_chunks: EN_CHUNKS['square'], emoji: '⬜' },
+                { word: '三角形', en: 'triangle', en_chunks: EN_CHUNKS['triangle'], emoji: '🔺' },
+                { word: '星形', en: 'star', en_chunks: EN_CHUNKS['star'], emoji: '⭐' },
+                { word: '心形', en: 'heart', en_chunks: EN_CHUNKS['heart'], emoji: '❤️' },
+                { word: '菱形', en: 'diamond', en_chunks: EN_CHUNKS['diamond'], emoji: '🔷' },
+                { word: '十字形', en: 'cross', en_chunks: EN_CHUNKS['cross'], emoji: '➕' }
+            ],
+            '动作': [
+                { word: '跑步', en: 'run', en_chunks: EN_CHUNKS['run'], emoji: '🏃' },
+                { word: '走路', en: 'walk', en_chunks: EN_CHUNKS['walk'], emoji: '🚶' },
+                { word: '站立', en: 'stand', en_chunks: EN_CHUNKS['stand'], emoji: '🧍' },
+                { word: '坐下', en: 'sit', en_chunks: EN_CHUNKS['sit'], emoji: '🪑' },
+                { word: '睡觉', en: 'sleep', en_chunks: EN_CHUNKS['sleep'], emoji: '😴' },
+                { word: '大笑', en: 'laugh', en_chunks: EN_CHUNKS['laugh'], emoji: '😄' },
+                { word: '哭泣', en: 'cry', en_chunks: EN_CHUNKS['cry'], emoji: '😢' },
+                { word: '拍手', en: 'clap', en_chunks: EN_CHUNKS['clap'], emoji: '👏' },
+                { word: '挥手', en: 'wave', en_chunks: EN_CHUNKS['wave'], emoji: '👋' },
+                { word: '拥抱', en: 'hug', en_chunks: EN_CHUNKS['hug'], emoji: '🤗' },
+                { word: '唱歌', en: 'sing', en_chunks: EN_CHUNKS['sing'], emoji: '🎤' },
+                { word: '跳舞', en: 'dance', en_chunks: EN_CHUNKS['dance'], emoji: '💃' }
+            ],
+            '场景': [
+                { word: '学校', en: 'school', en_chunks: EN_CHUNKS['school'], emoji: '🏫' },
+                { word: '河流', en: 'river', en_chunks: EN_CHUNKS['river'], emoji: '🏞️' },
+                { word: '高山', en: 'mountain', en_chunks: EN_CHUNKS['mountain'], emoji: '⛰️' },
+                { word: '农田', en: 'farm', en_chunks: EN_CHUNKS['farm'], emoji: '🌾' },
+                { word: '海滩', en: 'beach', en_chunks: EN_CHUNKS['beach'], emoji: '🏖️' }
+            ]
+        };
+
+        function loadWords() {
+            const stored = localStorage.getItem('myVocabWords');
+            let storedData = {};
+            if (stored) { try { storedData = JSON.parse(stored); } catch (e) {} }
+            const merged = JSON.parse(JSON.stringify(DEFAULT_WORDS));
+            for (const [cat, arr] of Object.entries(storedData)) {
+                if (merged[cat]) {
+                    const existing = new Set(merged[cat].map(w => w.word));
+                    arr.forEach(item => {
+                        if (!existing.has(item.word)) merged[cat].push({
+                            word: item.word,
+                            en: item.en || '',
+                            en_chunks: item.en_chunks || null,
+                            emoji: item.emoji,
+                            image: item.image,
+                            isNumber: item.isNumber || false
+                        });
+                    });
+                } else {
+                    merged[cat] = arr;
+                }
+            }
+            localStorage.setItem('myVocabWords', JSON.stringify(merged));
+            return merged;
+        }
+
+        function loadSettings() {
+            const stored = localStorage.getItem('myVocabSettings');
+            if (stored) { try { return JSON.parse(stored); } catch (e) {} }
+            return { language: 'zh', soundMode: 'manual' };
+        }
+        function saveSettings(settings) { localStorage.setItem('myVocabSettings', JSON.stringify(settings)); }
+
+        let vocabData = loadWords();
+        let appSettings = loadSettings();
+        let isEnglishMode = (appSettings.language === 'en');
+        let soundMode = appSettings.soundMode || 'manual';
+        let currentCategory = null, currentWordIndex = -1, currentWordObj = null;
+        let currentChars = [], tileStates = [], expectedIndex = 0, isShuffled = false, isComplete = false;
+        let selectedImageData = null, selectedEmojiData = null;
+        let tileLayoutCache = { tileW: 88, tileH: 70, gap: 10 };
+
+        const $ = id => document.getElementById(id);
+        const homePage = $('homePage'), learnPage = $('learnPage'), categoryList = $('categoryList');
+        const displayEmoji = $('displayEmoji'), displayWrapper = $('displayWrapper');
+        const puzzleArea = $('puzzleArea'), slotsRow = $('slotsRow');
+        const scrambleContainer = $('scrambleContainer'), tilesLayer = $('tilesLayer');
+        const actionBtn = $('actionBtn'), backBtn = $('backBtn'), wordStrip = $('wordStrip');
+        const statusHint = $('statusHint'), newWordInput = $('newWordInput'), newEnInput = $('newEnInput'), addWordBtn = $('addWordBtn');
+        const imageInput = $('imageInput'), pickImageBtn = $('pickImageBtn'), pickEmojiBtn = $('pickEmojiBtn'), resetBtn = $('resetBtn');
+        const speakBtn = $('speakBtn');
+        const homeSettingsBtn = $('homeSettingsBtn'), learnLangToggle = $('learnLangToggle');
+        const settingsOverlay = $('settingsOverlay'), settingsPanelClose = $('settingsPanelClose');
+        const emojiPanelOverlay = $('emojiPanelOverlay'), emojiPanelGrid = $('emojiPanelGrid'), emojiPanelCloseBtn = $('emojiPanelClose');
+        const iconPreview = $('iconPreview');
+
+        function updateLangToggleUI() { learnLangToggle.classList.toggle('en-active', isEnglishMode); }
+        function updateSpeakBtnVisibility() {
+            if (soundMode === 'mute') speakBtn.classList.add('speak-hidden');
+            else speakBtn.classList.remove('speak-hidden');
+        }
+        function updateSettingsPanelUI() {
+            document.querySelectorAll('#settingsLangRow .settings-option-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === (isEnglishMode ? 'en' : 'zh'));
+            });
+            document.querySelectorAll('#settingsSoundRow .settings-option-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.sound === soundMode);
+            });
+        }
+
+        function getWordText(item) { return (isEnglishMode && item.en) ? item.en : item.word; }
+        function getDisplayWord(item) { return getWordText(item); }
+
+        function getCharsForWord(item) {
+            if (isEnglishMode && item.en) {
+                // 优先使用预设拆分
+                if (item.en_chunks && Array.isArray(item.en_chunks)) return item.en_chunks;
+                // 后备随机拆分
+                const word = item.en;
+                const len = word.length;
+                if (len <= 1) return [word];
+                const maxSeg = Math.min(4, len);
+                const minSeg = Math.max(2, Math.ceil(len/5));
+                const seg = minSeg + Math.floor(Math.random()*(maxSeg-minSeg+1));
+                if (seg >= len) return Array.from(word);
+                const cuts = [];
+                for (let i=1;i<len;i++) cuts.push(i);
+                for (let i=cuts.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [cuts[i],cuts[j]]=[cuts[j],cuts[i]]; }
+                const sel = cuts.slice(0,seg-1).sort((a,b)=>a-b);
+                const res=[]; let s=0;
+                for (const c of sel){ res.push(word.slice(s,c)); s=c; }
+                res.push(word.slice(s));
+                return res;
+            }
+            const word = item.word;
+            if (window.Intl && Intl.Segmenter) {
+                const seg = new Intl.Segmenter('zh', { granularity: 'grapheme' });
+                return Array.from(seg.segment(word)).map(x=>x.segment);
+            }
+            return Array.from(word);
+        }
+
+        pickImageBtn.onclick = () => imageInput.click();
+        pickEmojiBtn.onclick = () => { emojiPanelOverlay.classList.add('show'); buildEmojiPanel(); };
+        emojiPanelCloseBtn.onclick = () => emojiPanelOverlay.classList.remove('show');
+        emojiPanelOverlay.onclick = (e) => { if (e.target === emojiPanelOverlay) emojiPanelOverlay.classList.remove('show'); };
+        function buildEmojiPanel() {
+            emojiPanelGrid.innerHTML = '';
+            const list = ['🍎','🍌','🍇','🍓','🍊','🍉','🍑','🍐','🍒','🍋','🥭','🍍','🥝','🍞','🍰','🍪','🍕','🍔','🍟','🍜','🍚','🥟','🥚','🥛','🍗','🍦','🍫','🍿','🍣','🥠','🐱','🐶','🐦','🐟','🐰','🐘','🐯','🦁','🦒','🐒','🐻','🐼','🐷','🐮','🐑','🐴','🐸','🦆','🐔','🦋','🐞','🕷️','🐝','🪰','🐬','🐋','🚂','✈️','🚢','🚗','🚲','🚌','🚕','🚑','🚒','🚓','🏍️','🚀','🚁','🚜','⛵','☀️','🌙','⭐','☁️','🌧️','❄️','💨','🌈','⚡','🌫️','🔴','🔵','🟢','🟡','🟠','🟣','⚫','⚪','💗','🟤','👨','👩','👦','👧','👶','👴','👵','🧔','👩‍🦰','⚪','⬜','🔺','⭐','❤️','🔷','➕','🏃','🚶','🧍','🪑','😴','😄','😢','👏','👋','🤗','🎤','💃','🏫','🏞️','⛰️','🌾','🏖️','🌲','🏜️','🏙️','🌊','🏔️','🧩','🎯','🎨','🎵','📖','✏️','🌟','🔥','💧','🍀','🎈','🎁','🧸','🪀','🛝'];
+            list.forEach(emo => {
+                const btn = document.createElement('button');
+                btn.className = 'emoji-panel-item';
+                btn.textContent = emo;
+                btn.onclick = () => { selectedEmojiData = emo; selectedImageData = null; imageInput.value = ''; updateIconPreview(); emojiPanelOverlay.classList.remove('show'); };
+                emojiPanelGrid.appendChild(btn);
+            });
+        }
+        function updateIconPreview() {
+            if (selectedEmojiData) { iconPreview.style.display = 'inline-flex'; iconPreview.innerHTML = '<span class="selected-emoji-preview">'+selectedEmojiData+'</span>'; }
+            else if (selectedImageData) { iconPreview.style.display = 'inline-flex'; iconPreview.innerHTML = '<img class="selected-image-preview" src="'+selectedImageData+'" alt="preview">'; }
+            else { iconPreview.style.display = 'none'; iconPreview.innerHTML = ''; }
+        }
+        imageInput.onchange = e => {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas'); const MAX_SIZE = 200;
+                    let w=img.width, h=img.height;
+                    if(w>h){ if(w>MAX_SIZE){ h*=MAX_SIZE/w; w=MAX_SIZE; } } else { if(h>MAX_SIZE){ w*=MAX_SIZE/h; h=MAX_SIZE; } }
+                    canvas.width=w; canvas.height=h; canvas.getContext('2d').drawImage(img,0,0,w,h);
+                    selectedImageData = canvas.toDataURL('image/jpeg',0.8); selectedEmojiData = null; updateIconPreview();
+                }; img.src = ev.target.result;
+            }; reader.readAsDataURL(file);
+        };
+
+        function renderIcon(item, kind) {
+            if (item.image) { const cls = kind==='card'?'card-image':(kind==='strip'?'strip-image':''); return `<img class="${cls}" src="${item.image}" alt="${item.word}">`; }
+            if (item.isNumber) { const cls = kind==='card'?'num-card':(kind==='strip'?'num-strip':'num-display'); return `<span class="number-badge ${cls}">${item.emoji}</span>`; }
+            if (kind==='card') return `<span class="emoji-big">${item.emoji}</span>`;
+            if (kind==='strip') return `<span>${item.emoji}</span>`;
+            return item.emoji;
+        }
+        function startLearningByWord(item) {
+            for (const [c,arr] of Object.entries(vocabData)) {
+                const idx = arr.findIndex(w=>w.word===item.word);
+                if(idx!==-1){ startLearning(c,idx); return; }
+            }
+        }
+        function makeWordCard(item) {
+            const card = document.createElement('div'); card.className = 'word-card';
+            const displayText = getWordText(item);
+            const wordClass = (displayText.length>4?'word-text word-break':'word-text')+(isEnglishMode&&item.en?' word-en':'');
+            card.innerHTML = `${renderIcon(item,'card')}<span class="${wordClass}">${displayText}</span>`;
+            card.onclick = () => startLearningByWord(item);
+            return card;
+        }
+        function buildCategorySection(cat, words) {
+            const section = document.createElement('div'); section.className = 'category-section';
+            section.innerHTML = `<div class="category-label">${cat} <span>${words.length}</span></div>`;
+            const grid = document.createElement('div'); grid.className = 'word-grid'; section.appendChild(grid);
+            categoryList.appendChild(section);
+            let expanded=false, rowCount=null;
+            function makeToggleCard(isExpand) {
+                const card = document.createElement('div'); card.className = 'word-card expand-card';
+                card.innerHTML = isExpand?`<span class="expand-icon">⋯</span><span class="word-text">展开</span>`:`<span class="expand-icon">︿</span><span class="word-text">收起</span>`;
+                card.onclick = () => { expanded=!expanded; renderGrid(); }; return card;
+            }
+            function renderGrid() {
+                grid.innerHTML = ''; words.forEach(item=>grid.appendChild(makeWordCard(item)));
+                if(rowCount===null){
+                    const cards = Array.from(grid.children);
+                    if(cards.length){ const firstTop=cards[0].offsetTop; rowCount=0; for(const el of cards){ if(el.offsetTop===firstTop) rowCount++; else break; } } else rowCount=0;
+                }
+                if(rowCount>0 && words.length>rowCount){
+                    if(!expanded){ const visible = Array.from(grid.children).slice(0,rowCount-1); grid.innerHTML=''; visible.forEach(el=>grid.appendChild(el)); grid.appendChild(makeToggleCard(true)); }
+                    else { grid.appendChild(makeToggleCard(false)); }
+                }
+            }
+            renderGrid();
+        }
+        function renderHome() { categoryList.innerHTML = ''; for(const [cat,words] of Object.entries(vocabData)){ if(words.length) buildCategorySection(cat, words); } }
+
+        // 单字词（如"猫""一"）只有一个字，打乱起来没什么意思。
+        // 这里从同类别里随机挑另一个词，把它的字也混进打乱池当"干扰项"——
+        // 只有目标字被点击才会推进进度，点到干扰字会走原有的"不对哦"判定，不需要改handleTileClick。
+        function getDecoyChars(wordObj) {
+            if (!currentCategory) return [];
+            const pool = (vocabData[currentCategory] || []).filter(w => w.word !== wordObj.word);
+            if (!pool.length) return [];
+            const other = pool[Math.floor(Math.random() * pool.length)];
+            return getCharsForWord(other);
+        }
+        function loadWord(wordObj) {
+            tilesLayer.innerHTML = ''; currentWordObj = wordObj;
+            currentChars = getCharsForWord(wordObj);
+            const decoyChars = currentChars.length === 1 ? getDecoyChars(wordObj) : [];
+            tileStates = currentChars.map((ch,i)=>({char:ch, correctIndex:i, left:0, top:0, placed:false}))
+                .concat(decoyChars.map(ch=>({char:ch, correctIndex:-1, left:0, top:0, placed:false, isDecoy:true})));
+            expectedIndex=0; isShuffled=false; isComplete=false;
+            displayEmoji.innerHTML = wordObj.image?`<img src="${wordObj.image}" alt="${wordObj.word}">`:renderIcon(wordObj,'display');
+            displayEmoji.className = 'display-emoji'; actionBtn.textContent='🔀 打乱'; actionBtn.disabled=false;
+            statusHint.textContent='点击"打乱"开始挑战'; renderTiles(false);
+            if(soundMode==='auto'){ setTimeout(()=>speakCurrentWord(),300); }
+        }
+        function startLearning(cat, idx) {
+            currentCategory=cat; currentWordIndex=idx; homePage.classList.add('home-hidden'); learnPage.classList.add('active');
+            loadWord(vocabData[cat][idx]); renderWordStrip(); updateLangToggleUI(); updateSpeakBtnVisibility();
+        }
+        function renderWordStrip() {
+            const words = vocabData[currentCategory]; wordStrip.innerHTML='';
+            words.forEach((item,idx)=>{
+                const el=document.createElement('div'); el.className='strip-item'+(idx===currentWordIndex?' active':'');
+                el.innerHTML=renderIcon(item,'strip');
+                el.onclick=()=>{ if(idx===currentWordIndex) return; currentWordIndex=idx; loadWord(words[idx]); renderWordStrip(); };
+                wordStrip.appendChild(el);
+            });
+            const activeEl=wordStrip.querySelector('.strip-item.active'); if(activeEl) activeEl.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+        }
+        function renderTiles(shuffled) {
+            if(!isShuffled && !isComplete){ tilesLayer.innerHTML=''; slotsRow.innerHTML=`<div class="intact-word">${getDisplayWord(currentWordObj)}</div>`; return; }
+            if(isComplete){ tilesLayer.innerHTML=''; slotsRow.innerHTML=`<div class="completed-word">${getDisplayWord(currentWordObj)}</div>`; return; }
+            const cw = puzzleArea.clientWidth||360; const count = tileStates.length; if(!count) return;
+            const gap=10; const availableW=(cw-gap*(count+1))/count; const tileW=Math.max(48,Math.min(96,availableW)); const tileH=Math.min(82,tileW*1.2);
+            tileLayoutCache={tileW,tileH,gap};
+            const totalWidth=count*tileW+(count-1)*gap; const startX=(cw-totalWidth)/2;
+            if(!shuffled){ tileStates.forEach((t,i)=>{t.left=startX+i*(tileW+gap);t.top=0;t.placed=false;}); expectedIndex=0; isShuffled=false; isComplete=false; displayEmoji.classList.remove('dim','pop'); }
+            slotsRow.innerHTML=''; for(let i=0;i<count;i++){ const ph=document.createElement('div'); ph.className='slot-placeholder'; ph.style.width=tileW+'px'; ph.style.height=tileH+'px'; slotsRow.appendChild(ph); }
+            if(tilesLayer.children.length!==count){ tilesLayer.innerHTML=''; tileStates.forEach((t,idx)=>{ const tile=document.createElement('div'); tile.className='tile'; tile.textContent=t.char; tile.onclick=()=>handleTileClick(idx); tilesLayer.appendChild(tile); }); }
+            tileStates.forEach((t,idx)=>{ const tile=tilesLayer.children[idx]; tile.className='tile'+(t.placed?' placed':''); tile.style.left=t.left+'px'; tile.style.top=t.top+'px'; tile.style.width=tileW+'px'; tile.style.height=tileH+'px'; tile.style.fontSize=Math.max(22,Math.min(36,tileW*0.55))+'px'; tile.style.zIndex = count - idx; });
+            statusHint.textContent = isShuffled?`👆 按顺序点击，还剩 ${currentChars.length-expectedIndex} 个`:'点击"打乱"开始挑战';
+        }
+        actionBtn.onclick = () => { if(!isComplete) isShuffled?resetLearn():shuffleTiles(); };
+        function shuffleTiles() {
+            const {tileW,tileH}=tileLayoutCache; const margin=16;
+            const boxTop=scrambleContainer.offsetTop, boxLeft=scrambleContainer.offsetLeft;
+            const boxW=scrambleContainer.clientWidth, boxH=scrambleContainer.clientHeight;
+            const unplaced=tileStates.filter(t=>!t.placed); if(!unplaced.length) return;
+            const positions=[];
+            unplaced.forEach(()=>{ let left,top,overlap,attempts=0; do{ left=boxLeft+margin+Math.random()*Math.max(0,boxW-tileW-2*margin); top=boxTop+margin+Math.random()*Math.max(0,boxH-tileH-2*margin); overlap=positions.some(p=>Math.abs(p.left-left)<tileW/2+5&&Math.abs(p.top-top)<tileH/2+5); attempts++; } while(overlap&&attempts<100); positions.push({left,top}); });
+            unplaced.forEach((t,i)=>{t.left=positions[i].left; t.top=positions[i].top;});
+            if(!isShuffled){ isShuffled=true; displayEmoji.classList.add('dim'); }
+            expectedIndex=tileStates.findIndex(t=>!t.placed); if(expectedIndex===-1) expectedIndex=tileStates.length;
+            renderTiles(true); actionBtn.textContent='🔄 重置';
+        }
+        function resetLearn() {
+            tileStates.forEach(t=>{t.left=0;t.top=0;t.placed=false;}); expectedIndex=0; isShuffled=false; isComplete=false;
+            displayEmoji.className='display-emoji'; renderTiles(false); actionBtn.textContent='🔀 打乱'; actionBtn.disabled=false;
+        }
+        function handleTileClick(idx) {
+            if(isComplete||!isShuffled){ if(!isShuffled) statusHint.textContent='先点击"打乱"再开始吧！'; return; }
+            const tile=tileStates[idx]; if(tile.placed) return;
+            if(tile.char===currentChars[expectedIndex]){
+                tile.placed=true; const cw=puzzleArea.clientWidth||360; const {tileW,gap}=tileLayoutCache;
+                const totalWidth=currentChars.length*tileW+(currentChars.length-1)*gap; const startX=(cw-totalWidth)/2;
+                tile.left=startX+expectedIndex*(tileW+gap); tile.top=0; expectedIndex++;
+                if(soundMode==='auto' && !isEnglishMode){ speakChar(tile.char); }
+                if(expectedIndex===currentChars.length){
+                    isComplete=true; displayEmoji.classList.remove('dim'); void displayEmoji.offsetWidth; displayEmoji.classList.add('pop');
+                }
+                renderTiles(true);
+                if(isComplete){
+                    statusHint.textContent='🎉 全部复位！太棒啦！'; actionBtn.textContent='✅ 已完成'; actionBtn.disabled=true;
+                    if(soundMode==='auto'){ setTimeout(()=>speakCurrentWord(),900); }
+                } else { statusHint.textContent=`👆 继续，还剩 ${currentChars.length-expectedIndex} 个`; }
+            } else {
+                const tileEl=tilesLayer.children[idx]; if(tileEl){ tileEl.classList.add('wrong'); setTimeout(()=>tileEl.classList.remove('wrong'),300); }
+                statusHint.textContent='❌ 不对哦，试试另一个';
+            }
+        }
+        function speakChar(char) {
+            if(!window.speechSynthesis||soundMode==='mute') return;
+            window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(char);
+            u.lang='zh-CN'; u.rate=0.8; u.volume=0.9;
+            const voices=speechSynthesis.getVoices(); if(voices.length){ const zh=voices.find(v=>v.lang.startsWith('zh')); if(zh) u.voice=zh; }
+            speechSynthesis.speak(u);
+        }
+        function speakCurrentWord() {
+            if(soundMode==='mute') return; if(!currentWordObj) return;
+            const text=getDisplayWord(currentWordObj); if(!text) return;
+            if(!window.speechSynthesis){ statusHint.textContent='🔇 浏览器不支持发音'; return; }
+            window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
+            u.lang=isEnglishMode?'en-US':'zh-CN'; u.rate=0.85;
+            const voices=speechSynthesis.getVoices();
+            if(voices.length){
+                if(isEnglishMode){ const us=voices.find(v=>v.lang.startsWith('en-US')); if(us) u.voice=us; else{ const en=voices.find(v=>v.lang.startsWith('en')); if(en) u.voice=en; } }
+                else { const zh=voices.find(v=>v.lang.startsWith('zh')); if(zh) u.voice=zh; }
+            }
+            speakBtn.classList.add('speaking'); u.onend=u.onerror=()=>speakBtn.classList.remove('speaking');
+            speechSynthesis.speak(u); if(soundMode==='manual'||soundMode==='auto') statusHint.textContent='🔊 正在发音...';
+        }
+        speakBtn.onclick = (e) => { e.stopPropagation(); speakCurrentWord(); };
+        displayWrapper.onclick = () => speakCurrentWord();
+
+        function switchLanguage() {
+            isEnglishMode=!isEnglishMode; appSettings.language=isEnglishMode?'en':'zh'; saveSettings(appSettings);
+            updateLangToggleUI(); updateSettingsPanelUI(); renderHome();
+            if(learnPage.classList.contains('active')&&currentWordObj){ loadWord(vocabData[currentCategory][currentWordIndex]); renderWordStrip(); }
+        }
+        function setSoundMode(mode) { soundMode=mode; appSettings.soundMode=mode; saveSettings(appSettings); updateSpeakBtnVisibility(); updateSettingsPanelUI(); if(mode==='mute'){ window.speechSynthesis&&window.speechSynthesis.cancel(); speakBtn.classList.remove('speaking'); } }
+        learnLangToggle.onclick = switchLanguage;
+        homeSettingsBtn.onclick = () => { updateSettingsPanelUI(); settingsOverlay.classList.add('show'); };
+        settingsPanelClose.onclick = () => settingsOverlay.classList.remove('show');
+        settingsOverlay.onclick = (e) => { if(e.target===settingsOverlay) settingsOverlay.classList.remove('show'); };
+        document.getElementById('settingsLangRow').addEventListener('click', (e) => { const btn=e.target.closest('.settings-option-btn'); if(!btn) return; const lang=btn.dataset.lang; if((lang==='en')!==isEnglishMode) switchLanguage(); });
+        document.getElementById('settingsSoundRow').addEventListener('click', (e) => { const btn=e.target.closest('.settings-option-btn'); if(!btn) return; setSoundMode(btn.dataset.sound); });
+
+        backBtn.onclick = () => { learnPage.classList.remove('active'); homePage.classList.remove('home-hidden'); currentCategory=null; currentWordIndex=-1; currentWordObj=null; window.speechSynthesis&&window.speechSynthesis.cancel(); speakBtn.classList.remove('speaking'); renderHome(); };
+
+        function addCustomWord() {
+            const raw=newWordInput.value.trim(), rawEn=newEnInput.value.trim(); if(!raw) return;
+            const words=raw.split(/[,，\s]+/).filter(w=>w.length>0&&w.length<=6); if(!words.length){ alert('❌ 请输入1到6个字的有效词汇'); return; }
+            const category='自定义'; if(!vocabData[category]) vocabData[category]=[];
+            words.forEach(w=>{
+                let emoji=selectedEmojiData||getEmojiForWord(w); const item={word:w,en:rawEn||'',emoji};
+                if(selectedImageData) item.image=selectedImageData;
+                if(!vocabData[category].some(x=>x.word===w)) vocabData[category].push(item);
+            });
+            try{ localStorage.setItem('myVocabWords',JSON.stringify(vocabData)); }catch(e){ alert('保存失败'); return; }
+            newWordInput.value=''; newEnInput.value=''; selectedImageData=null; selectedEmojiData=null; imageInput.value=''; updateIconPreview(); renderHome();
+        }
+        function getEmojiForWord(w){ const map={'火车':'🚂','飞机':'✈️','轮船':'🚢','汽车':'🚗','自行车':'🚲','公交车':'🚌','出租车':'🚕','救护车':'🚑','消防车':'🚒','警车':'🚓','摩托车':'🏍️','火箭':'🚀','直升机':'🚁','拖拉机':'🚜','帆船':'⛵','苹果':'🍎','香蕉':'🍌','葡萄':'🍇','草莓':'🍓','橙子':'🍊','西瓜':'🍉','桃子':'🍑','梨':'🍐','樱桃':'🍒','柠檬':'🍋','芒果':'🥭','菠萝':'🍍','猕猴桃':'🥝','猫':'🐱','狗':'🐶','鸟':'🐦','鱼':'🐟','兔子':'🐰','大象':'🐘','老虎':'🐯','狮子':'🦁','长颈鹿':'🦒','猴子':'🐒','熊':'🐻','熊猫':'🐼','猪':'🐷','牛':'🐮','羊':'🐑','马':'🐴','青蛙':'🐸','鸭子':'🦆','鸡':'🐔','蝴蝶':'🦋','瓢虫':'🐞','蜘蛛':'🕷️','蜜蜂':'🐝','苍蝇':'🪰','海豚':'🐬','鲸鱼':'🐋','一':'1️⃣','二':'2️⃣','三':'3️⃣','四':'4️⃣','五':'5️⃣','六':'6️⃣','七':'7️⃣','八':'8️⃣','九':'9️⃣','十':'🔟','太阳':'☀️','月亮':'🌙','星星':'⭐','云':'☁️','雨':'🌧️','雪':'❄️','风':'💨','彩虹':'🌈','闪电':'⚡','雾':'🌫️','红色':'🔴','蓝色':'🔵','绿色':'🟢','黄色':'🟡','橙色':'🟠','紫色':'🟣','黑色':'⚫','白色':'⚪','粉色':'💗','棕色':'🟤','面包':'🍞','蛋糕':'🍰','饼干':'🍪','披萨':'🍕','汉堡':'🍔','薯条':'🍟','面条':'🍜','米饭':'🍚','饺子':'🥟','鸡蛋':'🥚','牛奶':'🥛','鸡腿':'🍗','冰淇淋':'🍦','巧克力':'🍫','爆米花':'🍿','寿司':'🍣','幸运饼干':'🥠','爸爸':'👨','妈妈':'👩','哥哥':'👦','姐姐':'👧','弟弟':'👶','妹妹':'👧','爷爷':'👴','奶奶':'👵','叔叔':'🧔','阿姨':'👩‍🦰','圆形':'⚪','正方形':'⬜','三角形':'🔺','星形':'⭐','心形':'❤️','菱形':'🔷','十字形':'➕','跑步':'🏃','走路':'🚶','站立':'🧍','坐下':'🪑','睡觉':'😴','大笑':'😄','哭泣':'😢','拍手':'👏','挥手':'👋','拥抱':'🤗','唱歌':'🎤','跳舞':'💃','学校':'🏫','河流':'🏞️','高山':'⛰️','农田':'🌾','海滩':'🏖️','滑梯':'🛝','气球':'🎈','泰迪熊':'🧸','溜溜球':'🪀','礼物':'🎁'}; return map[w]||'🧩'; }
+        addWordBtn.onclick = addCustomWord;
+        newWordInput.onkeydown = e => { if(e.key==='Enter') addCustomWord(); };
+        newEnInput.onkeydown = e => { if(e.key==='Enter') addCustomWord(); };
+        resetBtn.onclick = () => { if(confirm('确定要清空本地词库、恢复默认词汇吗？')){ localStorage.removeItem('myVocabWords'); vocabData=loadWords(); selectedImageData=null; selectedEmojiData=null; imageInput.value=''; updateIconPreview(); renderHome(); } };
+        window.onresize = () => { if(learnPage.classList.contains('active')&&currentWordObj&&isShuffled&&!isComplete) renderTiles(true); };
+        updateLangToggleUI(); updateSpeakBtnVisibility(); updateSettingsPanelUI(); updateIconPreview(); renderHome();
+    </script>
+</body>
+</html>
