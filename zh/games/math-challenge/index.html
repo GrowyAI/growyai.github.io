@@ -222,7 +222,7 @@
   <div id="startModal" class="modal">
     <div class="panel">
       <h1>🐱 小猫吃鱼</h1>
-      <p>选择比大小、加法或减法模式，拖动小猫吃掉正确答案的鱼！<br>吃对 +10 分，吃错 -10 分。<br>30 秒内拿到 50 分即可闯关成功！</p>
+      <p>选择比大小、加法、减法、乘法或除法模式，拖动小猫吃掉正确答案的鱼！<br>吃对 +10 分，吃错 -10 分。<br>拿到 50 分即可闯关成功！</p>
       <button id="startBtn">开始游戏</button>
     </div>
   </div>
@@ -283,7 +283,9 @@ const GameConfig = {
   scoreWrong: -10,
   successHoldTime: 1000,      // ms
   catNumberFontSize: 18,
-  fishNumberFontSize: 16
+  fishNumberFontSize: 16,
+  multiplicationFishCount: 4,   // 乘法模式：每一轮同时出现的备选鱼数量
+  multiplicationMaxB: 9          // 乘法模式：乘数 b 从 1 递增到几
 };
 
 /* ========================= Utils ========================= */
@@ -306,6 +308,16 @@ const Utils = {
   },
   randomSign() {
     return Math.random() < 0.5 ? -1 : 1;
+  },
+  // 原地打乱数组顺序（Fisher-Yates），并返回该数组
+  shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Utils.randInt(0, i);
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
   },
   easeOutCubic(t) {
     return 1 - Math.pow(1 - t, 3);
@@ -417,6 +429,50 @@ function makeSubtractionLevel(id, name, max, catRange, avoidZero) {
   };
 }
 
+// 工厂函数：乘法关卡（设计思路与其他模式不同，见下方 kind:'multiplication' 分支说明）。
+// 小猫头顶显示算式"a×b"，鱼身上只显示一个答案数字（不是算式）。
+// 关卡选择的是固定的基数 a（1-9），游戏内 b 会按 buildRoundSequence() 给出的顺序（1→9依次）出现，
+// 不需要 generate()：具体的每轮出题逻辑由 FishManager.spawnMultiplicationRound 负责，
+// 因为它需要"一次性生成4条互不重复的鱼"，与其余模式"逐条补充"的模式不同。
+function makeMultiplicationLevel(base) {
+  return {
+    id: 'base' + base,
+    name: '× ' + base,
+    kind: 'multiplication',
+    base: base,
+    valueRange: [0, base * GameConfig.multiplicationMaxB],
+    generateCatNumber: () => base * 1,
+    // 乘法就按 1→9 顺序来即可（乘数递增本身没有"能被猜出规律"的问题）
+    buildRoundSequence: () => {
+      const seq = [];
+      for (let i = 1; i <= GameConfig.multiplicationMaxB; i++) seq.push(i);
+      return seq;
+    }
+  };
+}
+
+// 工厂函数：除法关卡。与乘法共用同一套"每轮4条鱼(1对3错)、吃了就清空进入下一轮、
+// 全部轮次结束才结算"的引擎（见 kind:'division' 分支说明），只是出题方式不同：
+// 小猫头顶显示算式"a÷b"（a为随机生成的被除数，b为关卡选择的固定除数），
+// 鱼身上显示的是候选商（答案），正确答案永远是整数商 q（1-9）。
+// 商 q 不是简单地从1数到9（那样太容易被猜出规律），而是拆成两半分别打乱：
+// 先把 1-5 打乱排一遍，再把 6-9 打乱排一遍，拼起来作为本局9轮的出题顺序。
+function makeDivisionLevel(divisor) {
+  return {
+    id: 'divisor' + divisor,
+    name: '÷ ' + divisor,
+    kind: 'division',
+    divisor: divisor,
+    valueRange: [1, 9],
+    generateCatNumber: () => divisor * 1,
+    buildRoundSequence: () => {
+      const firstHalf = Utils.shuffle([1, 2, 3, 4, 5]);
+      const secondHalf = Utils.shuffle([6, 7, 8, 9]);
+      return firstHalf.concat(secondHalf);
+    }
+  };
+}
+
 // 平方数关卡：鱼显示 "15²"，真实比较的是平方后的结果
 const squareNumberLevel = {
   id: 'squareNumber',
@@ -496,10 +552,40 @@ const GAME_MODES = [
       makeSubtractionLevel('within50', '50以内', 50, [18, 50], false),
       makeSubtractionLevel('within100', '100以内', 100, [30, 100], false)
     ]
+  },
+  {
+    id: 'multiplication',
+    name: '乘法',
+    icon: '✖️',
+    levels: [
+      makeMultiplicationLevel(1),
+      makeMultiplicationLevel(2),
+      makeMultiplicationLevel(3),
+      makeMultiplicationLevel(4),
+      makeMultiplicationLevel(5),
+      makeMultiplicationLevel(6),
+      makeMultiplicationLevel(7),
+      makeMultiplicationLevel(8),
+      makeMultiplicationLevel(9)
+    ]
+  },
+  {
+    id: 'division',
+    name: '除法',
+    icon: '➗',
+    levels: [
+      makeDivisionLevel(1),
+      makeDivisionLevel(2),
+      makeDivisionLevel(3),
+      makeDivisionLevel(4),
+      makeDivisionLevel(5),
+      makeDivisionLevel(6),
+      makeDivisionLevel(7),
+      makeDivisionLevel(8),
+      makeDivisionLevel(9)
+    ]
   }
   // 未来新增模式示例（不在第一版实现），只需追加对象，无需改动引擎：
-  // { id:'multiplication', name:'乘法', icon:'✖️', levels:[ ... ] },
-  // { id:'division', name:'除法', icon:'➗', levels:[ ... ] },
   // { id:'evenNumber', name:'找偶数', icon:'🔵', levels:[ ... ] },
   // { id:'primeNumber', name:'找质数', icon:'⭐', levels:[ ... ] },
 ];
@@ -545,6 +631,19 @@ class GameState {
     this.status = 'idle'; // idle | playing | success | fail
     this.score = 0;
     this.timeRemaining = this.config.timeLimit;
+    this.kind = (level && level.kind) || 'standard'; // standard | multiplication | division
+    // "按轮次推进"的模式（乘法/除法）共用这一套字段：
+    // roundSequence 是本局9轮的出题顺序（乘法固定1→9；除法是打乱过的），
+    // roundIndex 是当前是第几轮（0-based），roundMax 恒为9。
+    if (level && typeof level.buildRoundSequence === 'function') {
+      this.roundSequence = level.buildRoundSequence();
+      this.roundIndex = 0;
+      this.roundMax = this.roundSequence.length;
+    } else {
+      this.roundSequence = null;
+      this.roundIndex = 0;
+      this.roundMax = 0;
+    }
     const catNumber = level
       ? level.generateCatNumber()
       : Utils.randInt(this.config.catNumberRange[0], this.config.catNumberRange[1]);
@@ -553,6 +652,7 @@ class GameState {
       y: 0,
       radius: this.config.catRadius,
       number: catNumber,
+      display: null, // 非空时 Renderer 优先显示这个文本（例如乘法模式的"3×4"）
       // 视觉动画状态（挤压/弹跳），与游戏逻辑无关
       squash: 1,
       squashTarget: 1,
@@ -669,18 +769,141 @@ class FishManager {
     }
   }
 
+  // 乘法模式：一次性生成固定数量的鱼（1条正确答案 + N-1条互不重复的干扰答案）
+  spawnMultiplicationRound(level, base, b, bounds) {
+    const correctValue = base * b;
+    // 干扰项优先池：同一乘法表里其它乘数的结果（例如目标3×4=12，干扰项用3×6=18），更具迷惑性
+    const candidatePool = [];
+    for (let ob = 1; ob <= this.config.multiplicationMaxB; ob++) {
+      if (ob !== b) candidatePool.push(base * ob);
+    }
+    this._spawnAnswerRound(level, correctValue, candidatePool, 8, bounds);
+  }
+
+  // 除法模式：一次性生成固定数量的鱼（1条正确的商 + N-1条互不重复的干扰商）
+  spawnDivisionRound(level, divisor, quotient, bounds) {
+    const correctValue = quotient;
+    // 干扰项优先池：1-9 中除了正确答案以外的其它商（除法商本身范围小，用这个池子基本就够了）
+    const candidatePool = [];
+    for (let q = 1; q <= 9; q++) {
+      if (q !== quotient) candidatePool.push(q);
+    }
+    this._spawnAnswerRound(level, correctValue, candidatePool, 3, bounds);
+  }
+
+  // 通用：按"1个正确答案 + N-1个互不重复的干扰答案"铺满整轮的鱼，
+  // 干扰项优先从 candidatePool（题目本身相关的候选值）里挑，挑不够再在正确答案附近随机抖动兜底。
+  // jitterRange 控制抖动兜底时的浮动范围（乘法数值大用大一些，除法商是1-9用小一些）。
+  _spawnAnswerRound(level, correctValue, candidatePool, jitterRange, bounds) {
+    this.fishList = [];
+    const need = this.config.multiplicationFishCount - 1;
+    const wrongValues = [];
+    const maxTries = 200;
+    let tries = 0;
+    while (wrongValues.length < need && tries < maxTries) {
+      tries++;
+      let candidate;
+      if (candidatePool.length && Math.random() < 0.6) {
+        candidate = Utils.choice(candidatePool);
+      } else {
+        // 在正确答案附近随机取一个数，制造"看起来差不多"的干扰项
+        candidate = correctValue + Utils.randInt(-jitterRange, jitterRange);
+      }
+      if (candidate <= 0) candidate = correctValue + Utils.randInt(1, jitterRange || 1);
+      if (candidate !== correctValue && !wrongValues.includes(candidate)) {
+        wrongValues.push(candidate);
+      }
+    }
+    // 极端兜底：万一还没凑够（理论上不会发生），用递增值补满，保证一定有N-1个干扰项
+    let fallback = correctValue + 1;
+    while (wrongValues.length < need) {
+      if (fallback !== correctValue && !wrongValues.includes(fallback)) {
+        wrongValues.push(fallback);
+      }
+      fallback++;
+    }
+
+    const items = [{ value: correctValue, isCorrect: true }];
+    for (const v of wrongValues) items.push({ value: v, isCorrect: false });
+
+    const [vmin, vmax] = level.valueRange || [0, correctValue + 20];
+    for (const item of items) {
+      const t = Utils.clamp((item.value - vmin) / ((vmax - vmin) || 1), 0, 1);
+      const radius = this.config.fishRadiusMin +
+        t * (this.config.fishRadiusMax - this.config.fishRadiusMin);
+      const speed = Utils.randFloat(this.config.fishSpeedRange[0], this.config.fishSpeedRange[1]);
+      const spawnPos = this._pickEdgeSpawn(radius, bounds);
+      const palette = Utils.choice(this.palettes);
+
+      this.fishList.push({
+        x: spawnPos.x,
+        y: spawnPos.y,
+        vx: Math.cos(spawnPos.angle) * speed,
+        vy: Math.sin(spawnPos.angle) * speed,
+        radius: radius,
+        display: String(item.value),
+        answer: item.value,
+        isCorrect: item.isCorrect,
+        angle: spawnPos.angle,
+        palette: palette,
+        wigglePhase: Math.random() * Math.PI * 2,
+        spawnT: 0,
+        bounce: true,
+        // 分别记录 x/y 轴是否已经进入过画面合法范围，用于上面 update() 里的反弹判定
+        enteredX: (spawnPos.x - radius >= 0 && spawnPos.x + radius <= bounds.width),
+        enteredY: (spawnPos.y - radius >= 0 && spawnPos.y + radius <= bounds.height)
+      });
+    }
+  }
+
   update(dt, bounds) {
     const despawnMargin = this.config.fishDespawnMargin;
     for (const fish of this.fishList) {
       fish.x += fish.vx * dt;
       fish.y += fish.vy * dt;
 
+      if (fish.bounce) {
+        // 乘法模式：碰到画面边缘就反弹回来，而不是游出屏幕消失
+        // （题量固定只有4条，消失了容易来不及反应，且没有鱼补充）
+        // 注意：x轴和y轴要分开判断"是否已进入画面"——鱼是从边缘斜着游进来的，
+        // 比如从左边游入时y坐标本来就在合法范围内，应该立刻生效防止纵向漂出画面；
+        // 如果非要等x、y同时进入画面才生效，等待期间另一个轴可能已经持续漂出去回不来了。
+        const r = fish.radius;
+        if (!fish.enteredX && fish.x - r >= 0 && fish.x + r <= bounds.width) {
+          fish.enteredX = true;
+        }
+        if (fish.enteredX) {
+          if (fish.x - r < 0) {
+            fish.x = r;
+            fish.vx = Math.abs(fish.vx);
+          } else if (fish.x + r > bounds.width) {
+            fish.x = bounds.width - r;
+            fish.vx = -Math.abs(fish.vx);
+          }
+        }
+        if (!fish.enteredY && fish.y - r >= 0 && fish.y + r <= bounds.height) {
+          fish.enteredY = true;
+        }
+        if (fish.enteredY) {
+          if (fish.y - r < 0) {
+            fish.y = r;
+            fish.vy = Math.abs(fish.vy);
+          } else if (fish.y + r > bounds.height) {
+            fish.y = bounds.height - r;
+            fish.vy = -Math.abs(fish.vy);
+          }
+        }
+        fish.angle = Math.atan2(fish.vy, fish.vx);
+      }
+
       fish.wigglePhase += dt * 6;
       if (fish.spawnT < 1) fish.spawnT = Math.min(1, fish.spawnT + dt * 4);
     }
 
     // 游出屏幕足够远的鱼直接消失，留出空位给下一条新鱼
+    // （带 bounce 标记的鱼——乘法模式——已经在上面反弹回画面内，不会走到这里被判定"出界"）
     this.fishList = this.fishList.filter(fish => {
+      if (fish.bounce) return true;
       const m = fish.radius + despawnMargin;
       const outOfBounds =
         fish.x < -m || fish.x > bounds.width + m ||
@@ -703,7 +926,7 @@ class CollisionManager {
     this.config = config;
   }
 
-  checkAndResolve(catState, fishManager, onEat) {
+  checkAndResolve(catState, fishManager, onEat, maxEat) {
     const cat = catState.cat;
     const eaten = [];
 
@@ -711,6 +934,7 @@ class CollisionManager {
       const d = Utils.dist(cat.x, cat.y, fish.x, fish.y);
       if (d < cat.radius * 0.75 + fish.radius * 0.6) {
         eaten.push(fish);
+        if (typeof maxEat === 'number' && eaten.length >= maxEat) break;
       }
     }
 
@@ -1308,7 +1532,7 @@ class Renderer {
     ctx.save();
     const ty = cat.y + bob - cat.radius * sq - 18;
     ctx.font = `bold ${this.config.catNumberFontSize}px sans-serif`;
-    const numText = String(cat.number);
+    const numText = (cat.display !== undefined && cat.display !== null) ? cat.display : String(cat.number);
     const textW = ctx.measureText(numText).width;
     const bubbleRx = Math.max(20, textW / 2 + 10);
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -1383,7 +1607,11 @@ class UI {
 
   updateHUD(state) {
     this.elScore.textContent = '分数：' + state.score;
-    this.elTime.textContent = '时间：' + Math.ceil(state.timeRemaining);
+    if (state.kind === 'multiplication' || state.kind === 'division') {
+      this.elTime.textContent = '进度：' + (state.roundIndex + 1) + '/' + state.roundMax;
+    } else {
+      this.elTime.textContent = '时间：' + Math.ceil(state.timeRemaining);
+    }
   }
 
   setModeLabel(mode, level) {
@@ -1613,7 +1841,11 @@ class MathCatGame {
     this.state.cat.x = this.bounds.width / 2;
     this.state.cat.y = this.bounds.height / 2;
     this.fishManager.reset();
-    this.fishManager.fillToMax(level, this.state.cat.number, this.bounds);
+    if (level.kind === 'multiplication' || level.kind === 'division') {
+      this._spawnRoundBasedFish();
+    } else {
+      this.fishManager.fillToMax(level, this.state.cat.number, this.bounds);
+    }
     this.effects.floatingTexts = [];
     this.effects.particles = [];
     this.effects.ripples = [];
@@ -1630,6 +1862,38 @@ class MathCatGame {
 
   // 通关规则：仅在计时结束时结算一次。
   // 30 秒内分数 >= 目标分即为通关，否则失败；不再提前于游戏中途判定。
+  // "按轮次推进"的模式（乘法/除法）：根据 state.roundSequence[roundIndex] 取出本轮的关键数字，
+  // 设置小猫的算式显示，并让 FishManager 一次性铺好本轮的4条鱼。
+  _spawnRoundBasedFish() {
+    const level = this.currentLevel;
+    const value = this.state.roundSequence[this.state.roundIndex];
+    if (level.kind === 'multiplication') {
+      const b = value; // 乘数
+      this.state.cat.number = level.base * b;
+      this.state.cat.display = level.base + ' × ' + b;
+      this.fishManager.spawnMultiplicationRound(level, level.base, b, this.bounds);
+    } else if (level.kind === 'division') {
+      const q = value; // 商（正确答案）
+      const dividend = level.divisor * q;
+      this.state.cat.number = q;
+      this.state.cat.display = dividend + ' ÷ ' + level.divisor;
+      this.fishManager.spawnDivisionRound(level, level.divisor, q, this.bounds);
+    }
+  }
+
+  // "按轮次推进"的模式：吃掉一条鱼后（无论对错）清空剩余的鱼，进入下一轮；
+  // 若已经是最后一轮，则直接结算本关
+  _advanceRoundBasedRound() {
+    this.fishManager.fishList = [];
+    if (this.state.roundIndex >= this.state.roundMax - 1) {
+      const success = this.state.score >= this.config.targetScore;
+      this.endGame(success);
+      return;
+    }
+    this.state.roundIndex += 1;
+    this._spawnRoundBasedFish();
+  }
+
   endGame(success) {
     this.state.status = success ? 'success' : 'fail';
     const hasNextLevel = !!getNextLevelStep(this.currentMode, this.currentLevel);
@@ -1650,14 +1914,35 @@ class MathCatGame {
     this.input.clampCatToBounds(this.state.cat, this.bounds);
 
     this.fishManager.update(dt, this.bounds);
-    this.fishManager.fillToMax(this.currentLevel, this.state.cat.number, this.bounds);
 
-    this.collisionManager.checkAndResolve(this.state, this.fishManager, (fish, isCorrect, delta) => {
-      this.effects.spawnScoreText(fish.x, fish.y - fish.radius, delta);
-      this.effects.spawnEatBurst(fish.x, fish.y, fish.palette.body, isCorrect);
-    });
+    const isRoundBased = this.currentLevel &&
+      (this.currentLevel.kind === 'multiplication' || this.currentLevel.kind === 'division');
+
+    if (!isRoundBased) {
+      this.fishManager.fillToMax(this.currentLevel, this.state.cat.number, this.bounds);
+    }
+
+    let ateThisFrame = false;
+    this.collisionManager.checkAndResolve(
+      this.state,
+      this.fishManager,
+      (fish, isCorrect, delta) => {
+        this.effects.spawnScoreText(fish.x, fish.y - fish.radius, delta);
+        this.effects.spawnEatBurst(fish.x, fish.y, fish.palette.body, isCorrect);
+        ateThisFrame = true;
+      },
+      isRoundBased ? 1 : undefined // 按轮次推进的模式一帧最多只按一条鱼计分，其余的鱼稍后统一清空
+    );
 
     this.effects.update(dt);
+
+    if (isRoundBased) {
+      // 乘法/除法模式不限时：吃到一条鱼后清空剩余的鱼，推进到下一轮（或结算本关）
+      if (ateThisFrame) {
+        this._advanceRoundBasedRound();
+      }
+      return;
+    }
 
     this.state.timeRemaining -= dt;
     if (this.state.timeRemaining <= 0) {
