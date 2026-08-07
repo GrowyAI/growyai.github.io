@@ -21,32 +21,31 @@ Growy 是一套开放的育儿辅助工具集，帮助父母在信息爆炸的�
 
 本项目为纯静态前端页面，无需安装依赖或构建。
 
-1. 克隆仓库  
-   ```bash
-   git clone https://github.com/GrowyAI/growy.git
-   ```
+1. 克隆仓库
 
-2. 用任意现代浏览器直接打开 index.html 即可。
+        git clone https://github.com/GrowyAI/growy.git
+
+2. 用任意现代浏览器直接打开 `index.html` 即可。
 
 如果只想在线体验，无需下载，直接访问首页对应的 GitHub Pages 或本地启动静态服务器均可。
 
-🛠️ 技术栈
+## 🛠️ 技术栈
 
-· HTML5 / CSS3
-· 原生 JavaScript
-· 每个页面均可独立运行，轻量、快速。
+- HTML5 / CSS3
+- 原生 JavaScript
+- 每个页面均可独立运行，轻量、快速。
 
-📄 许可证
+## 📄 许可证
 
 本项目采用 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)（知识共享署名-非商业性使用）许可。  
 你可以自由分享、改编内容，但需注明出处且不可用于商业目的。
 
-📬 联系与反馈
+## 📬 联系与反馈
 
 Growy 还在持续生长中，你的任何想法都非常珍贵：
 
 - 𝕏 Twitter/X：[GrowyAI](https://x.com/GrowyAI)
-- Substack：[Substack](https://growyai.substack.com)
+- Substack：[GrowyAI Substack](https://growyai.substack.com)
 - 代码仓库：[GitHub](https://github.com/GrowyAI)
 - 微信公众号：[查看介绍](https://mp.weixin.qq.com/s/ftYUVkcBBGB3yZLWohW-uw)
 - 反馈表单：[提出建议](https://forms.gle/apsWM1rhMNpKjVCe6)
