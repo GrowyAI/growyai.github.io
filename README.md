@@ -24,7 +24,7 @@ Growy 是一套开放的育儿辅助工具集，帮助父母在信息爆炸的�
 1. 克隆仓库  
    ```bash
    git clone https://github.com/GrowyAI/growy.git
-```
+   ```
 
 2. 用任意现代浏览器直接打开 index.html 即可。
 
