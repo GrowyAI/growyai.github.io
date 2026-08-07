@@ -34,21 +34,27 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 10px 16px;
+    gap: 6px;
+    padding: 8px 16px;
     box-sizing: border-box;
     background: rgba(255,255,255,0.6);
     backdrop-filter: blur(6px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
     color: #34495e;
     z-index: 10;
     pointer-events: none;
   }
-  #topBar span {
-    margin-right: 10px;
+  #statsRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #statsRow span {
+    margin: 0 5px;
     white-space: nowrap;
     background: rgba(255,255,255,0.5);
     padding: 4px 10px;
@@ -57,7 +63,23 @@
   #uiScore { color: #E67E22; }
   #uiTime { color: #E74C3C; }
   #uiTarget { color: #27AE60; }
-  #uiMode { color: #8E44AD; }
+  #uiModeBtn {
+    pointer-events: auto;
+    border: none;
+    background: rgba(255,255,255,0.55);
+    color: #8E44AD;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: inherit;
+    white-space: nowrap;
+    padding: 5px 16px;
+    border-radius: 14px;
+    box-shadow: 0 2px 0 rgba(142,68,173,0.25);
+  }
+  #uiModeBtn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(142,68,173,0.25);
+  }
   .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -189,16 +211,18 @@
   <canvas id="gameCanvas"></canvas>
 
   <div id="topBar">
-    <span id="uiMode">选择模式开始游戏</span>
-    <span id="uiScore">分数：0</span>
-    <span id="uiTarget">目标：50</span>
-    <span id="uiTime">时间：30</span>
+    <button id="uiModeBtn" type="button">选择模式开始游戏</button>
+    <div id="statsRow">
+      <span id="uiScore">分数：0</span>
+      <span id="uiTarget">目标：50</span>
+      <span id="uiTime">时间：30</span>
+    </div>
   </div>
 
   <div id="startModal" class="modal">
     <div class="panel">
       <h1>🐱 小猫吃鱼</h1>
-      <p>拖动小猫吃掉数字不大于小猫头顶数字的鱼！<br>吃对 +10 分，吃错 -20 分。<br>30 秒内拿到 50 分即可闯关成功！</p>
+      <p>选择比大小、加法或减法模式，拖动小猫吃掉正确答案的鱼！<br>吃对 +10 分，吃错 -10 分。<br>30 秒内拿到 50 分即可闯关成功！</p>
       <button id="startBtn">开始游戏</button>
     </div>
   </div>
@@ -227,6 +251,7 @@
       <div class="endBtnRow">
         <button id="nextLevelBtn" class="hidden">挑战下一关</button>
         <button id="restartBtn">重新挑战本关</button>
+        <button id="chooseOtherBtn" class="secondaryBtn">挑战其他关卡</button>
       </div>
     </div>
   </div>
@@ -255,7 +280,7 @@ const GameConfig = {
   fishDespawnMargin: 60,      // 鱼游出屏幕多远后视为消失
   grabRadius: 80,
   scoreCorrect: 10,
-  scoreWrong: -20,
+  scoreWrong: -10,
   successHoldTime: 1000,      // ms
   catNumberFontSize: 18,
   fishNumberFontSize: 16
@@ -320,9 +345,74 @@ function makeRangeLevel(id, name, min, max, catRange) {
     name: name,
     valueRange: [min, max],
     generateCatNumber: () => Utils.randInt(catRange[0], catRange[1]),
-    generate: (relation, catNumber) => {
+    generate: (catNumber, wantCorrect) => {
+      const relation = wantCorrect ? 'le' : 'gt';
       const value = Utils.compareValueGenerator(relation, catNumber, min, max);
       return { display: String(value), answer: value };
+    }
+  };
+}
+
+// 工厂函数：加法关卡。小猫头顶显示"目标和"，鱼显示形如"3+5"的算式，
+// 算式结果等于目标和即为可以吃的"正确"鱼。
+// max：加法结果与加数的上限（例如"10以内"即 max=10）
+// catRange：目标和的随机范围
+// avoidZero：为 true 时，算式中的两个加数都不会出现0（照顾刚启蒙、还不认识0的孩子）
+function makeAdditionLevel(id, name, max, catRange, avoidZero) {
+  const minOperand = avoidZero ? 1 : 0;
+  return {
+    id: id,
+    name: name,
+    valueRange: [0, max],
+    generateCatNumber: () => Utils.randInt(catRange[0], catRange[1]),
+    generate: (catNumber, wantCorrect) => {
+      let sum;
+      if (wantCorrect) {
+        sum = catNumber;
+      } else {
+        const lo = avoidZero ? 2 : 0;
+        sum = Utils.randInt(lo, max);
+        if (sum === catNumber) {
+          sum = (sum + 1 <= max) ? sum + 1 : Math.max(lo, sum - 1);
+        }
+      }
+      const loA = minOperand;
+      const hiA = sum - minOperand;
+      const a = (hiA >= loA) ? Utils.randInt(loA, hiA) : minOperand;
+      const b = sum - a;
+      return { display: a + '+' + b, answer: sum };
+    }
+  };
+}
+
+// 工厂函数：减法关卡。小猫头顶显示"目标差"，鱼显示形如"9-4"的算式（被减数≥减数，结果非负），
+// 算式结果等于目标差即为可以吃的"正确"鱼。
+// max：被减数的上限（例如"10以内"即 max=10）
+// catRange：目标差的随机范围
+// avoidZero：为 true 时，算式中的被减数、减数都不会出现0（照顾刚启蒙、还不认识0的孩子）
+function makeSubtractionLevel(id, name, max, catRange, avoidZero) {
+  const minOperand = avoidZero ? 1 : 0;
+  return {
+    id: id,
+    name: name,
+    valueRange: [0, max],
+    generateCatNumber: () => Utils.randInt(catRange[0], catRange[1]),
+    generate: (catNumber, wantCorrect) => {
+      let diff;
+      if (wantCorrect) {
+        diff = catNumber;
+      } else {
+        const hi = avoidZero ? (max - 1) : max;
+        diff = Utils.randInt(0, hi);
+        if (diff === catNumber) {
+          diff = (diff + 1 <= hi) ? diff + 1 : Math.max(0, diff - 1);
+        }
+      }
+      const loA = diff + minOperand;
+      const hiA = max;
+      const a = (hiA >= loA) ? Utils.randInt(loA, hiA) : Math.min(max, loA);
+      const b = a - diff;
+      return { display: a + '-' + b, answer: diff };
     }
   };
 }
@@ -336,7 +426,8 @@ const squareNumberLevel = {
     const base = Utils.randInt(5, 15);
     return base * base;
   },
-  generate: (relation, catNumber) => {
+  generate: (catNumber, wantCorrect) => {
+    const relation = wantCorrect ? 'le' : 'gt';
     const BASE_MIN = 1, BASE_MAX = 25;
     const sqrtOfCat = Math.sqrt(Math.max(catNumber, 0));
     let base;
@@ -357,7 +448,8 @@ const squareRootLevel = {
   name: '平方根',
   valueRange: [1, 25],
   generateCatNumber: () => Utils.randInt(5, 15),
-  generate: (relation, catNumber) => {
+  generate: (catNumber, wantCorrect) => {
+    const relation = wantCorrect ? 'le' : 'gt';
     const n = Utils.compareValueGenerator(relation, catNumber, 1, 25);
     return { display: '√' + (n * n), answer: n };
   }
@@ -378,10 +470,34 @@ const GAME_MODES = [
       squareNumberLevel,
       squareRootLevel
     ]
+  },
+  {
+    id: 'addition',
+    name: '加法',
+    icon: '➕',
+    levels: [
+      makeAdditionLevel('within5', '5以内', 5, [2, 5], true),
+      makeAdditionLevel('within10', '10以内', 10, [3, 10], true),
+      makeAdditionLevel('within20', '20以内', 20, [6, 20], false),
+      makeAdditionLevel('within30', '30以内', 30, [12, 30], false),
+      makeAdditionLevel('within50', '50以内', 50, [18, 50], false),
+      makeAdditionLevel('within100', '100以内', 100, [30, 100], false)
+    ]
+  },
+  {
+    id: 'subtraction',
+    name: '减法',
+    icon: '➖',
+    levels: [
+      makeSubtractionLevel('within5', '5以内', 5, [2, 4], true),
+      makeSubtractionLevel('within10', '10以内', 10, [3, 9], true),
+      makeSubtractionLevel('within20', '20以内', 20, [6, 20], false),
+      makeSubtractionLevel('within30', '30以内', 30, [12, 30], false),
+      makeSubtractionLevel('within50', '50以内', 50, [18, 50], false),
+      makeSubtractionLevel('within100', '100以内', 100, [30, 100], false)
+    ]
   }
   // 未来新增模式示例（不在第一版实现），只需追加对象，无需改动引擎：
-  // { id:'addition', name:'加法', icon:'➕', levels:[ ... ] },
-  // { id:'subtraction', name:'减法', icon:'➖', levels:[ ... ] },
   // { id:'multiplication', name:'乘法', icon:'✖️', levels:[ ... ] },
   // { id:'division', name:'除法', icon:'➗', levels:[ ... ] },
   // { id:'evenNumber', name:'找偶数', icon:'🔵', levels:[ ... ] },
@@ -414,7 +530,7 @@ class QuestionGenerator {
     if (!level || typeof level.generate !== 'function') {
       throw new Error('Invalid level config: missing generate()');
     }
-    return level.generate(context.relation, context.reference);
+    return level.generate(context.reference, context.wantCorrect);
   }
 }
 
@@ -504,10 +620,10 @@ class FishManager {
     return { x, y, angle };
   }
 
-  spawnOne(level, catNumber, bounds, relation) {
+  spawnOne(level, catNumber, bounds, wantCorrect) {
     const question = this.questionGenerator.generate(
       level,
-      { reference: catNumber, relation: relation }
+      { reference: catNumber, wantCorrect: wantCorrect }
     );
 
     const value = question.answer;
@@ -528,6 +644,7 @@ class FishManager {
       radius: radius,
       display: question.display,
       answer: question.answer,
+      isCorrect: wantCorrect,
       angle: spawnPos.angle,
       palette: palette,
       wigglePhase: Math.random() * Math.PI * 2,
@@ -539,9 +656,16 @@ class FishManager {
 
   fillToMax(level, catNumber, bounds) {
     while (this.fishList.length < this.config.maxFish) {
-      // 用持续递增的计数器交替生成两类鱼，避免因鱼不断消失/补充导致比例失衡
-      const relation = (this.spawnCounter % 2 === 0) ? 'le' : 'gt';
-      this.spawnOne(level, catNumber, bounds, relation);
+      let wantCorrect;
+      if (level.correctProbability === undefined) {
+        // 未指定概率的模式（如比大小）：用持续递增的计数器交替生成两类鱼，
+        // 保证严格50/50，避免因鱼不断消失/补充导致比例失衡
+        wantCorrect = (this.spawnCounter % 2 === 0);
+      } else {
+        // 指定了概率的模式（如加法/减法）：按概率随机决定这条鱼是否为"正确"答案
+        wantCorrect = Math.random() < level.correctProbability;
+      }
+      this.spawnOne(level, catNumber, bounds, wantCorrect);
     }
   }
 
@@ -591,7 +715,7 @@ class CollisionManager {
     }
 
     for (const fish of eaten) {
-      const isCorrect = fish.answer <= cat.number;
+      const isCorrect = fish.isCorrect;
       const delta = isCorrect ? this.config.scoreCorrect : this.config.scoreWrong;
       catState.addScore(delta);
       fishManager.removeFish(fish);
@@ -1230,7 +1354,7 @@ class Renderer {
 class UI {
   constructor(config) {
     this.config = config;
-    this.elMode = document.getElementById('uiMode');
+    this.elMode = document.getElementById('uiModeBtn');
     this.elScore = document.getElementById('uiScore');
     this.elTarget = document.getElementById('uiTarget');
     this.elTime = document.getElementById('uiTime');
@@ -1252,6 +1376,7 @@ class UI {
     this.restartBtn = document.getElementById('restartBtn');
     this.nextLevelBtn = document.getElementById('nextLevelBtn');
     this.backToModeBtn = document.getElementById('backToModeBtn');
+    this.chooseOtherBtn = document.getElementById('chooseOtherBtn');
 
     this.elTarget.textContent = '目标：' + this.config.targetScore;
   }
@@ -1366,8 +1491,16 @@ class UI {
     this.nextLevelBtn.addEventListener('click', handler);
   }
 
+  bindChooseOther(handler) {
+    this.chooseOtherBtn.addEventListener('click', handler);
+  }
+
   bindBackToMode(handler) {
     this.backToModeBtn.addEventListener('click', handler);
+  }
+
+  bindModeLabelClick(handler) {
+    this.elMode.addEventListener('click', handler);
   }
 }
 
@@ -1405,6 +1538,8 @@ class MathCatGame {
     this.ui.bindBackToMode(() => this._goModeSelect());
     this.ui.bindRestart(() => this._retryCurrentLevel());
     this.ui.bindNextLevel(() => this._goNextLevel());
+    this.ui.bindModeLabelClick(() => this._goModeSelect());
+    this.ui.bindChooseOther(() => this._goModeSelect());
 
     this.ui.showStart();
     this._loop = this._loop.bind(this);
@@ -1412,6 +1547,10 @@ class MathCatGame {
   }
 
   _goModeSelect() {
+    // 若游戏正在进行中被中途唤出选关页面，暂停计时与鱼群更新，避免在菜单里偷跑时间
+    if (this.state.status === 'playing') {
+      this.state.status = 'idle';
+    }
     this.ui.hideStart();
     this.ui.hideEnd();
     this.ui.renderModeList(GAME_MODES, (mode) => this._goLevelSelect(mode));
