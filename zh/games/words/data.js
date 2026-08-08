@@ -191,7 +191,6 @@ window.DEFAULT_WORDS = {
         { word: '向日葵', en: 'sunflower', en_chunks: ['sun','flow','er'], emoji: '🌻' },
         { word: '玫瑰', en: 'rose', en_chunks: ['r','ose'], emoji: '🌹' },
         { word: '仙人掌', en: 'cactus', en_chunks: ['cac','tus'], emoji: '🌵' },
-        { word: '莲花', en: 'lotus', en_chunks: ['lo','tus'], emoji: '🪷' },
         { word: '松树', en: 'pine', en_chunks: ['p','ine'], emoji: '🌲' }
     ],
     '职业': [
@@ -199,7 +198,7 @@ window.DEFAULT_WORDS = {
         { word: '医生', en: 'doctor', en_chunks: ['doc','tor'], emoji: '🧑‍⚕️' },
         { word: '护士', en: 'nurse', en_chunks: ['nur','se'], emoji: '👩‍⚕️' },
         { word: '警察', en: 'police officer', en_chunks: ['police','officer'], emoji: '👮' },
-        { word: '消防员', en: 'firefighter', en_chunks: ['fire','fight','er'], emoji: '🧑‍🚒' },
+        { word: '消防员', en: 'firefighter', en_chunks: ['fire','fighter'], emoji: '🧑‍🚒' },
         { word: '厨师', en: 'chef', en_chunks: ['ch','ef'], emoji: '👨‍🍳' },
         { word: '画家', en: 'painter', en_chunks: ['paint','er'], emoji: '👩‍🎨' },
         { word: '宇航员', en: 'astronaut', en_chunks: ['as','tro','naut'], emoji: '👩‍🚀' },
@@ -209,13 +208,11 @@ window.DEFAULT_WORDS = {
     '学习用品': [
         { word: '铅笔', en: 'pencil', en_chunks: ['pen','cil'], emoji: '✏️' },
         { word: '钢笔', en: 'pen', en_chunks: ['p','en'], emoji: '🖋️' },
-        { word: '橡皮', en: 'eraser', en_chunks: ['e','ras','er'], emoji: '🧽' },
         { word: '尺子', en: 'ruler', en_chunks: ['rul','er'], emoji: '📏' },
         { word: '书包', en: 'schoolbag', en_chunks: ['school','bag'], emoji: '🎒' },
         { word: '书', en: 'book', en_chunks: ['b','ook'], emoji: '📖' },
         { word: '笔记本', en: 'notebook', en_chunks: ['note','book'], emoji: '📓' },
         { word: '剪刀', en: 'scissors', en_chunks: ['scis','sors'], emoji: '✂️' },
-        { word: '胶水', en: 'glue', en_chunks: ['gl','ue'], emoji: '🧴' },
         { word: '蜡笔', en: 'crayon', en_chunks: ['cray','on'], emoji: '🖍️' }
     ],
     '生活用品': [
@@ -227,7 +224,6 @@ window.DEFAULT_WORDS = {
         { word: '筷子', en: 'chopsticks', en_chunks: ['chop','sticks'], emoji: '🥢' },
         { word: '牙刷', en: 'toothbrush', en_chunks: ['tooth','brush'], emoji: '🪥' },
         { word: '肥皂', en: 'soap', en_chunks: ['s','oap'], emoji: '🧼' },
-        { word: '梳子', en: 'comb', en_chunks: ['c','omb'], emoji: '🪮' },
         { word: '雨伞', en: 'umbrella', en_chunks: ['um','brel','la'], emoji: '☂️' },
         { word: '卫生纸', en: 'toilet paper', en_chunks: ['toilet','paper'], emoji: '🧻' }
     ]
