@@ -11,7 +11,25 @@ window.DEFAULT_WORDS = {
         { word: '七', en: 'seven', en_chunks: ['se','ven'], emoji: '7', isNumber: true },
         { word: '八', en: 'eight', en_chunks: ['e','ight'], emoji: '8', isNumber: true },
         { word: '九', en: 'nine', en_chunks: ['n','ine'], emoji: '9', isNumber: true },
-        { word: '十', en: 'ten', en_chunks: ['t','en'], emoji: '10', isNumber: true }
+        { word: '十', en: 'ten', en_chunks: ['t','en'], emoji: '10', isNumber: true },
+        { word: '十一', en: 'eleven', en_chunks: ['e','lev','en'], emoji: '11', isNumber: true },
+        { word: '十二', en: 'twelve', en_chunks: ['tw','elve'], emoji: '12', isNumber: true },
+        { word: '十三', en: 'thirteen', en_chunks: ['thir','teen'], emoji: '13', isNumber: true },
+        { word: '十四', en: 'fourteen', en_chunks: ['four','teen'], emoji: '14', isNumber: true },
+        { word: '十五', en: 'fifteen', en_chunks: ['fif','teen'], emoji: '15', isNumber: true },
+        { word: '十六', en: 'sixteen', en_chunks: ['six','teen'], emoji: '16', isNumber: true },
+        { word: '十七', en: 'seventeen', en_chunks: ['se','ven','teen'], emoji: '17', isNumber: true },
+        { word: '十八', en: 'eighteen', en_chunks: ['eight','een'], emoji: '18', isNumber: true },
+        { word: '十九', en: 'nineteen', en_chunks: ['nine','teen'], emoji: '19', isNumber: true },
+        { word: '二十', en: 'twenty', en_chunks: ['twen','ty'], emoji: '20', isNumber: true },
+        { word: '三十', en: 'thirty', en_chunks: ['th','ir','ty'], emoji: '30', isNumber: true },
+        { word: '四十', en: 'forty', en_chunks: ['for','ty'], emoji: '40', isNumber: true },
+        { word: '五十', en: 'fifty', en_chunks: ['fif','ty'], emoji: '50', isNumber: true },
+        { word: '六十', en: 'sixty', en_chunks: ['six','ty'], emoji: '60', isNumber: true },
+        { word: '七十', en: 'seventy', en_chunks: ['se','ven','ty'], emoji: '70', isNumber: true },
+        { word: '八十', en: 'eighty', en_chunks: ['eight','y'], emoji: '80', isNumber: true },
+        { word: '九十', en: 'ninety', en_chunks: ['nine','ty'], emoji: '90', isNumber: true },
+        { word: '一百', en: 'one hundred', en_chunks: ['one','hundred'], emoji: '100', isNumber: true }
     ],
     '水果': [
         { word: '苹果', en: 'apple', en_chunks: ['ap','ple'], emoji: '🍎' },
@@ -66,7 +84,7 @@ window.DEFAULT_WORDS = {
         { word: '出租车', en: 'taxi', en_chunks: ['tax','i'], emoji: '🚕' },
         { word: '救护车', en: 'ambulance', en_chunks: ['am','bu','lance'], emoji: '🚑' },
         { word: '消防车', en: 'firetruck', en_chunks: ['fire','truck'], emoji: '🚒' },
-        { word: '警车', en: 'police car', en_chunks: ['po','lice','car'], emoji: '🚓' },
+        { word: '警车', en: 'police car', en_chunks: ['police','car'], emoji: '🚓' },
         { word: '摩托车', en: 'motorcycle', en_chunks: ['mo','tor','cy','cle'], emoji: '🏍️' },
         { word: '火箭', en: 'rocket', en_chunks: ['rock','et'], emoji: '🚀' },
         { word: '直升机', en: 'helicopter', en_chunks: ['hel','i','cop','ter'], emoji: '🚁' },
@@ -85,7 +103,7 @@ window.DEFAULT_WORDS = {
         { word: '饺子', en: 'dumpling', en_chunks: ['dump','ling'], emoji: '🥟' },
         { word: '鸡蛋', en: 'egg', en_chunks: ['e','gg'], emoji: '🥚' },
         { word: '牛奶', en: 'milk', en_chunks: ['m','ilk'], emoji: '🥛' },
-        { word: '鸡腿', en: 'chicken leg', en_chunks: ['chick','en','leg'], emoji: '🍗' },
+        { word: '鸡腿', en: 'chicken leg', en_chunks: ['chicken','leg'], emoji: '🍗' },
         { word: '冰淇淋', en: 'ice cream', en_chunks: ['ice','cream'], emoji: '🍦' },
         { word: '巧克力', en: 'chocolate', en_chunks: ['choc','o','late'], emoji: '🍫' },
         { word: '爆米花', en: 'popcorn', en_chunks: ['pop','corn'], emoji: '🍿' },
@@ -133,7 +151,7 @@ window.DEFAULT_WORDS = {
         { word: '爷爷', en: 'grandpa', en_chunks: ['grand','pa'], emoji: '👴' },
         { word: '奶奶', en: 'grandma', en_chunks: ['grand','ma'], emoji: '👵' },
         { word: '叔叔', en: 'uncle', en_chunks: ['un','cle'], emoji: '🧔' },
-        { word: '阿姨', en: 'aunt', en_chunks: ['aunt'], emoji: '👩\u200d🦰' }
+        { word: '阿姨', en: 'aunt', en_chunks: ['au','nt'], emoji: '👩\u200d🦰' }
     ],
     '形状': [
         { word: '圆形', en: 'circle', en_chunks: ['cir','cle'], emoji: '⚪' },
@@ -164,5 +182,53 @@ window.DEFAULT_WORDS = {
         { word: '高山', en: 'mountain', en_chunks: ['moun','tain'], emoji: '⛰️' },
         { word: '农田', en: 'farm', en_chunks: ['f','arm'], emoji: '🌾' },
         { word: '海滩', en: 'beach', en_chunks: ['b','each'], emoji: '🏖️' }
+    ],
+    '植物': [
+        { word: '花', en: 'flower', en_chunks: ['flow','er'], emoji: '🌸' },
+        { word: '草', en: 'grass', en_chunks: ['gr','ass'], emoji: '🌿' },
+        { word: '树', en: 'tree', en_chunks: ['tr','ee'], emoji: '🌳' },
+        { word: '叶子', en: 'leaf', en_chunks: ['l','eaf'], emoji: '🍃' },
+        { word: '向日葵', en: 'sunflower', en_chunks: ['sun','flow','er'], emoji: '🌻' },
+        { word: '玫瑰', en: 'rose', en_chunks: ['r','ose'], emoji: '🌹' },
+        { word: '仙人掌', en: 'cactus', en_chunks: ['cac','tus'], emoji: '🌵' },
+        { word: '莲花', en: 'lotus', en_chunks: ['lo','tus'], emoji: '🪷' },
+        { word: '松树', en: 'pine', en_chunks: ['p','ine'], emoji: '🌲' }
+    ],
+    '职业': [
+        { word: '教师', en: 'teacher', en_chunks: ['teach','er'], emoji: '🧑‍🏫' },
+        { word: '医生', en: 'doctor', en_chunks: ['doc','tor'], emoji: '🧑‍⚕️' },
+        { word: '护士', en: 'nurse', en_chunks: ['nur','se'], emoji: '👩‍⚕️' },
+        { word: '警察', en: 'police officer', en_chunks: ['police','officer'], emoji: '👮' },
+        { word: '消防员', en: 'firefighter', en_chunks: ['fire','fight','er'], emoji: '🧑‍🚒' },
+        { word: '厨师', en: 'chef', en_chunks: ['ch','ef'], emoji: '👨‍🍳' },
+        { word: '画家', en: 'painter', en_chunks: ['paint','er'], emoji: '👩‍🎨' },
+        { word: '宇航员', en: 'astronaut', en_chunks: ['as','tro','naut'], emoji: '👩‍🚀' },
+        { word: '农民', en: 'farmer', en_chunks: ['farm','er'], emoji: '👩‍🌾' },
+        { word: '科学家', en: 'scientist', en_chunks: ['sci','en','tist'], emoji: '👩‍🔬' }
+    ],
+    '学习用品': [
+        { word: '铅笔', en: 'pencil', en_chunks: ['pen','cil'], emoji: '✏️' },
+        { word: '钢笔', en: 'pen', en_chunks: ['p','en'], emoji: '🖋️' },
+        { word: '橡皮', en: 'eraser', en_chunks: ['e','ras','er'], emoji: '🧽' },
+        { word: '尺子', en: 'ruler', en_chunks: ['rul','er'], emoji: '📏' },
+        { word: '书包', en: 'schoolbag', en_chunks: ['school','bag'], emoji: '🎒' },
+        { word: '书', en: 'book', en_chunks: ['b','ook'], emoji: '📖' },
+        { word: '笔记本', en: 'notebook', en_chunks: ['note','book'], emoji: '📓' },
+        { word: '剪刀', en: 'scissors', en_chunks: ['scis','sors'], emoji: '✂️' },
+        { word: '胶水', en: 'glue', en_chunks: ['gl','ue'], emoji: '🧴' },
+        { word: '蜡笔', en: 'crayon', en_chunks: ['cray','on'], emoji: '🖍️' }
+    ],
+    '生活用品': [
+        { word: '杯子', en: 'cup', en_chunks: ['c','up'], emoji: '🥛' },
+        { word: '碗', en: 'bowl', en_chunks: ['b','owl'], emoji: '🥣' },
+        { word: '盘子', en: 'plate', en_chunks: ['pl','ate'], emoji: '🍽️' },
+        { word: '勺子', en: 'spoon', en_chunks: ['sp','oon'], emoji: '🥄' },
+        { word: '叉子', en: 'fork', en_chunks: ['f','ork'], emoji: '🍴' },
+        { word: '筷子', en: 'chopsticks', en_chunks: ['chop','sticks'], emoji: '🥢' },
+        { word: '牙刷', en: 'toothbrush', en_chunks: ['tooth','brush'], emoji: '🪥' },
+        { word: '肥皂', en: 'soap', en_chunks: ['s','oap'], emoji: '🧼' },
+        { word: '梳子', en: 'comb', en_chunks: ['c','omb'], emoji: '🪮' },
+        { word: '雨伞', en: 'umbrella', en_chunks: ['um','brel','la'], emoji: '☂️' },
+        { word: '卫生纸', en: 'toilet paper', en_chunks: ['toilet','paper'], emoji: '🧻' }
     ]
 };
