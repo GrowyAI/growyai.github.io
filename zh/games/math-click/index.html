@@ -70,81 +70,122 @@
 
             boxTypes: {
                 number: {
-                    layout(capacity) {
-                        const cols = Math.min(3, capacity);
-                        const rows = Math.ceil(capacity / cols);
-                        const spacing = Config.itemRadius * 2.3;
-                        const padding = Config.itemRadius * 1.3;
-                        return { cols, rows, spacing, w: cols * spacing + padding * 2, h: rows * spacing + padding * 2 };
+                    // 所有盘子统一大小；外径留足余量，最多允许 10 个水果溢出到第 4 行
+                    plateBaseDiameter: 260,
+                    // 每行最多 3 个，整体（不只是单行）上下左右居中
+                    // 1 个水果时正好在圆心
+                    gridCols: 3,
+                    // 填满后弹跳出现的活泼低饱和度颜色（红黄蓝绿橙棕紫）
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+
+                    // 根据画布宽度和盘子数量，算出统一的盘子直径（水果大小固定不变）
+                    computeDims(cw, count) {
+                        const sideMargin = 20;
+                        const gap = 24;
+                        const maxAvailable = (cw - sideMargin * 2 - gap * (count - 1)) / count;
+                        const plateD = Math.max(150, Math.min(this.plateBaseDiameter, maxAvailable));
+                        const labelFontSize = Math.max(70, Math.round(120 * (plateD / this.plateBaseDiameter)));
+                        return { plateD, gap, labelFontSize };
                     },
+
+                    // 生成 n 个水果在盘子里的固定位置：每行最多 3 个，整体居中
+                    // （1 个水果 = 单独在圆心；最后一行不满也单独居中；行数不够就往下多加一行，10 个会溢出到第 4 行）
+                    slotLayout(n) {
+                        const cols = Math.min(this.gridCols, n);
+                        const rows = Math.ceil(n / cols);
+                        const spacing = Config.itemRadius * 2.3;
+                        const positions = [];
+                        for (let i = 0; i < n; i++) {
+                            const row = Math.floor(i / cols);
+                            const itemsInRow = Math.min(n - row * cols, cols);
+                            const startX = -((itemsInRow - 1) * spacing) / 2;
+                            const startY = -((rows - 1) * spacing) / 2;
+                            const col = i % cols;
+                            positions.push({
+                                x: startX + col * spacing,
+                                y: startY + row * spacing
+                            });
+                        }
+                        return positions;
+                    },
+
                     draw(ctx, box) {
-                        const w = box.w, h = box.h;
+                        const r = box.r;
                         const full = box.items.length >= box.capacity;
                         ctx.save();
                         ctx.translate(box.x, box.y);
-                        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+
+                        // 阴影
+                        ctx.fillStyle = 'rgba(0,0,0,0.10)';
                         ctx.beginPath();
-                        ctx.ellipse(0, h * 0.06, w / 2, h / 2 * 0.55, 0, 0, Math.PI * 2);
+                        ctx.arc(0, r * 0.06, r, 0, Math.PI * 2);
                         ctx.fill();
-                        const rim = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+
+                        // 盘边（正圆）
+                        const rim = ctx.createLinearGradient(0, -r, 0, r);
                         rim.addColorStop(0, '#ffffff');
                         rim.addColorStop(1, '#cfe8f5');
                         ctx.fillStyle = rim;
                         ctx.beginPath();
-                        ctx.ellipse(0, 0, w / 2, h / 2 * 0.62, 0, 0, Math.PI * 2);
+                        ctx.arc(0, 0, r, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.lineWidth = full ? 6 : 4;
                         ctx.strokeStyle = full ? '#43a047' : '#9fc9de';
                         ctx.stroke();
-                        const inner = ctx.createRadialGradient(0, -h * 0.05, 4, 0, 0, w / 2 * 0.72);
+
+                        // 盘心
+                        const inner = ctx.createRadialGradient(0, -r * 0.1, 4, 0, 0, r * 0.82);
                         inner.addColorStop(0, '#ffffff');
                         inner.addColorStop(1, '#e4f3fa');
                         ctx.fillStyle = inner;
                         ctx.beginPath();
-                        ctx.ellipse(0, 0, w / 2 * 0.72, h / 2 * 0.42, 0, 0, Math.PI * 2);
+                        ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.lineWidth = 2;
                         ctx.strokeStyle = 'rgba(120,170,190,0.5)';
                         ctx.stroke();
+
+                        // 空位提示：浅灰色圆形占位（不显示任何数字）
+                        ctx.fillStyle = 'rgba(120,140,150,0.18)';
+                        for (let i = box.items.length; i < box.capacity; i++) {
+                            const s = box.slots[i];
+                            ctx.beginPath();
+                            ctx.arc(s.x, s.y, box.itemR, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+
                         ctx.restore();
                     },
+
+                    // 目标数字：位于盘子下方，未填满为浅灰，填满后放大变色并弹跳
                     drawLabel(ctx, box) {
                         const full = box.items.length >= box.capacity;
-                        
-                        // 大数字透明度：未满30%，满后100%
                         ctx.save();
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.translate(box.x, box.labelY);
                         ctx.scale(box.numberScale || 1, box.numberScale || 1);
-                        ctx.font = 'bold 40px sans-serif';
-                        ctx.lineWidth = 5;
-                        ctx.strokeStyle = '#ffffff';
-                        ctx.globalAlpha = full ? 1 : 0.3;
-                        ctx.strokeText(String(box.value), 0, 0);
-                        ctx.fillStyle = '#2b5876';
+                        ctx.font = `bold ${box.labelFontSize}px sans-serif`;
+                        if (full) {
+                            ctx.lineWidth = 6;
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.strokeText(String(box.value), 0, 0);
+                            ctx.fillStyle = box.completeColor || '#43a047';
+                        } else {
+                            ctx.fillStyle = '#cdd8dd';
+                        }
                         ctx.fillText(String(box.value), 0, 0);
-                        ctx.restore();
-
-                        // 计数文字透明度：未满100%，满后30%
-                        ctx.save();
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.font = 'bold 18px sans-serif';
-                        ctx.globalAlpha = full ? 0.3 : 1;
-                        ctx.fillStyle = full ? '#2e7d32' : '#5b7d91';
-                        ctx.fillText(`${box.items.length}/${box.capacity}`, box.x, box.countY);
                         ctx.restore();
                     }
                 }
             },
 
             levels: [
-                { id: 1, title: '认识数量 1 · 2', boxNumbers: [1, 2], itemType: 'apple', boxType: 'number' },
-                { id: 2, title: '认识数量 3 · 4', boxNumbers: [3, 4], itemType: 'apple', boxType: 'number' },
-                { id: 3, title: '认识数量 5 · 6', boxNumbers: [5, 6], itemType: 'apple', boxType: 'number' },
-                { id: 4, title: '认识数量 7 · 8', boxNumbers: [7, 8], itemType: 'apple', boxType: 'number' },
-                { id: 5, title: '认识数量 9 · 10', boxNumbers: [9, 10], itemType: 'apple', boxType: 'number' }
+                { id: 1, title: '认识 1 · 2', boxNumbers: [1, 2], itemType: 'apple', boxType: 'number' },
+                { id: 2, title: '认识 3 · 4', boxNumbers: [3, 4], itemType: 'apple', boxType: 'number' },
+                { id: 3, title: '认识 5 · 6', boxNumbers: [5, 6], itemType: 'apple', boxType: 'number' },
+                { id: 4, title: '认识 7 · 8', boxNumbers: [7, 8], itemType: 'apple', boxType: 'number' },
+                { id: 5, title: '认识 9 · 10', boxNumbers: [9, 10], itemType: 'apple', boxType: 'number' }
             ]
         };
 
@@ -187,44 +228,42 @@
             init(level, cw, topOffset) {
                 this.boxes = [];
                 const typeDef = Config.boxTypes[level.boxType];
-                const labelReserve = 56;
-                const gap = 30;
-                const dims = level.boxNumbers.map(v => typeDef.layout(v));
-                const maxH = Math.max(...dims.map(d => d.h));
-                const totalW = dims.reduce((s, d) => s + d.w, 0) + gap * (dims.length - 1);
-                const centerY = topOffset + labelReserve + maxH / 2;
+                const count = level.boxNumbers.length;
+                const { plateD, gap, labelFontSize } = typeDef.computeDims(cw, count);
+                const totalW = plateD * count + gap * (count - 1);
+                const centerY = topOffset + plateD / 2;
+                const labelGap = 18;
+                const labelY = centerY + plateD / 2 + labelGap + labelFontSize * 0.5;
                 let curX = (cw - totalW) / 2;
 
                 level.boxNumbers.forEach((value, i) => {
-                    const d = dims[i];
+                    const x = curX + plateD / 2;
+                    const slots = typeDef.slotLayout(value);
                     const box = {
                         id: 'box' + i,
                         type: level.boxType,
                         value,
                         capacity: value,
                         items: [],
-                        x: curX + d.w / 2,
-                        y: centerY,
-                        w: d.w, h: d.h,
-                        cols: d.cols, rows: d.rows, spacing: d.spacing,
-                        labelY: centerY - maxH / 2 - 34,
-                        countY: centerY - maxH / 2 - 10,
-                        numberScale: 1
+                        x, y: centerY,
+                        r: plateD / 2,
+                        itemR: Config.itemRadius,
+                        slots,
+                        labelY,
+                        labelFontSize,
+                        numberScale: 1,
+                        completeColor: null
                     };
                     this.boxes.push(box);
-                    curX += d.w + gap;
+                    curX += plateD + gap;
                 });
-                this.scatterTop = centerY + maxH / 2 + 26;
+
+                this.scatterTop = labelY + labelFontSize * 0.6 + 24;
             },
 
             slotPosition(box, index) {
-                const cols = box.cols;
-                const row = Math.floor(index / cols);
-                const itemsInRow = Math.min(box.capacity - row * cols, cols);
-                const startX = -((itemsInRow - 1) * box.spacing) / 2;
-                const startY = -((box.rows - 1) * box.spacing) / 2;
-                const col = index % cols;
-                return { x: box.x + startX + col * box.spacing, y: box.y + startY + row * box.spacing };
+                const s = box.slots[index];
+                return { x: box.x + s.x, y: box.y + s.y };
             },
 
             findAvailableBox() {
@@ -234,7 +273,14 @@
             tryPlace(box, item) {
                 if (box.items.length >= box.capacity) return false;
                 box.items.push(item);
-                Animation.pulse(box, 'numberScale', 1, 1.3, 300);
+                const nowFull = box.items.length >= box.capacity;
+                if (nowFull) {
+                    const palette = Config.boxTypes[box.type].completeColors;
+                    box.completeColor = palette[Math.floor(Math.random() * palette.length)];
+                    Animation.pulse(box, 'numberScale', 1, 1.6, 420);
+                } else {
+                    Animation.pulse(box, 'numberScale', 1, 1.12, 220);
+                }
                 return true;
             },
 
@@ -353,8 +399,8 @@
             showComplete(cw, ch) {
                 this.complete = true;
                 this.celebrateScale = 0.5;
-                Animation.add(this, 'celebrateScale', 0.5, 1, 400, null);
-                this.continueBtn = { x: cw / 2 - 90, y: ch * 0.7, w: 180, h: 56 };
+                Animation.add(this, 'celebrateScale', 0.5, 1, 380, null);
+                this.continueBtn = { x: cw / 2 - 95, y: ch * 0.46, w: 190, h: 66 };
             },
 
             drawTitle(ctx, cw) {
@@ -368,27 +414,25 @@
                 ctx.restore();
             },
 
+            // 只保留一个"继续"按钮，去掉庆祝表情与文字，避免干扰
             drawComplete(ctx, cw, ch) {
                 ctx.save();
-                ctx.translate(cw / 2, ch * 0.4);
-                ctx.scale(this.celebrateScale, this.celebrateScale);
-                ctx.font = 'bold 60px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#2b5876';
-                ctx.fillText('🎉', 0, 0);
+                ctx.fillStyle = 'rgba(234,247,255,0.6)';
+                ctx.fillRect(0, 0, cw, ch);
                 ctx.restore();
 
                 const b = this.continueBtn;
                 ctx.save();
+                ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+                ctx.scale(this.celebrateScale, this.celebrateScale);
                 ctx.fillStyle = '#43a047';
-                roundRect(ctx, b.x, b.y, b.w, b.h, 28);
+                roundRect(ctx, -b.w / 2, -b.h / 2, b.w, b.h, 33);
                 ctx.fill();
-                ctx.font = 'bold 20px sans-serif';
+                ctx.font = 'bold 26px sans-serif';
                 ctx.fillStyle = '#fff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('点击继续', b.x + b.w / 2, b.y + b.h / 2);
+                ctx.fillText('继续', 0, 0);
                 ctx.restore();
             },
 
