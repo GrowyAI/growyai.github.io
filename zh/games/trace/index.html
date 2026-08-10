@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Cat Chases Fish - Letter Tracing</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #E0F7FA;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: none;
+        }
+
+        /* ===== 顶部：分类标签（数字/大写/小写/形状），常驻不换行，只有4个所以不用滚动 ===== */
+        #categoryBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            padding: 10px 10px 0;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+        #categoryTabs {
+            pointer-events: auto;
+            display: flex;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-radius: 24px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
+        }
+        .tab-btn {
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
+        }
+        .tab-btn.active {
+            background: #4FC3F7;
+            color: #fff;
+        }
+        .tab-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* ===== 底部：条目横向滑动带（一个分类下所有可选项，左右滑动挑选） ===== */
+        #itemBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            box-sizing: border-box;
+            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.97) 60%, rgba(255, 255, 255, 0));
+        }
+        #itemStrip {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 16px;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            touch-action: pan-x; /* 覆盖 body 上的 touch-action: none，允许在这条带上横向滑动 */
+        }
+        #itemStrip::-webkit-scrollbar {
+            display: none;
+        }
+        .item-btn {
+            flex: 0 0 auto;
+            scroll-snap-align: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #e5e5e5;
+            background: #fff;
+            color: #444;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+        }
+        .item-btn.active {
+            background: #FF8C42;
+            border-color: #FF8C42;
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .item-btn:active {
+            transform: scale(0.9);
+        }
+        .item-empty-tip {
+            color: #999;
+            font-size: 13px;
+            padding: 8px;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="categoryBar">
+        <div id="categoryTabs"></div>
+    </div>
+
+    <div id="itemBar">
+        <div id="itemStrip"></div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        "use strict";
+
+        // ========================= 描红练习：分类数据 =========================
+        // 数字/大写字母/小写字母 用的是公有领域 Hershey Fonts（"Sans 1-stroke" / futural）
+        // 单线矢量字体骨架数据，来自开源移植 hersheytextjs（github.com/techninja/hersheytextjs）。
+        // "d" 里 M 表示抬笔换新的一笔，L 后面的坐标是连续连线。
+        // 形状类走程序生成（generator 对应下面引擎里的生成函数）。
+        // 以后要调整某个字符的比例/新增符号，直接改这里的数字/字符串就行，不用碰下面的引擎逻辑。
+        window.TRACE_DATA = {
+            categories: [
+                { id: 'numbers', label: '🔢 数字', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
+                { id: 'uppercase', label: '🔠 大写字母', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
+                { id: 'lowercase', label: '🔡 小写字母', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
+                { id: 'shapes', label: '🔷 形状', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] }
+            ],
+            items: {
+                '0': { type: 'hershey', d: 'M9,1 L6,2 4,5 3,10 3,13 4,18 6,21 9,22 11,22 14,21 16,18 17,13 17,10 16,5 14,2 11,1 9,1' },
+                '1': { type: 'hershey', d: 'M6,5 L8,4 11,1 11,22' },
+                '2': { type: 'hershey', d: 'M4,6 L4,5 5,3 6,2 8,1 12,1 14,2 15,3 16,5 16,7 15,9 13,12 3,22 17,22' },
+                '3': { type: 'hershey', d: 'M5,1 L16,1 10,9 13,9 15,10 16,11 17,14 17,16 16,19 14,21 11,22 8,22 5,21 4,20 3,18' },
+                '4': { type: 'hershey', d: 'M13,1 L3,15 18,15 M13,1 L13,22' },
+                '5': { type: 'hershey', d: 'M5,1 L4,10 5,9 8,8 11,8 14,9 16,11 17,14 17,16 16,19 14,21 11,22 8,22 5,21 4,20 3,18 M5,1 L15,1' },
+                '6': { type: 'hershey', d: 'M16,4 L15,2 12,1 10,1 7,2 5,5 4,10 4,15 5,19 7,21 10,22 11,22 14,21 16,19 17,16 17,15 16,12 14,10 11,9 10,9 7,10 5,12 4,15' },
+                '7': { type: 'hershey', d: 'M3,1 L17,1 7,22' },
+                '8': { type: 'hershey', d: 'M8,1 L5,2 4,4 4,6 5,8 7,9 11,10 14,11 16,13 17,15 17,18 16,20 15,21 12,22 8,22 5,21 4,20 3,18 3,15 4,13 6,11 9,10 13,9 15,8 16,6 16,4 15,2 12,1 8,1' },
+                '9': { type: 'hershey', d: 'M16,8 L15,4 13,2 10,1 9,1 6,2 4,4 3,7 3,8 4,11 6,13 9,14 10,14 13,13 15,11 16,8 16,13 15,18 13,21 10,22 8,22 5,21 4,19' },
+                'A': { type: 'hershey', d: 'M9,1 L1,22 M9,1 L17,22 M4,15 L14,15' },
+                'B': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L13,1 16,2 17,3 18,5 18,7 17,9 16,10 13,11 M4,11 L13,11 16,12 17,13 18,15 18,18 17,20 16,21 13,22 4,22' },
+                'C': { type: 'hershey', d: 'M18,6 L17,4 15,2 13,1 9,1 7,2 5,4 4,6 3,9 3,14 4,17 5,19 7,21 9,22 13,22 15,21 17,19 18,17' },
+                'D': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L11,1 14,2 16,4 17,6 18,9 18,14 17,17 16,19 14,21 11,22 4,22' },
+                'E': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L17,1 M4,11 L12,11 M4,22 L17,22' },
+                'F': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L17,1 M4,11 L12,11' },
+                'G': { type: 'hershey', d: 'M18,6 L17,4 15,2 13,1 9,1 7,2 5,4 4,6 3,9 3,14 4,17 5,19 7,21 9,22 13,22 15,21 17,19 18,17 18,14 M13,14 L18,14' },
+                'H': { type: 'hershey', d: 'M4,1 L4,22 M18,1 L18,22 M4,11 L18,11' },
+                'I': { type: 'hershey', d: 'M4,1 L4,22' },
+                'J': { type: 'hershey', d: 'M12,1 L12,17 11,20 10,21 8,22 6,22 4,21 3,20 2,17 2,15' },
+                'K': { type: 'hershey', d: 'M4,1 L4,22 M18,1 L4,15 M9,10 L18,22' },
+                'L': { type: 'hershey', d: 'M4,1 L4,22 M4,22 L16,22' },
+                'M': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L12,22 M20,1 L12,22 M20,1 L20,22' },
+                'N': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L18,22 M18,1 L18,22' },
+                'O': { type: 'hershey', d: 'M9,1 L7,2 5,4 4,6 3,9 3,14 4,17 5,19 7,21 9,22 13,22 15,21 17,19 18,17 19,14 19,9 18,6 17,4 15,2 13,1 9,1' },
+                'P': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L13,1 16,2 17,3 18,5 18,8 17,10 16,11 13,12 4,12' },
+                'Q': { type: 'hershey', d: 'M9,1 L7,2 5,4 4,6 3,9 3,14 4,17 5,19 7,21 9,22 13,22 15,21 17,19 18,17 19,14 19,9 18,6 17,4 15,2 13,1 9,1 M12,18 L18,24' },
+                'R': { type: 'hershey', d: 'M4,1 L4,22 M4,1 L13,1 16,2 17,3 18,5 18,7 17,9 16,10 13,11 4,11 M11,11 L18,22' },
+                'S': { type: 'hershey', d: 'M17,4 L15,2 12,1 8,1 5,2 3,4 3,6 4,8 5,9 7,10 13,12 15,13 16,14 17,16 17,19 15,21 12,22 8,22 5,21 3,19' },
+                'T': { type: 'hershey', d: 'M8,1 L8,22 M1,1 L15,1', order: [1, 0] },
+                'U': { type: 'hershey', d: 'M4,1 L4,16 5,19 7,21 10,22 12,22 15,21 17,19 18,16 18,1' },
+                'V': { type: 'hershey', d: 'M1,1 L9,22 M17,1 L9,22' },
+                'W': { type: 'hershey', d: 'M2,1 L7,22 M12,1 L7,22 M12,1 L17,22 M22,1 L17,22' },
+                'X': { type: 'hershey', d: 'M3,1 L17,22 M17,1 L3,22' },
+                'Y': { type: 'hershey', d: 'M1,1 L9,11 9,22 M17,1 L9,11' },
+                'Z': { type: 'hershey', d: 'M17,1 L3,22 M3,1 L17,1 M3,22 L17,22', order: [1, 0, 2] },
+                'a': { type: 'hershey', d: 'M15,8 L15,22 M15,11 L13,9 11,8 8,8 6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19', order: [1, 0] },
+                'b': { type: 'hershey', d: 'M4,1 L4,22 M4,11 L6,9 8,8 11,8 13,9 15,11 16,14 16,16 15,19 13,21 11,22 8,22 6,21 4,19' },
+                'c': { type: 'hershey', d: 'M15,11 L13,9 11,8 8,8 6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19' },
+                'd': { type: 'hershey', d: 'M15,1 L15,22 M15,11 L13,9 11,8 8,8 6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19' },
+                'e': { type: 'hershey', d: 'M3,14 L15,14 15,12 14,10 13,9 11,8 8,8 6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19' },
+                'f': { type: 'hershey', d: 'M10,1 L8,1 6,2 5,5 5,22 M2,8 L9,8' },
+                'g': { type: 'hershey', d: 'M15,8 L15,24 14,27 13,28 11,29 8,29 6,28 M15,11 L13,9 11,8 8,8 6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19', order: [1, 0] },
+                'h': { type: 'hershey', d: 'M4,1 L4,22 M4,12 L7,9 9,8 12,8 14,9 15,12 15,22' },
+                'i': { type: 'hershey', d: 'M3,1 L4,2 5,1 4,0 3,1 M4,8 L4,22', order: [1, 0] },
+                'j': { type: 'hershey', d: 'M5,1 L6,2 7,1 6,0 5,1 M6,8 L6,25 5,28 3,29 1,29', order: [1, 0] },
+                'k': { type: 'hershey', d: 'M4,1 L4,22 M14,8 L4,18 M8,14 L15,22' },
+                'l': { type: 'hershey', d: 'M4,1 L4,22' },
+                'm': { type: 'hershey', d: 'M4,8 L4,22 M4,12 L7,9 9,8 12,8 14,9 15,12 15,22 M15,12 L18,9 20,8 23,8 25,9 26,12 26,22' },
+                'n': { type: 'hershey', d: 'M4,8 L4,22 M4,12 L7,9 9,8 12,8 14,9 15,12 15,22' },
+                'o': { type: 'hershey', d: 'M8,8 L6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19 16,16 16,14 15,11 13,9 11,8 8,8' },
+                'p': { type: 'hershey', d: 'M4,8 L4,29 M4,11 L6,9 8,8 11,8 13,9 15,11 16,14 16,16 15,19 13,21 11,22 8,22 6,21 4,19' },
+                'q': { type: 'hershey', d: 'M15,8 L15,29 M15,11 L13,9 11,8 8,8 6,9 4,11 3,14 3,16 4,19 6,21 8,22 11,22 13,21 15,19' },
+                'r': { type: 'hershey', d: 'M4,8 L4,22 M4,14 L5,11 7,9 9,8 12,8' },
+                's': { type: 'hershey', d: 'M14,11 L13,9 10,8 7,8 4,9 3,11 4,13 6,14 11,15 13,16 14,18 14,19 13,21 10,22 7,22 4,21 3,19' },
+                't': { type: 'hershey', d: 'M5,1 L5,18 6,21 8,22 10,22 M2,8 L9,8' },
+                'u': { type: 'hershey', d: 'M4,8 L4,18 5,21 7,22 10,22 12,21 15,18 M15,8 L15,22' },
+                'v': { type: 'hershey', d: 'M2,8 L8,22 M14,8 L8,22' },
+                'w': { type: 'hershey', d: 'M3,8 L7,22 M11,8 L7,22 M11,8 L15,22 M19,8 L15,22' },
+                'x': { type: 'hershey', d: 'M3,8 L14,22 M14,8 L3,22' },
+                'y': { type: 'hershey', d: 'M2,8 L8,22 M14,8 L8,22 6,26 4,28 2,29 1,29' },
+                'z': { type: 'hershey', d: 'M14,8 L3,22 M3,8 L14,8 M3,22 L14,22', order: [1, 0, 2] },
+                circle: { type: 'procedural', label: '⚪', generator: 'circle' },
+                triangle: { type: 'procedural', label: '🔺', generator: 'triangle' },
+                square: { type: 'procedural', label: '⬜', generator: 'square' },
+                hexagon: { type: 'procedural', label: '⬡', generator: 'hexagon' },
+                pentagon: { type: 'procedural', label: '⬠', generator: 'pentagon' },
+                star: { type: 'procedural', label: '⭐', generator: 'star' },
+                heart: { type: 'procedural', label: '❤️', generator: 'heart' },
+                ellipse: { type: 'procedural', label: '⬭', generator: 'ellipse' },
+                rectangle: { type: 'procedural', label: '▭', generator: 'rectangle' },
+                rhombus: { type: 'procedural', label: '♦️', generator: 'rhombus' }
+            }
+        };
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const COLORS = ['#FF5252', '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63'];
+
+        let currentShape = 'circle';
+        let allStrokes = [];
+        let currentStrokeIndex = 0;
+        let currentPath = [];
+        let pathColor = '#FF5252';
+        let catIndex = 0;
+        let fishIndex = 0;
+        let isDragging = false;
+        let isSuccess = false;
+        let strokeTransitionLock = false; // 一笔写完后短暂停顿，锁住输入，营造"歇一下再写下一笔"的节奏
+
+        const FISH_LEAD_POINTS = 40;
+        const TOLERANCE_RADIUS = 100;
+        const LOOK_AHEAD_POINTS = 35;
+
+        // 屏幕四周留给UI/呼吸浮动/猫鱼emoji的边距，图形/字母的真实可用范围就是屏幕减去这些边距
+        const CANVAS_MARGIN = {
+            top: 110,    // 顶部分类栏
+            bottom: 130, // 底部选图案条（含安全区）
+            side: 48     // 左右留白，防止圆滑鼓起/呼吸浮动贴边被裁切
+        };
+
+        // 追逐对配置：每次 startGame 随机选一对，避免孩子只看猫和鱼看腻
+        const CHASE_PAIRS = [
+            { hunter: '🐱', prey: '🐟' }, // 猫吃鱼
+            { hunter: '🐶', prey: '🦴' }, // 狗啃骨头
+            { hunter: '🐦', prey: '🐛' }, // 鸟吃虫
+            { hunter: '🐒', prey: '🍌' }, // 猴子吃香蕉
+            { hunter: '🐰', prey: '🥕' }, // 兔子吃胡萝卜
+            { hunter: '🐮', prey: '🌿' }  // 牛吃草
+        ];
+        let currentPair = CHASE_PAIRS[0];
+
+        // ===== 轻量idle动效（参考"小猫吃鱼"主游戏的wigglePhase/bobPhase/squash思路，做emoji版的简化实现）=====
+        let fishWigglePhase = 0;   // 鱼身摆动相位
+        let catBobPhase = 0;       // 猫上下浮动相位
+        let catBreath = 1;         // 猫呼吸缩放（仅在非拖动时生效，拖动时立即恢复为1，避免和抓取反馈打架）
+        const FISH_WIGGLE_SPEED = 3.6;   // 摆动速度（调小，不那么抢眼）
+        const FISH_WIGGLE_AMOUNT = 0.10; // 摆动幅度（弧度，约6度）
+        const CAT_BOB_SPEED = 1.8;       // 猫浮动速度
+        const CAT_BOB_AMOUNT = 2;        // 猫上下浮动幅度（像素）
+        const CAT_BREATH_AMOUNT = 0.022; // 猫呼吸幅度（2.2%）
+        const PREY_FONT_SIZE = 45;       // 食物图标字号（56px×0.8），比猎手小一圈，方向感更明确
+
+        /* ========================= 特效管理 ========================= */
+        class EffectsManager {
+            constructor() {
+                this.particles = [];
+                this.ripples = [];
+            }
+
+            spawnEffect(x, y) {
+                for (let i = 0; i < 12; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 120 + 60;
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        radius: Math.random() * 4 + 2,
+                        color: pathColor,
+                        life: 0,
+                        maxLife: Math.random() * 0.4 + 0.4
+                    });
+                }
+                this.ripples.push({ x: x, y: y, life: 0, maxLife: 0.5 });
+            }
+
+            update(dt) {
+                for (const p of this.particles) {
+                    p.life += dt;
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+                    p.vy += 250 * dt;
+                    p.vx *= 0.95;
+                }
+                this.particles = this.particles.filter(p => p.life < p.maxLife);
+
+                for (const r of this.ripples) {
+                    r.life += dt;
+                }
+                this.ripples = this.ripples.filter(r => r.life < r.maxLife);
+            }
+
+            render(ctx) {
+                ctx.save();
+
+                for (const r of this.ripples) {
+                    const t = r.life / r.maxLife;
+                    const radius = 15 + t * 55;
+                    ctx.save();
+                    ctx.globalAlpha = (1 - t) * 0.7;
+                    ctx.strokeStyle = pathColor;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                for (const p of this.particles) {
+                    const t = p.life / p.maxLife;
+                    ctx.save();
+                    ctx.globalAlpha = 1 - t;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * (1 - t * 0.3), 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        const effects = new EffectsManager();
+
+        /* ========================= 轨迹生成 ========================= */
+        function getLinePath(p1, p2, step = 2) {
+            const path = [];
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const distance = Math.hypot(dx, dy);
+            const numPoints = Math.floor(distance / step);
+            for (let i = 0; i <= numPoints; i++) {
+                path.push({ x: p1.x + dx * (i / numPoints), y: p1.y + dy * (i / numPoints) });
+            }
+            return path;
+        }
+
+        function generateTrianglePath(cx, cy, size) {
+            const p1 = { x: cx, y: cy - size };
+            const p2 = { x: cx - size * 0.866, y: cy + size * 0.5 };
+            const p3 = { x: cx + size * 0.866, y: cy + size * 0.5 };
+            let l1 = getLinePath(p1, p2);
+            let l2 = getLinePath(p2, p3);
+            let l3 = getLinePath(p3, p1);
+            l1.pop();
+            l2.pop();
+            return [].concat(l1, l2, l3);
+        }
+
+        function generateCirclePath(cx, cy, radius, step = 2) {
+            const path = [];
+            const circumference = 2 * Math.PI * radius;
+            const numPoints = Math.floor(circumference / step);
+            const startAngle = -Math.PI / 2;
+            for (let i = 0; i <= numPoints; i++) {
+                const angle = startAngle - ((i / numPoints) * 2 * Math.PI);
+                path.push({
+                    x: cx + radius * Math.cos(angle),
+                    y: cy + radius * Math.sin(angle)
+                });
+            }
+            return path;
+        }
+
+        function generateSquarePath(cx, cy, size) {
+            // 起点改为左上角顶点（原来是上边中点），顺时针画一圈回到起点
+            const corner1 = { x: cx - size, y: cy - size };
+            const corner2 = { x: cx + size, y: cy - size };
+            const corner3 = { x: cx + size, y: cy + size };
+            const corner4 = { x: cx - size, y: cy + size };
+
+            let l1 = getLinePath(corner1, corner2);
+            let l2 = getLinePath(corner2, corner3);
+            let l3 = getLinePath(corner3, corner4);
+            let l4 = getLinePath(corner4, corner1);
+            l1.pop();
+            l2.pop();
+            l3.pop();
+            return [].concat(l1, l2, l3, l4);
+        }
+
+        function generateHexagonPath(cx, cy, size) {
+            const vertices = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = -Math.PI / 2 + (i * Math.PI / 3);
+                vertices.push({
+                    x: cx + size * Math.cos(angle),
+                    y: cy + size * Math.sin(angle)
+                });
+            }
+            const segments = [];
+            for (let i = 0; i < 6; i++) {
+                const from = vertices[i];
+                const to = vertices[(i + 1) % 6];
+                segments.push(getLinePath(from, to));
+            }
+            for (let i = 0; i < 5; i++) {
+                segments[i].pop();
+            }
+            return [].concat(...segments);
+        }
+
+        // 通用"N边正多边形"辅助函数，供五边形复用，逻辑和六边形一致，只是顶点数不同
+        function generatePolygonPath(cx, cy, size, sides) {
+            const vertices = [];
+            for (let i = 0; i < sides; i++) {
+                const angle = -Math.PI / 2 + (i * 2 * Math.PI / sides);
+                vertices.push({ x: cx + size * Math.cos(angle), y: cy + size * Math.sin(angle) });
+            }
+            const segments = [];
+            for (let i = 0; i < sides; i++) {
+                segments.push(getLinePath(vertices[i], vertices[(i + 1) % sides]));
+            }
+            for (let i = 0; i < sides - 1; i++) segments[i].pop();
+            return [].concat(...segments);
+        }
+
+        function generatePentagonPath(cx, cy, size) {
+            return generatePolygonPath(cx, cy, size, 5);
+        }
+
+        // 椭圆：复用circle的参数方程，只是x/y半径不同（不是等半径，所以形状和圆能明显区分）
+        function generateEllipsePath(cx, cy, rx, ry, step = 2) {
+            const path = [];
+            // 用较大的那个半径估算周长采样密度，保证疏密和其它图形一致
+            const approxCircumference = 2 * Math.PI * Math.max(rx, ry);
+            const numPoints = Math.floor(approxCircumference / step);
+            const startAngle = -Math.PI / 2;
+            for (let i = 0; i <= numPoints; i++) {
+                const angle = startAngle - ((i / numPoints) * 2 * Math.PI);
+                path.push({ x: cx + rx * Math.cos(angle), y: cy + ry * Math.sin(angle) });
+            }
+            return path;
+        }
+
+        // 长方形：复用square的四角连线逻辑，只是宽高不同（不是等边，和正方形能明显区分）
+        function generateRectPath(cx, cy, halfW, halfH) {
+            const corner1 = { x: cx - halfW, y: cy - halfH };
+            const corner2 = { x: cx + halfW, y: cy - halfH };
+            const corner3 = { x: cx + halfW, y: cy + halfH };
+            const corner4 = { x: cx - halfW, y: cy + halfH };
+            let l1 = getLinePath(corner1, corner2);
+            let l2 = getLinePath(corner2, corner3);
+            let l3 = getLinePath(corner3, corner4);
+            let l4 = getLinePath(corner4, corner1);
+            l1.pop(); l2.pop(); l3.pop();
+            return [].concat(l1, l2, l3, l4);
+        }
+
+        // 菱形：四个顶点在上下左右，但左右到中心的距离（halfW）和上下到中心的距离（halfH）不同，
+        // 四条边长度依然相等（都是 sqrt(halfW²+halfH²)），符合菱形定义，同时不会退化成"转了45度的正方形"
+        function generateRhombusPath(cx, cy, halfW, halfH) {
+            const top = { x: cx, y: cy - halfH };
+            const right = { x: cx + halfW, y: cy };
+            const bottom = { x: cx, y: cy + halfH };
+            const left = { x: cx - halfW, y: cy };
+            let l1 = getLinePath(top, right);
+            let l2 = getLinePath(right, bottom);
+            let l3 = getLinePath(bottom, left);
+            let l4 = getLinePath(left, top);
+            l1.pop(); l2.pop(); l3.pop();
+            return [].concat(l1, l2, l3, l4);
+        }
+
+        // 五角星：5个外尖角 + 5个内凹角交替连线，一共10个顶点，沿轮廓描边（和其它图形逻辑一致，
+        // 不做"一笔跳过顶点连线"那种画法）。innerRatio 控制内凹角离中心多近，0.382是视觉上比较"标准"的五角星比例
+        function generateStarPath(cx, cy, outerR, innerRatio = 0.382) {
+            const innerR = outerR * innerRatio;
+            const vertices = [];
+            for (let i = 0; i < 10; i++) {
+                const angle = -Math.PI / 2 + (i * Math.PI / 5);
+                const r = (i % 2 === 0) ? outerR : innerR;
+                vertices.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+            }
+            const segments = [];
+            for (let i = 0; i < 10; i++) {
+                segments.push(getLinePath(vertices[i], vertices[(i + 1) % 10]));
+            }
+            for (let i = 0; i < 9; i++) segments[i].pop();
+            return [].concat(...segments);
+        }
+
+        // 心形：不是直线多边形，用经典的心形参数曲线公式直接生成密集点，本身就是圆滑曲线，
+        // 不需要走那套"角度判断+圆角平滑"的逻辑（和circle一样属于解析曲线）
+        function generateHeartPath(cx, cy, size, numPoints = 260) {
+            const path = [];
+            for (let i = 0; i <= numPoints; i++) {
+                const t = (i / numPoints) * 2 * Math.PI;
+                const hx = 16 * Math.pow(Math.sin(t), 3);
+                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                // 心形公式原始坐标范围大约x:[-16,16] y:[-17,12]，按size/17做缩放，让心形整体和其它图形视觉大小一致
+                path.push({ x: cx + hx * (size / 17), y: cy + hy * (size / 17) });
+            }
+            return path;
+        }
+
+        /* ========================= 通用路径工具（字母 / 未来汉字 都复用这套） =========================
+         * 设计思路：
+         * 1. 每个字母定义在一个统一的“本地坐标框”里：x 0~100，y 0~130（居中点 50,65）。
+         *    这样比例、笔顺一目了然，改比例只需改数字，不用重新推导三角函数。
+         * 2. 直线用 resamplePolyline 直接给顶点；弧线/曲线先用 denseCubic 采样出密集点，
+         *    再统一丢进 resamplePolyline，按弧长重新等间距采样。
+         *    这保证了不管是直线、贝塞尔曲线还是椭圆弧，点的疏密都一致——
+         *    这正是猫咪追鱼的"最近点搜索"逻辑（LOOK_AHEAD_POINTS）能稳定工作的前提，
+         *    原来的写法（sin 近似造弧）疏密不均，容易导致小猫在弯道处判定跳动。
+         * 3. 以后要加新字母，只需在本地坐标框里描出关键点/控制点，调用同一套函数即可，
+         *    不用为每个字母单独发明一种参数化数学公式。
+         * 4. 以后要加汉字：手写笔画公式几乎不现实（几千个字，笔顺规则复杂）。
+         *    更好的方式是引入开源的 Hanzi Writer 数据（https://chanind.github.io/hanzi-writer/）：
+         *    它为每个汉字提供了标准笔顺的 "medians"（笔画骨架点数组），格式和这里的
+         *    allStrokes（笔画数组 -> 点数组）几乎一致，可以直接喂给 resamplePolyline
+         *    做等距重采样后使用，游戏机制（猫追鱼、涂色、笔画切换）完全不用改。
+         */
+
+        // 按弧长把任意折线/密集采样点重新采成等间距的点（step 像素一个点）
+        function resamplePolyline(points, step) {
+            if (points.length < 2) return points.slice();
+            const cum = [0];
+            for (let i = 1; i < points.length; i++) {
+                cum.push(cum[i - 1] + Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y));
+            }
+            const total = cum[cum.length - 1];
+            if (total === 0) return [points[0]];
+            const n = Math.max(1, Math.round(total / step));
+            const result = [];
+            let seg = 0;
+            for (let i = 0; i <= n; i++) {
+                const target = total * (i / n);
+                while (seg < cum.length - 2 && cum[seg + 1] < target) seg++;
+                const segLen = cum[seg + 1] - cum[seg];
+                const t = segLen > 0 ? (target - cum[seg]) / segLen : 0;
+                const a = points[seg], b = points[seg + 1];
+                result.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+            }
+            return result;
+        }
+
+        // Catmull-Rom 插值点：用于把折线变成圆滑曲线
+        function catmullRomPoint(p0, p1, p2, p3, t) {
+            const t2 = t * t, t3 = t2 * t;
+            return {
+                x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+                y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3)
+            };
+        }
+
+        // 保留尖角的圆滑处理：Hershey 字体的曲线部分其实是很多段短直线拼出来的折线，
+        // 直接连线在放大后会看出棱角。这个函数会先判断每个折点的转弯角度——
+        // 转弯很小（比如圆弧上的点）就当作"曲线的一部分"用 Catmull-Rom 抹圆滑；
+        // 转弯很大（比如 A 的尖顶、直线转角）就当作"真正的角"保留原样，不去磨圆它。
+        // 做法：在做曲线插值时，靠近"真角"的那一侧，把切线控制点收缩成该点本身，
+        // 曲线自然贴着角走，不会又鼓出一个不该有的圆边。
+        // smoothPull：控制圆角的"鼓起半径"——1 = 完全按原始邻点画弧（半径最大)，
+        // 数值越小，即使某个点被误判成"曲线的一部分"，鼓起的幅度也越小，误判的代价更低。
+        function smoothStroke(points, cornerThresholdDeg = 30, subdivisions = 8, smoothPull = 0.55) {
+            const n = points.length;
+            if (n < 3) return points.slice();
+            const isHardCorner = new Array(n).fill(false);
+            isHardCorner[0] = true;
+            isHardCorner[n - 1] = true;
+            for (let i = 1; i < n - 1; i++) {
+                const a = points[i - 1], b = points[i], c = points[i + 1];
+                const v1x = b.x - a.x, v1y = b.y - a.y;
+                const v2x = c.x - b.x, v2y = c.y - b.y;
+                const len1 = Math.hypot(v1x, v1y), len2 = Math.hypot(v2x, v2y);
+                if (len1 < 1e-6 || len2 < 1e-6) { isHardCorner[i] = true; continue; }
+                let dot = (v1x * v2x + v1y * v2y) / (len1 * len2);
+                dot = Math.max(-1, Math.min(1, dot));
+                const angleDeg = Math.acos(dot) * 180 / Math.PI;
+                if (angleDeg > cornerThresholdDeg) isHardCorner[i] = true;
+            }
+            const result = [points[0]];
+            for (let i = 0; i < n - 1; i++) {
+                const p1 = points[i], p2 = points[i + 1];
+                const rawP0 = (i === 0) ? p1 : points[i - 1];
+                const rawP3 = (i + 2 >= n) ? p2 : points[i + 2];
+                // 硬角：控制点直接收缩成自身，曲线贴着角走。
+                // 非硬角：控制点只朝原始邻点方向"拉"smoothPull这么多，而不是直接用邻点本身——
+                // 这样鼓起的弧度半径变小，就算判断错了也不会鼓得太夸张。
+                const p0 = isHardCorner[i] ? p1 : { x: p1.x + (rawP0.x - p1.x) * smoothPull, y: p1.y + (rawP0.y - p1.y) * smoothPull };
+                const p3 = isHardCorner[i + 1] ? p2 : { x: p2.x + (rawP3.x - p2.x) * smoothPull, y: p2.y + (rawP3.y - p2.y) * smoothPull };
+                for (let s = 1; s <= subdivisions; s++) {
+                    result.push(catmullRomPoint(p0, p1, p2, p3, s / subdivisions));
+                }
+            }
+            return result;
+        }
+
+        /* ========================= Hershey 单线矢量字体：解析与渲染 =========================
+         * 具体每个字符的骨架数据在上面的 TRACE_DATA.items 里，
+         * 这里只保留"怎么画"的引擎逻辑，方便复用于数字/大写/小写任何字符。
+         */
+
+        // 解析 Hershey 的 "d" 字符串：M 开始新的一笔（抬笔），L 后面跟的多组坐标都算连续 lineto
+        function parseHersheyStrokes(d) {
+            const tokens = d.trim().split(/\s+/);
+            const strokes = [];
+            let current = null;
+            for (const tok of tokens) {
+                const cmd = tok[0];
+                const rest = (cmd === 'M' || cmd === 'L') ? tok.slice(1) : tok;
+                if (cmd === 'M') { current = []; strokes.push(current); }
+                const [x, y] = rest.split(',').map(Number);
+                current.push({ x, y });
+            }
+            return strokes;
+        }
+
+        // 把 Hershey 字形（自带坐标系）按自身的实际包围盒居中、等比缩放到画布上，
+        // 再统一用 resamplePolyline 重采样成等距点——这样不管字形坐标疏密如何，
+        // 猫追鱼的"最近点搜索"逻辑都能稳定工作
+        //
+        // 注意：Hershey 原始数据里"抬笔次数=第几笔"这个顺序，是照绘图仪画着方便的顺序来的，
+        // 不一定符合英文手写教学的笔顺（比如 Z 原始顺序是"斜线→上横→下横"，
+        // 但手写应该是"上横→斜线→下横"）。所以字符数据里可以加一个可选的 order 字段，
+        // 按手写笔顺重新排列这几笔的绘制顺序（只调整顺序，不改变每一笔本身的方向）。
+        function generateHersheyLetterStrokes(cx, cy, size, glyph, heightRatio = 1.9) {
+            let rawStrokes = parseHersheyStrokes(glyph.d);
+            if (glyph.order && glyph.order.length === rawStrokes.length) {
+                rawStrokes = glyph.order.map(idx => rawStrokes[idx]);
+            }
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            for (const s of rawStrokes) for (const p of s) {
+                if (p.x < minX) minX = p.x;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.y > maxY) maxY = p.y;
+            }
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+            const scale = (size * heightRatio) / (maxY - minY || 1);
+            return rawStrokes.map(pts => {
+                const canvasPts = pts.map(p => ({
+                    x: cx + (p.x - centerX) * scale,
+                    y: cy + (p.y - centerY) * scale
+                }));
+                return resamplePolyline(smoothStroke(canvasPts), 2.2);
+            });
+        }
+
+        /* ========================= 笔画生成入口：从数据条目分派到对应引擎 ========================= */
+        function generateStrokesForItem(cx, cy, size, item) {
+            if (!item) return [generateCirclePath(cx, cy, size)];
+            if (item.type === 'hershey') {
+                return generateHersheyLetterStrokes(cx, cy, size, item);
+            }
+            if (item.type === 'procedural') {
+                switch (item.generator) {
+                    case 'circle': return [generateCirclePath(cx, cy, size)];
+                    case 'triangle': return [generateTrianglePath(cx, cy, size)];
+                    case 'square': return [generateSquarePath(cx, cy, size)];
+                    case 'hexagon': return [generateHexagonPath(cx, cy, size)];
+                    case 'pentagon': return [generatePentagonPath(cx, cy, size)];
+                    case 'star': return [generateStarPath(cx, cy, size)];
+                    case 'heart': return [generateHeartPath(cx, cy, size)];
+                    case 'ellipse': return [generateEllipsePath(cx, cy, size * 1.3, size * 0.87)]; // 3:2 宽高比，和圆形能明显区分
+                    case 'rectangle': return [generateRectPath(cx, cy, size * 1.2, size * 0.8)];   // 3:2 宽高比，和正方形能明显区分
+                    case 'rhombus': return [generateRhombusPath(cx, cy, size * 0.75, size * 1.05)]; // 上下比左右稍长，和正方形转45度能明显区分
+                    default: return [generateCirclePath(cx, cy, size)];
+                }
+            }
+            return [generateCirclePath(cx, cy, size)];
+        }
+
+        // 自动量尺寸：不同图形/字母在同一个"size"参数下，实际占用的上下左右范围完全不同
+        // （比如三角形只往下延伸0.5*size，圆形/六边形往四面都是1*size；椭圆左右比上下宽很多）。
+        // 与其给每个图形手动猜一个缩放系数，不如先用一个参考尺寸真的生成一次，量出它实际的
+        // 上下左右四个方向各伸出多远，再反推出"贴着屏幕能显示下的最大size"——这样新加图形也自动适配，不用每次手调。
+        function fitSizeToScreen(cx, cy, item, budgetLeft, budgetRight, budgetUp, budgetDown) {
+            const TEST_SIZE = 100;
+            const testStrokes = generateStrokesForItem(cx, cy, TEST_SIZE, item);
+            let maxLeft = 0, maxRight = 0, maxUp = 0, maxDown = 0;
+            for (const stroke of testStrokes) {
+                for (const p of stroke) {
+                    maxLeft = Math.max(maxLeft, cx - p.x);
+                    maxRight = Math.max(maxRight, p.x - cx);
+                    maxUp = Math.max(maxUp, cy - p.y);
+                    maxDown = Math.max(maxDown, p.y - cy);
+                }
+            }
+            const ratio = (budget, extent) => extent > 0.01 ? budget / extent : Infinity;
+            const scale = Math.min(
+                ratio(budgetLeft, maxLeft),
+                ratio(budgetRight, maxRight),
+                ratio(budgetUp, maxUp),
+                ratio(budgetDown, maxDown)
+            );
+            return TEST_SIZE * scale;
+        }
+
+        function startGame(itemId) {
+            currentShape = itemId;
+            const cx = width / 2;
+            // 上下留白：分类栏和选图案条各占一块，可用区域取正中间，这样才能真正"尽量占满"而不是拍脑袋往下挪40px
+            const cy = CANVAS_MARGIN.top + (height - CANVAS_MARGIN.top - CANVAS_MARGIN.bottom) / 2;
+
+            allStrokes = [];
+            currentStrokeIndex = 0;
+
+            const item = window.TRACE_DATA.items[itemId];
+            const budgetLeft = cx - CANVAS_MARGIN.side;
+            const budgetRight = (width - CANVAS_MARGIN.side) - cx;
+            const budgetUp = cy - CANVAS_MARGIN.top;
+            const budgetDown = (height - CANVAS_MARGIN.bottom) - cy;
+            const fitSize = fitSizeToScreen(cx, cy, item, budgetLeft, budgetRight, budgetUp, budgetDown);
+            allStrokes = generateStrokesForItem(cx, cy, fitSize, item);
+
+            currentPath = allStrokes[0];
+            pathColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+            currentPair = CHASE_PAIRS[Math.floor(Math.random() * CHASE_PAIRS.length)];
+
+            catIndex = 0;
+            fishIndex = Math.min(FISH_LEAD_POINTS, currentPath.length - 1);
+            isDragging = false;
+            isSuccess = false;
+            effects.particles = [];
+            effects.ripples = [];
+        }
+
+        /* ========================= 交互逻辑 ========================= */
+        function handleInput(x, y, isStart) {
+            if (currentPath.length === 0 || isSuccess || strokeTransitionLock) return;
+
+            const catPos = currentPath[catIndex];
+            const distToCat = Math.hypot(x - catPos.x, y - catPos.y);
+
+            if (isStart) {
+                if (distToCat <= TOLERANCE_RADIUS) {
+                    isDragging = true;
+                }
+                return;
+            }
+
+            if (isDragging) {
+                if (distToCat > TOLERANCE_RADIUS) {
+                    isDragging = false;
+                    return;
+                }
+
+                let nextIndex = catIndex;
+                let minDist = distToCat;
+
+                for (let i = 1; i <= LOOK_AHEAD_POINTS; i++) {
+                    if (catIndex + i >= currentPath.length) break;
+                    const nextPos = currentPath[catIndex + i];
+                    const distToNext = Math.hypot(x - nextPos.x, y - nextPos.y);
+                    if (distToNext < minDist) {
+                        minDist = distToNext;
+                        nextIndex = catIndex + i;
+                    }
+                }
+
+                if (nextIndex > catIndex) {
+                    catIndex = nextIndex;
+                    fishIndex = Math.min(catIndex + FISH_LEAD_POINTS, currentPath.length - 1);
+
+                    // 检查当前笔画是否接近完成
+                    if (catIndex >= currentPath.length - 12) {
+                        catIndex = currentPath.length - 1;
+                        isDragging = false;
+                        const strokeEndPos = currentPath[currentPath.length - 1];
+                        effects.spawnEffect(strokeEndPos.x, strokeEndPos.y);
+
+                        // 检查是否还有下一笔
+                        if (currentStrokeIndex < allStrokes.length - 1) {
+                            // 先停顿一下，让孩子感受到"这一笔写完了"，再出现下一笔
+                            strokeTransitionLock = true;
+                            setTimeout(() => {
+                                currentStrokeIndex++;
+                                currentPath = allStrokes[currentStrokeIndex];
+                                catIndex = 0;
+                                fishIndex = Math.min(FISH_LEAD_POINTS, currentPath.length - 1);
+                                isSuccess = false;
+                                strokeTransitionLock = false;
+                            }, 500);
+                        } else {
+                            // 全部完成
+                            isSuccess = true;
+                            setTimeout(() => {
+                                startGame(currentShape);
+                            }, 1500);
+                        }
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('touchstart', e => {
+            if (e.target.closest('#itemBar')) return; // 底部选图案条自己处理触摸（横向滑动选择），不走小猫拖拽逻辑
+            handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
+        }, { passive: false });
+        window.addEventListener('touchmove', e => {
+            if (e.target.closest('#itemBar')) return; // 同上：放行，让浏览器原生横向滑动生效
+            e.preventDefault();
+            if (e.touches.length > 0) handleInput(e.touches[0].clientX, e.touches[0].clientY, false);
+        }, { passive: false });
+        window.addEventListener('touchend', () => isDragging = false);
+
+        window.addEventListener('mousedown', e => handleInput(e.clientX, e.clientY, true));
+        window.addEventListener('mousemove', e => handleInput(e.clientX, e.clientY, false));
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            startGame(currentShape);
+        });
+
+        /* ========================= 渲染循环 ========================= */
+        let lastTime = performance.now();
+
+        function loop(timestamp) {
+            const dt = Math.min(0.05, (timestamp - lastTime) / 1000);
+            lastTime = timestamp;
+
+            // 更新idle动效相位
+            fishWigglePhase += dt * FISH_WIGGLE_SPEED;
+            catBobPhase += dt * CAT_BOB_SPEED;
+            // 猫呼吸：非拖动时跟随sin波轻微起伏；拖动时快速抚平为1，交给现有的78→84px抓取反馈，两者不打架
+            const catBreathTarget = isDragging ? 1 : (1 + Math.sin(catBobPhase) * CAT_BREATH_AMOUNT);
+            catBreath += (catBreathTarget - catBreath) * Math.min(1, dt * 10);
+
+            ctx.clearRect(0, 0, width, height);
+
+            if (allStrokes.length > 0 && currentPath.length > 0) {
+                // 1. 底色轨道点阵（所有笔画）
+                ctx.save();
+                ctx.globalAlpha = 1.0;
+                ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+                for (let s = 0; s < allStrokes.length; s++) {
+                    const stroke = allStrokes[s];
+                    for (let i = 0; i < stroke.length; i += 10) {
+                        ctx.beginPath();
+                        ctx.arc(stroke[i].x, stroke[i].y, 4.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                ctx.restore();
+
+                // 2. 彩笔涂色轨迹
+                ctx.save();
+                ctx.globalAlpha = 1.0;
+                ctx.strokeStyle = pathColor;
+                ctx.lineWidth = 26;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+
+                // 已完成笔画
+                for (let s = 0; s < currentStrokeIndex; s++) {
+                    const stroke = allStrokes[s];
+                    if (stroke.length > 0) {
+                        ctx.beginPath();
+                        ctx.moveTo(stroke[0].x, stroke[0].y);
+                        for (let i = 1; i < stroke.length; i++) {
+                            ctx.lineTo(stroke[i].x, stroke[i].y);
+                        }
+                        ctx.stroke();
+                    }
+                }
+
+                // 当前笔画（已追踪部分）
+                if (catIndex > 0 && currentPath.length > 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(currentPath[0].x, currentPath[0].y);
+                    for (let i = 1; i <= catIndex; i++) {
+                        ctx.lineTo(currentPath[i].x, currentPath[i].y);
+                    }
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // 3. 小鱼（轻微左右扭身摆动，暗示"活着、在往前游"）
+                if (!isSuccess) {
+                    const fishPos = currentPath[fishIndex];
+                    const fishWiggle = Math.sin(fishWigglePhase) * FISH_WIGGLE_AMOUNT;
+                    ctx.save();
+                    ctx.globalAlpha = 1.0;
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.translate(fishPos.x, fishPos.y);
+                    ctx.rotate(fishWiggle);
+                    ctx.font = PREY_FONT_SIZE + "px sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(currentPair.prey, 0, 0);
+                    ctx.restore();
+                }
+
+                // 4. 特效
+                effects.update(dt);
+                effects.render(ctx);
+
+                // 5. 小猫（拖动时微微放大：84px，正常78px；非拖动时轻微呼吸+上下浮动，暗示"想动、等着被拖走"）
+                const catPos = currentPath[catIndex];
+                const catBobY = isDragging ? 0 : Math.sin(catBobPhase) * CAT_BOB_AMOUNT;
+                ctx.save();
+                ctx.globalAlpha = 1.0;
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.translate(catPos.x, catPos.y + catBobY);
+                ctx.scale(1 / Math.sqrt(catBreath), catBreath);
+                ctx.font = isDragging ? "84px sans-serif" : "78px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(currentPair.hunter, 0, 0);
+                ctx.restore();
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        /* ========================= 分类标签栏 / 条目滑动带 ========================= */
+        function buildCategoryUI() {
+            const tabsEl = document.getElementById('categoryTabs');
+            const itemsEl = document.getElementById('itemStrip');
+            let activeCategoryId = window.TRACE_DATA.categories[0].id;
+
+            // 高亮当前条目，并把它滚动到滑动带的可见范围内（居中显示）
+            function setActiveItem(itemId) {
+                Array.from(itemsEl.children).forEach(btn => {
+                    const isActive = btn.dataset.itemId === itemId;
+                    btn.classList.toggle('active', isActive);
+                    if (isActive) btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                });
+            }
+
+            function renderItems(catId) {
+                const cat = window.TRACE_DATA.categories.find(c => c.id === catId);
+                itemsEl.innerHTML = '';
+                if (!cat || cat.items.length === 0) {
+                    const tip = document.createElement('span');
+                    tip.className = 'item-empty-tip';
+                    tip.textContent = '敬请期待 ✨';
+                    itemsEl.appendChild(tip);
+                    return;
+                }
+                cat.items.forEach(id => {
+                    const def = window.TRACE_DATA.items[id];
+                    const btn = document.createElement('button');
+                    btn.className = 'item-btn';
+                    btn.dataset.itemId = id;
+                    btn.textContent = (def && def.label) ? def.label : id;
+                    btn.onclick = () => {
+                        setActiveItem(id);
+                        startGame(id);
+                    };
+                    itemsEl.appendChild(btn);
+                });
+                itemsEl.scrollLeft = 0;
+            }
+
+            window.TRACE_DATA.categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn' + (cat.id === activeCategoryId ? ' active' : '');
+                btn.textContent = cat.label;
+                btn.onclick = () => {
+                    if (cat.id === activeCategoryId) return;
+                    activeCategoryId = cat.id;
+                    tabsEl.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderItems(cat.id);
+                    // 切换大类后，直接进入这一类的第一项，不用再多点一次
+                    if (cat.items.length > 0) {
+                        setActiveItem(cat.items[0]);
+                        startGame(cat.items[0]);
+                    }
+                };
+                tabsEl.appendChild(btn);
+            });
+
+            renderItems(activeCategoryId);
+            const firstItems = window.TRACE_DATA.categories.find(c => c.id === activeCategoryId);
+            if (firstItems && firstItems.items.length > 0) setActiveItem(firstItems.items[0]);
+        }
+
+        buildCategoryUI();
+        const firstCategoryWithItems = window.TRACE_DATA.categories.find(c => c.items.length > 0) || window.TRACE_DATA.categories[0];
+        startGame(firstCategoryWithItems.items[0] || 'circle');
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

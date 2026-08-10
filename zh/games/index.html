@@ -29,7 +29,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            padding: 15px 20px;
             -webkit-font-smoothing: antialiased;
             background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
         }
@@ -37,7 +37,7 @@
         .back-nav {
             width: 100%;
             max-width: 480px;
-            margin-bottom: 22px;
+            margin-bottom: 12px;
             text-align: left;
         }
 
@@ -63,7 +63,7 @@
         header {
             width: 100%;
             max-width: 480px;
-            margin-bottom: 36px;
+            margin-bottom: 16px;
             text-align: center;
         }
 
@@ -82,7 +82,7 @@
         p.subtitle {
             font-size: 15.5px;
             color: var(--text-muted);
-            margin-top: 8px;
+            margin-top: 4px;
             line-height: 1.5;
         }
 
@@ -91,19 +91,19 @@
             max-width: 480px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 10px;
         }
 
         /* 游戏卡片 */
         .game-card {
             background-color: var(--card-bg);
             border-radius: var(--radius);
-            padding: 22px;
+            padding: 14px;
             text-decoration: none;
             color: inherit;
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 14px;
             box-shadow: 0 6px 20px rgba(120, 108, 90, 0.07);
             border: 1px solid rgba(120, 108, 90, 0.06);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -128,6 +128,7 @@
 
         /* 果物底色 */
         .icon-words { background-color: #fdf1ed; }     /* 淡杏粉 */
+        .icon-write { background-color: #eaf3ec; }      /* 淡薄荷绿 */
         .icon-click { background-color: #fbeef0; }      /* 淡粉 */
         .icon-challenge { background-color: #eef2f6; }  /* 淡雾蓝 */
 
@@ -192,6 +193,33 @@
         .icon-cat .heart-1 { top: 12px; right: 14px; font-size: 14px; }
         .icon-cat .heart-2 { top: 20px; right: 23px; font-size: 11px; opacity: 0.85; }
 
+        /* 图标 4: 写写画画——大写"Aa"居中，右上角配一支顺时针转90度的小铅笔 */
+        .icon-trace {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .icon-trace .trace-letters {
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1;
+            background-image: linear-gradient(90deg, #e0975a 0%, #d6708a 45%, #7c8fc4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .icon-trace .badge-pencil {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 22px;
+            line-height: 1;
+            transform: rotate(90deg);
+        }
+
         .card-content {
             flex: 1;
             min-width: 0;
@@ -201,7 +229,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             gap: 8px;
         }
 
@@ -220,6 +248,7 @@
         }
 
         .badge-words { background-color: #f6e3da; color: #a2694a; }
+        .badge-write { background-color: #dcebe0; color: #4a7d5c; }
         .badge-click { background-color: #f4dde1; color: #a25868; }
         .badge-challenge { background-color: #dde5ee; color: #55688a; }
 
@@ -238,7 +267,7 @@
         }
 
         footer {
-            margin-top: 28px;
+            margin-top: 12px;
             font-size: 13.5px;
             color: #a89e92;
             font-weight: 500;
@@ -275,7 +304,25 @@
             <span class="arrow">→</span>
         </a>
 
-        <!-- 游戏 2: 数字点点 -->
+        <!-- 游戏 2: 写写画画 -->
+        <a href="/zh/games/trace/index.html" class="game-card">
+            <div class="card-icon icon-write">
+                <div class="icon-trace">
+                    <span class="trace-letters">Aa</span>
+                    <span class="badge-pencil">✏️</span>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <span class="card-title">写写画画</span>
+                    <span class="age-badge badge-write">4+</span>
+                </div>
+                <div class="card-desc">帮小动物吃到美食，画出字母、数字和图形</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+
+        <!-- 游戏 3: 数字点点 -->
         <a href="/zh/games/math-click/index.html" class="game-card">
             <div class="card-icon icon-click">
                 <div class="icon-number">
@@ -293,7 +340,7 @@
             <span class="arrow">→</span>
         </a>
 
-        <!-- 游戏 3: 数学挑战 (小猫吃鱼) -->
+        <!-- 游戏 4: 数学挑战 (小猫吃鱼) -->
         <a href="/zh/games/math-challenge/index.html" class="game-card">
             <div class="card-icon icon-challenge">
                 <div class="icon-cat">
