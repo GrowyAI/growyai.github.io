@@ -10,6 +10,7 @@
             --consult: #42657D;
             --about: #546E7A;
             --priority: #6B5B95;
+            --orange: #E2703A;
             --bg: #F5F7FA;
             --text: #2C3E50;
             --gray: #6b7280;
@@ -130,6 +131,7 @@
         .card.blue::before { background: linear-gradient(to right, #6B8CA3, var(--consult)); }
         .card.gray::before { background: linear-gradient(to right, #C5D3DC, var(--about)); }
         .card.purple::before { background: linear-gradient(to right, #9C7BB8, var(--priority)); }
+        .card.orange::before { background: linear-gradient(to right, #FFA06B, var(--orange)); }
 
         .icon {
             width: 56px;
@@ -150,6 +152,8 @@
         .card.gray:hover .icon { background: var(--about); color: white; }
         .card.purple .icon { background: rgba(107,91,149,0.1); color: var(--priority); }
         .card.purple:hover .icon { background: var(--priority); color: white; }
+        .card.orange .icon { background: rgba(226,112,58,0.12); color: var(--orange); }
+        .card.orange:hover .icon { background: var(--orange); color: white; }
 
         .card h3 {
             font-size: 1.25rem;
@@ -162,6 +166,7 @@
         .card.blue:hover h3 { color: var(--consult); }
         .card.gray:hover h3 { color: var(--about); }
         .card.purple:hover h3 { color: var(--priority); }
+        .card.orange:hover h3 { color: var(--orange); }
 
         .card p {
             font-size: 0.875rem;
@@ -182,6 +187,7 @@
         .card.blue .action { color: var(--consult); }
         .card.gray .action { color: var(--about); }
         .card.purple .action { color: var(--priority); }
+        .card.orange .action { color: var(--orange); }
 
         /* Footer */
         footer {
@@ -260,15 +266,15 @@
                 <div class="action">Start Exploring →</div>
             </a>
 
-            <a href="priority.html" class="card purple">
+            <a href="games/index.html" class="card orange">
                 <div class="icon">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-6.857 2.143L12 21l-2.143-6.857L3 12l6.857-2.143L12 3z" />
                     </svg>
                 </div>
-                <h3>Everything Urgent Keeps Pushing Out What Matters</h3>
-                <p>This tool helps you protect a few important things—by placing them into your week first. No tracking. No pressure. Just a promise to yourself.</p>
-                <div class="action">Start Planning →</div>
+                <h3>Learning Through Play?</h3>
+                <p>Quiet, relaxing mini-games to help your child practice words, numbers, and math while having fun.</p>
+                <div class="action">Play Now →</div>
             </a>
 
             <a href="https://growyai.lovable.app" target="_blank" class="card blue">
@@ -280,6 +286,17 @@
                 <h3>Stuck in a Parenting Moment?</h3>
                 <p>When something happens and you don’t know how to respond, Growy helps you think it through—based on your child, your family, and your values.</p>
                 <div class="action">Chat with Growy →</div>
+            </a>
+
+            <a href="priority.html" class="card purple">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <h3>Everything Urgent Keeps Pushing Out What Matters</h3>
+                <p>This tool helps you protect a few important things—by placing them into your week first. No tracking. No pressure. Just a promise to yourself.</p>
+                <div class="action">Start Planning →</div>
             </a>
 
             <a href="about.html" class="card gray">
