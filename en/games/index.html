@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>游戏大厅 - 边玩边学</title>
+    <title>Game Hub - Play & Learn</title>
     <style>
         :root {
-            /* 更暖、更安静的底色 */
+            /* Warm, tranquil background colors */
             --bg-top: #fdfbf7;
             --bg-bottom: #f5f6f2;
             --card-bg: #ffffff;
-            --text-main: #2b2622;   /* 暖调深棕 */
-            --text-muted: #85796e;  /* 暖灰 */
+            --text-main: #2b2622;   /* Warm deep brown */
+            --text-muted: #85796e;  /* Warm gray */
             --radius: 20px;
         }
 
@@ -72,7 +72,6 @@
             font-weight: 750;
             letter-spacing: -0.01em;
             display: inline-block;
-            /* 暖色渐变字体，呼应卡片配色，活泼但不刺眼 */
             background-image: linear-gradient(90deg, #e0975a 0%, #d6708a 45%, #7c8fc4 100%);
             -webkit-background-clip: text;
             background-clip: text;
@@ -94,7 +93,7 @@
             gap: 10px;
         }
 
-        /* 游戏卡片 */
+        /* Game Card */
         .game-card {
             background-color: var(--card-bg);
             border-radius: var(--radius);
@@ -126,13 +125,13 @@
             overflow: hidden;
         }
 
-        /* 果物底色 */
-        .icon-words { background-color: #fdf1ed; }     /* 淡杏粉 */
-        .icon-write { background-color: #eaf3ec; }      /* 淡薄荷绿 */
-        .icon-click { background-color: #fbeef0; }      /* 淡粉 */
-        .icon-challenge { background-color: #eef2f6; }  /* 淡雾蓝 */
+        /* Card Colors */
+        .icon-words { background-color: #fdf1ed; }
+        .icon-write { background-color: #eaf3ec; }
+        .icon-click { background-color: #fbeef0; }
+        .icon-challenge { background-color: #eef2f6; }
 
-        /* 图标 1: 缩小字号并增加外围 Padding，使四宫格内聚且边距舒适 */
+        /* Icon Grid */
         .icon-grid {
             width: 100%;
             height: 100%;
@@ -148,7 +147,7 @@
             font-size: 21px;
         }
 
-        /* 图标 2: 优化数字与草莓比例，与外框保持平衡呼吸感 */
+        /* Icon Number */
         .icon-number {
             width: 100%;
             height: 100%;
@@ -173,7 +172,7 @@
             margin-top: 2px;
         }
 
-        /* 图标 3: 优化猫咪尺寸与爱心贴合位置，避免贴近外边框 */
+        /* Icon Cat */
         .icon-cat {
             width: 100%;
             height: 100%;
@@ -193,7 +192,7 @@
         .icon-cat .heart-1 { top: 12px; right: 14px; font-size: 14px; }
         .icon-cat .heart-2 { top: 20px; right: 23px; font-size: 11px; opacity: 0.85; }
 
-        /* 图标 4: 写写画画——大写"Aa"居中，右上角配一支顺时针转90度的小铅笔 */
+        /* Icon Trace */
         .icon-trace {
             width: 100%;
             height: 100%;
@@ -277,17 +276,17 @@
 <body>
 
     <div class="back-nav">
-        <a href="/zh/" class="back-link">🏠 返回</a>
+        <a href="../index.html" class="back-link">🏠 Back</a>
     </div>
 
     <header>
-        <h1>边玩边学</h1>
-        <p class="subtitle">安静、轻松的日常认知与数学练习</p>
+        <h1>Play & Learn</h1>
+        <p class="subtitle">Quiet, relaxing cognitive and math practice</p>
     </header>
 
     <main>
-        <!-- 游戏 1: 生活中的词汇 -->
-        <a href="/zh/games/words/index.html" class="game-card">
+        <!-- Game 1: Words in My Life -->
+        <a href="words/index.html" class="game-card">
             <div class="card-icon icon-words">
                 <div class="icon-grid">
                     <span>🍎</span><span>🚗</span>
@@ -296,16 +295,16 @@
             </div>
             <div class="card-content">
                 <div class="card-header">
-                    <span class="card-title">生活中的词汇</span>
+                    <span class="card-title">Words in My Life</span>
                     <span class="age-badge badge-words">3+</span>
                 </div>
-                <div class="card-desc">基础日常词汇与语言启蒙</div>
+                <div class="card-desc">Everyday vocabulary & early language skills</div>
             </div>
             <span class="arrow">→</span>
         </a>
 
-        <!-- 游戏 2: 写写画画 -->
-        <a href="/zh/games/trace/index.html" class="game-card">
+        <!-- Game 2: Tracing & Drawing -->
+        <a href="trace/index.html" class="game-card">
             <div class="card-icon icon-write">
                 <div class="icon-trace">
                     <span class="trace-letters">Aa</span>
@@ -314,16 +313,16 @@
             </div>
             <div class="card-content">
                 <div class="card-header">
-                    <span class="card-title">写写画画</span>
+                    <span class="card-title">Tracing & Drawing</span>
                     <span class="age-badge badge-write">4+</span>
                 </div>
-                <div class="card-desc">帮小动物吃到美食，画出字母、数字和图形</div>
+                <div class="card-desc">Help animals get food by tracing letters, numbers, and shapes</div>
             </div>
             <span class="arrow">→</span>
         </a>
 
-        <!-- 游戏 3: 数字点点 -->
-        <a href="/zh/games/math-click/index.html" class="game-card">
+        <!-- Game 3: Number Click -->
+        <a href="math-click/index.html" class="game-card">
             <div class="card-icon icon-click">
                 <div class="icon-number">
                     <span class="big-num">3</span>
@@ -332,16 +331,16 @@
             </div>
             <div class="card-content">
                 <div class="card-header">
-                    <span class="card-title">数字点点</span>
+                    <span class="card-title">Number Click</span>
                     <span class="age-badge badge-click">3+</span>
                 </div>
-                <div class="card-desc">认识数字、数数与基础运算</div>
+                <div class="card-desc">Number recognition, counting, and basic math</div>
             </div>
             <span class="arrow">→</span>
         </a>
 
-        <!-- 游戏 4: 数学挑战 (小猫吃鱼) -->
-        <a href="/zh/games/math-challenge/index.html" class="game-card">
+        <!-- Game 4: Math Challenge -->
+        <a href="math-challenge/index.html" class="game-card">
             <div class="card-icon icon-challenge">
                 <div class="icon-cat">
                     <span class="cat-face">🐱</span>
@@ -351,17 +350,17 @@
             </div>
             <div class="card-content">
                 <div class="card-header">
-                    <span class="card-title">数学挑战</span>
+                    <span class="card-title">Math Challenge</span>
                     <span class="age-badge badge-challenge">6+</span>
                 </div>
-                <div class="card-desc">拖动小猫吃掉正确的鱼，喂饱它</div>
+                <div class="card-desc">Drag the cat to eat the correct fish!</div>
             </div>
             <span class="arrow">→</span>
         </a>
     </main>
 
     <footer>
-        <p>Growy · 陪伴与新生</p>
+        <p>Growy · Grow With You</p>
     </footer>
 
 </body>

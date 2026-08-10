@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Learn Numbers</title>
+<style>
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #7fc8f0;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+        font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    #gameCanvas {
+        display: block;
+        margin: 0 auto;
+        background: #eaf7ff;
+        touch-action: none;
+    }
+</style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        'use strict';
+
+        /* =========================================================
+           工具函数
+        ========================================================= */
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        function dist(x1, y1, x2, y2) { return Math.hypot(x1 - x2, y1 - y2); }
+
+        function rand(a, b) { return a + Math.random() * (b - a); }
+
+        /* =========================================================
+           Config 模块
+           —— 物品类型 / 箱子(容器)类型 / 关卡数据 全部注册在这里
+        ========================================================= */
+        const Config = {
+            itemRadius: 20,
+
+            // 🍎🍌🍓🍊🍇🍉🍑🍒 —— 丰富食物类型
+            itemTypes: {
+                apple: { emoji: '🍎', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍎', 0, r * 0.08); ctx.restore(); } },
+                banana: { emoji: '🍌', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍌', 0, r * 0.08); ctx.restore(); } },
+                strawberry: { emoji: '🍓', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍓', 0, r * 0.08); ctx.restore(); } },
+                orange: { emoji: '🍊', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍊', 0, r * 0.08); ctx.restore(); } },
+                grape: { emoji: '🍇', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍇', 0, r * 0.08); ctx.restore(); } },
+                watermelon: { emoji: '🍉', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍉', 0, r * 0.08); ctx.restore(); } },
+                peach: { emoji: '🍑', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍑', 0, r * 0.08); ctx.restore(); } },
+                cherry: { emoji: '🍒', draw(ctx, r) { ctx.save(); ctx.font = `${r*2.15}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🍒', 0, r * 0.08); ctx.restore(); } }
+            },
+
+            foodTypeKeys: ['apple', 'banana', 'strawberry', 'orange', 'grape', 'watermelon', 'peach', 'cherry'],
+
+            boxTypes: {
+                number: {
+                    // 所有盘子统一大小；外径留足余量，最多允许 10 个水果溢出到第 4 行
+                    plateBaseDiameter: 260,
+                    // 每行最多 3 个，整体（不只是单行）上下左右居中
+                    // 1 个水果时正好在圆心
+                    gridCols: 3,
+                    // 填满后弹跳出现的活泼低饱和度颜色（红黄蓝绿橙棕紫）
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+
+                    // 根据画布宽度和盘子数量，算出统一的盘子直径（水果大小固定不变）
+                    computeDims(cw, count) {
+                        const sideMargin = 20;
+                        const gap = 24;
+                        const maxAvailable = (cw - sideMargin * 2 - gap * (count - 1)) / count;
+                        const plateD = Math.max(150, Math.min(this.plateBaseDiameter, maxAvailable));
+                        const labelFontSize = Math.max(70, Math.round(120 * (plateD / this.plateBaseDiameter)));
+                        return { plateD, gap, labelFontSize };
+                    },
+
+                    // 生成 n 个水果在盘子里的固定位置：每行最多 3 个，整体居中
+                    // （1 个水果 = 单独在圆心；最后一行不满也单独居中；行数不够就往下多加一行，10 个会溢出到第 4 行）
+                    slotLayout(n) {
+                        const cols = Math.min(this.gridCols, n);
+                        const rows = Math.ceil(n / cols);
+                        const spacing = Config.itemRadius * 2.3;
+                        const positions = [];
+                        for (let i = 0; i < n; i++) {
+                            const row = Math.floor(i / cols);
+                            const itemsInRow = Math.min(n - row * cols, cols);
+                            const startX = -((itemsInRow - 1) * spacing) / 2;
+                            const startY = -((rows - 1) * spacing) / 2;
+                            const col = i % cols;
+                            positions.push({
+                                x: startX + col * spacing,
+                                y: startY + row * spacing
+                            });
+                        }
+                        return positions;
+                    },
+
+                    draw(ctx, box) {
+                        const r = box.r;
+                        const full = box.items.length >= box.capacity;
+                        ctx.save();
+                        ctx.translate(box.x, box.y);
+
+                        // 阴影
+                        ctx.fillStyle = 'rgba(0,0,0,0.10)';
+                        ctx.beginPath();
+                        ctx.arc(0, r * 0.06, r, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // 盘边（正圆）
+                        const rim = ctx.createLinearGradient(0, -r, 0, r);
+                        rim.addColorStop(0, '#ffffff');
+                        rim.addColorStop(1, '#cfe8f5');
+                        ctx.fillStyle = rim;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, r, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.lineWidth = full ? 6 : 4;
+                        ctx.strokeStyle = full ? '#43a047' : '#9fc9de';
+                        ctx.stroke();
+
+                        // 盘心
+                        const inner = ctx.createRadialGradient(0, -r * 0.1, 4, 0, 0, r * 0.82);
+                        inner.addColorStop(0, '#ffffff');
+                        inner.addColorStop(1, '#e4f3fa');
+                        ctx.fillStyle = inner;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = 'rgba(120,170,190,0.5)';
+                        ctx.stroke();
+
+                        // 空位提示：浅灰色圆形占位（不显示任何数字）
+                        ctx.fillStyle = 'rgba(120,140,150,0.18)';
+                        for (let i = box.items.length; i < box.capacity; i++) {
+                            const s = box.slots[i];
+                            ctx.beginPath();
+                            ctx.arc(s.x, s.y, box.itemR, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+
+                        ctx.restore();
+                    },
+
+                    // 目标数字：位于盘子下方，未填满为浅灰，填满后放大变色并弹跳
+                    drawLabel(ctx, box) {
+                        const full = box.items.length >= box.capacity;
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.translate(box.x, box.labelY);
+                        ctx.scale(box.numberScale || 1, box.numberScale || 1);
+                        ctx.font = `bold ${box.labelFontSize}px sans-serif`;
+                        if (full) {
+                            ctx.lineWidth = 6;
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.strokeText(String(box.value), 0, 0);
+                            ctx.fillStyle = box.completeColor || '#43a047';
+                        } else {
+                            ctx.fillStyle = '#cdd8dd';
+                        }
+                        ctx.fillText(String(box.value), 0, 0);
+                        ctx.restore();
+                    }
+                }
+            },
+
+            levels: [
+                { id: 1, title: '1 · 2', boxNumbers: [1, 2], itemType: 'apple', boxType: 'number' },
+                { id: 2, title: '3 · 4', boxNumbers: [3, 4], itemType: 'apple', boxType: 'number' },
+                { id: 3, title: '5 · 6', boxNumbers: [5, 6], itemType: 'apple', boxType: 'number' },
+                { id: 4, title: '7 · 8', boxNumbers: [7, 8], itemType: 'apple', boxType: 'number' },
+                { id: 5, title: '9 · 10', boxNumbers: [9, 10], itemType: 'apple', boxType: 'number' }
+            ]
+        };
+
+        /* =========================================================
+           Animation 模块
+        ========================================================= */
+        const Animation = {
+            tweens: [],
+            add(target, prop, from, to, duration, onDone) {
+                this.tweens.push({ target, prop, from, to, duration, t: 0, onDone });
+                target[prop] = from;
+            },
+            pulse(target, prop, base, peak, duration) {
+                this.add(target, prop, base, peak, duration / 2, () => {
+                    this.add(target, prop, peak, base, duration / 2, null);
+                });
+            },
+            update(dt) {
+                for (let i = this.tweens.length - 1; i >= 0; i--) {
+                    const tw = this.tweens[i];
+                    tw.t += dt;
+                    const p = Math.min(1, tw.t / tw.duration);
+                    const ease = 1 - Math.pow(1 - p, 3);
+                    tw.target[tw.prop] = tw.from + (tw.to - tw.from) * ease;
+                    if (p >= 1) {
+                        this.tweens.splice(i, 1);
+                        if (tw.onDone) tw.onDone();
+                    }
+                }
+            }
+        };
+
+        /* =========================================================
+           BoxManager 模块
+        ========================================================= */
+        const BoxManager = {
+            boxes: [],
+            scatterTop: 0,
+
+            init(level, cw, topOffset) {
+                this.boxes = [];
+                const typeDef = Config.boxTypes[level.boxType];
+                const count = level.boxNumbers.length;
+                const { plateD, gap, labelFontSize } = typeDef.computeDims(cw, count);
+                const totalW = plateD * count + gap * (count - 1);
+                const centerY = topOffset + plateD / 2;
+                const labelGap = 18;
+                const labelY = centerY + plateD / 2 + labelGap + labelFontSize * 0.5;
+                let curX = (cw - totalW) / 2;
+
+                level.boxNumbers.forEach((value, i) => {
+                    const x = curX + plateD / 2;
+                    const slots = typeDef.slotLayout(value);
+                    const box = {
+                        id: 'box' + i,
+                        type: level.boxType,
+                        value,
+                        capacity: value,
+                        items: [],
+                        x, y: centerY,
+                        r: plateD / 2,
+                        itemR: Config.itemRadius,
+                        slots,
+                        labelY,
+                        labelFontSize,
+                        numberScale: 1,
+                        completeColor: null
+                    };
+                    this.boxes.push(box);
+                    curX += plateD + gap;
+                });
+
+                this.scatterTop = labelY + labelFontSize * 0.6 + 24;
+            },
+
+            slotPosition(box, index) {
+                const s = box.slots[index];
+                return { x: box.x + s.x, y: box.y + s.y };
+            },
+
+            findAvailableBox() {
+                return this.boxes.find(b => b.items.length < b.capacity) || null;
+            },
+
+            tryPlace(box, item) {
+                if (box.items.length >= box.capacity) return false;
+                box.items.push(item);
+                const nowFull = box.items.length >= box.capacity;
+                if (nowFull) {
+                    const palette = Config.boxTypes[box.type].completeColors;
+                    box.completeColor = palette[Math.floor(Math.random() * palette.length)];
+                    Animation.pulse(box, 'numberScale', 1, 1.6, 420);
+                } else {
+                    Animation.pulse(box, 'numberScale', 1, 1.12, 220);
+                }
+                return true;
+            },
+
+            isAllComplete() {
+                return this.boxes.every(b => b.items.length === b.capacity);
+            }
+        };
+
+        /* =========================================================
+           ItemManager 模块
+        ========================================================= */
+        const ItemManager = {
+            items: [],
+            moveLock: false,
+
+            init(level, cw, ch, scatterTop, foodType) {
+                this.items = [];
+                this.moveLock = false;
+                const total = level.boxNumbers.reduce((a, b) => a + b, 0);
+                const r = Config.itemRadius;
+                const positions = [];
+                const marginX = r + 14, marginY = r + 14;
+                const bottom = ch - marginY;
+
+                for (let i = 0; i < total; i++) {
+                    let pos = null, tries = 0;
+                    while (tries < 300) {
+                        const cand = { x: rand(marginX, cw - marginX), y: rand(scatterTop + marginY, bottom) };
+                        if (positions.every(p => dist(p.x, p.y, cand.x, cand.y) > r * 2.3)) {
+                            pos = cand; break;
+                        }
+                        tries++;
+                    }
+                    if (!pos) {
+                        const cols = Math.max(1, Math.floor((cw - 2 * marginX) / (r * 2.3)));
+                        pos = {
+                            x: marginX + (i % cols) * r * 2.3,
+                            y: scatterTop + marginY + Math.floor(i / cols) * r * 2.3
+                        };
+                    }
+                    positions.push(pos);
+                    this.items.push({
+                        id: 'item' + i,
+                        type: foodType,
+                        r,
+                        x: pos.x, y: pos.y,
+                        homeX: pos.x, homeY: pos.y,
+                        boxed: false,
+                        dragging: false,
+                        scale: 1
+                    });
+                }
+            },
+
+            itemAt(x, y) {
+                for (let i = this.items.length - 1; i >= 0; i--) {
+                    const it = this.items[i];
+                    if (it.boxed || it.dragging) continue;
+                    if (dist(x, y, it.x, it.y) <= it.r * 1.5) return it;
+                }
+                return null;
+            },
+
+            moveToBoxSlot(item, box, slot, onDone) {
+                item.boxed = true;
+                let completed = 0;
+                const tryDone = () => { completed++; if (completed >= 2 && onDone) onDone(); };
+                Animation.add(item, 'x', item.x, slot.x, 240, tryDone);
+                Animation.add(item, 'y', item.y, slot.y, 240, tryDone);
+                Animation.add(item, 'scale', 1, 1.35, 120, () => {
+                    Animation.add(item, 'scale', 1.35, 1, 120, null);
+                });
+            }
+        };
+
+        /* =========================================================
+           LevelManager 模块
+        ========================================================= */
+        const LevelManager = {
+            currentIndex: 0,
+            currentFoodType: 'apple',
+
+            randomFoodType() {
+                const keys = Config.foodTypeKeys;
+                return keys[Math.floor(Math.random() * keys.length)];
+            },
+
+            load(cw, ch, idx) {
+                this.currentIndex = idx;
+                const level = Config.levels[idx];
+                const topOffset = ch * 0.05 + 30;
+                this.currentFoodType = this.randomFoodType();
+                BoxManager.init(level, cw, topOffset);
+                ItemManager.init(level, cw, ch, BoxManager.scatterTop, this.currentFoodType);
+                UI.reset();
+            },
+
+            currentLevel() { return Config.levels[this.currentIndex]; },
+            reloadCurrent(cw, ch) { this.load(cw, ch, this.currentIndex); },
+            nextLevel(cw, ch) {
+                const next = (this.currentIndex + 1) % Config.levels.length;
+                this.load(cw, ch, next);
+            }
+        };
+
+        /* =========================================================
+           UI 模块
+        ========================================================= */
+        const UI = {
+            complete: false,
+            celebrateScale: 1,
+            continueBtn: null,
+
+            reset() { this.complete = false; },
+
+            showComplete(cw, ch) {
+                this.complete = true;
+                this.celebrateScale = 0.5;
+                Animation.add(this, 'celebrateScale', 0.5, 1, 380, null);
+                this.continueBtn = { x: cw / 2 - 95, y: ch * 0.46, w: 190, h: 66 };
+            },
+
+            drawTitle(ctx, cw) {
+                const level = LevelManager.currentLevel();
+                ctx.save();
+                ctx.font = 'bold 22px sans-serif';
+                ctx.fillStyle = '#2b5876';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(level.title, cw / 2, 10);
+                ctx.restore();
+            },
+
+            // 只保留一个"继续"按钮，去掉庆祝表情与文字，避免干扰
+            drawComplete(ctx, cw, ch) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(234,247,255,0.6)';
+                ctx.fillRect(0, 0, cw, ch);
+                ctx.restore();
+
+                const b = this.continueBtn;
+                ctx.save();
+                ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+                ctx.scale(this.celebrateScale, this.celebrateScale);
+                ctx.fillStyle = '#43a047';
+                roundRect(ctx, -b.w / 2, -b.h / 2, b.w, b.h, 33);
+                ctx.fill();
+                ctx.font = 'bold 26px sans-serif';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Continue', 0, 0);
+                ctx.restore();
+            },
+
+            hitContinue(x, y) {
+                const b = this.continueBtn;
+                if (!b) return false;
+                return x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h;
+            }
+        };
+
+        /* =========================================================
+           Renderer 模块
+        ========================================================= */
+        const Renderer = {
+            ctx: null,
+            canvas: null,
+
+            init(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+            },
+
+            render(cw, ch) {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, cw, ch);
+                ctx.fillStyle = '#eaf7ff';
+                ctx.fillRect(0, 0, cw, ch);
+
+                UI.drawTitle(ctx, cw);
+
+                BoxManager.boxes.forEach(box => Config.boxTypes[box.type].draw(ctx, box));
+
+                ItemManager.items.forEach(item => {
+                    ctx.save();
+                    ctx.translate(item.x, item.y);
+                    ctx.scale(item.scale, item.scale);
+                    const typeDef = Config.itemTypes[item.type];
+                    if (typeDef && typeDef.draw) typeDef.draw(ctx, item.r);
+                    ctx.restore();
+                });
+
+                BoxManager.boxes.forEach(box => Config.boxTypes[box.type].drawLabel(ctx, box));
+
+                if (UI.complete) UI.drawComplete(ctx, cw, ch);
+            }
+        };
+
+        /* =========================================================
+           Input 模块
+        ========================================================= */
+        const Input = {
+            bind(canvas, getSize) {
+                const toLocal = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const p = e.touches ? e.touches[0] : e;
+                    return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+                };
+
+                const down = (e) => {
+                    e.preventDefault();
+                    const { x, y } = toLocal(e);
+                    const { cw, ch } = getSize();
+
+                    if (UI.complete) {
+                        if (UI.hitContinue(x, y)) {
+                            UI.complete = false;
+                            LevelManager.nextLevel(cw, ch);
+                        }
+                        return;
+                    }
+
+                    if (ItemManager.moveLock) return;
+                    const item = ItemManager.itemAt(x, y);
+                    if (!item) return;
+
+                    const targetBox = BoxManager.findAvailableBox();
+                    if (!targetBox) return;
+
+                    ItemManager.moveLock = true;
+                    const placed = BoxManager.tryPlace(targetBox, item);
+                    if (!placed) {
+                        ItemManager.moveLock = false;
+                        return;
+                    }
+
+                    const slot = BoxManager.slotPosition(targetBox, targetBox.items.length - 1);
+                    ItemManager.moveToBoxSlot(item, targetBox, slot, () => {
+                        ItemManager.moveLock = false;
+                        if (BoxManager.isAllComplete()) {
+                            const sz = getSize();
+                            setTimeout(() => UI.showComplete(sz.cw, sz.ch), 260);
+                        }
+                    });
+                };
+
+                canvas.addEventListener('mousedown', down);
+                canvas.addEventListener('mousemove', () => {});
+                window.addEventListener('mouseup', () => {});
+                canvas.addEventListener('touchstart', down, { passive: false });
+                canvas.addEventListener('touchmove', () => {}, { passive: false });
+                window.addEventListener('touchend', () => {});
+            }
+        };
+
+        /* =========================================================
+           GameLoop
+        ========================================================= */
+        const Game = {
+            canvas: null,
+            cw: 0, ch: 0, dpr: 1,
+            lastTime: 0,
+
+            init() {
+                this.canvas = document.getElementById('gameCanvas');
+                Renderer.init(this.canvas);
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                Input.bind(this.canvas, () => ({ cw: this.cw, ch: this.ch }));
+                LevelManager.load(this.cw, this.ch, 0);
+                requestAnimationFrame((t) => this.loop(t));
+            },
+
+            resize() {
+                const maxW = 480;
+                this.cw = Math.min(window.innerWidth, maxW);
+                this.ch = window.innerHeight;
+                this.dpr = window.devicePixelRatio || 1;
+                this.canvas.style.width = this.cw + 'px';
+                this.canvas.style.height = this.ch + 'px';
+                this.canvas.width = this.cw * this.dpr;
+                this.canvas.height = this.ch * this.dpr;
+                Renderer.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+                if (BoxManager.boxes.length) LevelManager.reloadCurrent(this.cw, this.ch);
+            },
+
+            loop(time) {
+                const dt = this.lastTime ? Math.min(time - this.lastTime, 50) : 16;
+                this.lastTime = time;
+                Animation.update(dt);
+                Renderer.render(this.cw, this.ch);
+                requestAnimationFrame((t) => this.loop(t));
+            }
+        };
+
+        Game.init();
+    </script>
+</body>
+</html>

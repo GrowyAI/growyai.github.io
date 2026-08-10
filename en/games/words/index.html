@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vocab Cards · Tap to Reset</title>
+    <style>
+        :root {
+            --bg: #f7f4f0;
+            --card-bg: #fcfaf8;
+            --border-soft: #f0ebe4;
+            --border-dashed: #e0dad4;
+            --accent: #b8d4a8;
+            --accent-bg: #f1f8ea;
+            --text: #1a1a1a;
+            --text-muted: #555;
+            --text-light: #999;
+            --btn-bg: #f0ebe4;
+            --btn-active: #e0d8ce;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --radius-lg: 32px;
+            --radius-md: 18px;
+            --radius-sm: 14px;
+            --transition: 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+            --active-scale: 0.94;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            padding: 14px 14px 22px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .home-page { display: flex; flex-direction: column; gap: 16px; }
+        .home-title-row {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding-bottom: 4px; border-bottom: 3px solid var(--border-soft); flex-wrap: wrap;
+        }
+        .home-title { font-size: 24px; font-weight: 600; color: var(--text); text-align: center; }
+        .settings-btn {
+            background: var(--btn-bg); border: none; border-radius: 20px; padding: 6px 14px;
+            font-size: 15px; cursor: pointer; touch-action: manipulation; color: var(--text-muted);
+            font-weight: 500; white-space: nowrap; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .settings-btn:active { transform: scale(var(--active-scale)); background: var(--btn-active); }
+        .category-section { margin-bottom: 4px; }
+        .category-label { font-size: 17px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .category-label span { background: var(--btn-bg); border-radius: 20px; padding: 0 10px; font-size: 13px; color: #888; }
+        .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+        .word-card {
+            background: var(--card-bg); border-radius: var(--radius-md); padding: 8px 4px;
+            text-align: center; border: 2px solid var(--border-soft); cursor: pointer;
+            touch-action: manipulation; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 68px; transition: transform 0.12s, background 0.12s;
+        }
+        .word-card:active { transform: scale(var(--active-scale)); background: #f5f0ea; }
+        .word-card .emoji-big { font-size: 30px; line-height: 1.2; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; }
+        .word-card img.card-image { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; margin-bottom: 2px; }
+        .word-card .word-text { font-size: 18px; font-weight: 600; color: var(--text); margin-top: 2px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 90%; }
+        .word-card .word-text.word-en { font-size: 15px; text-transform: lowercase; }
+        .expand-card { background: #f5f0ea; border-style: dashed; }
+        .expand-card .expand-icon { font-size: 20px; line-height: 1.2; color: #aaa; }
+        .expand-card .word-text { color: var(--text-light); font-size: 14px; }
+        .number-badge {
+            display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+            background: #f2994a; color: #fff; font-weight: 700;
+            font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif; line-height: 1;
+        }
+        .number-badge.num-card { width: 32px; height: 32px; font-size: 15px; }
+        .number-badge.num-display { width: 110px; height: 110px; font-size: 50px; }
+        .number-badge.num-strip { width: 36px; height: 36px; font-size: 16px; }
+        .reset-row { text-align: center; margin-top: 2px; }
+        .reset-btn { background: none; border: none; color: #bbb; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 6px; }
+        .custom-input-area {
+            margin-top: 12px; border-top: 2px solid var(--border-soft); padding-top: 12px;
+            display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+        }
+        .custom-input-area input[type="text"] {
+            flex: 1; min-width: 100px; padding: 10px 12px; border: 2px solid var(--border-dashed);
+            border-radius: 40px; font-size: 16px; outline: none; background: var(--card-bg);
+        }
+        .custom-input-area input[type="text"]:focus { border-color: var(--accent); }
+        .custom-input-area input.en-input { flex: 0.6; min-width: 70px; font-size: 14px; padding: 10px 10px; }
+        .image-upload-btn, .emoji-pick-btn {
+            background: var(--btn-bg); border: none; border-radius: 50%; width: 40px; height: 40px;
+            font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; touch-action: manipulation; transition: transform 0.12s, background 0.12s;
+        }
+        .image-upload-btn:active, .emoji-pick-btn:active { transform: scale(0.9); background: var(--btn-active); }
+        .custom-input-area .btn { flex: 0 0 auto; padding: 10px 18px; font-size: 16px; }
+        .selected-image-preview { width: 30px; height: 30px; object-fit: cover; border-radius: 8px; border: 2px solid var(--accent); }
+        .selected-emoji-preview { font-size: 22px; line-height: 1; }
+        .preview-badge {
+            display: inline-flex; align-items: center; gap: 4px; background: var(--btn-bg);
+            border-radius: var(--radius-sm); padding: 2px 8px; font-size: 14px; flex-shrink: 0; max-width: 60px; overflow: hidden;
+        }
+        .learn-page { display: none; flex-direction: column; height: 100%; flex: 1; }
+        .learn-page.active { display: flex; }
+        .learn-top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .back-btn { font-size: 28px; background: none; border: none; cursor: pointer; align-self: flex-start; padding: 4px 8px; color: #888; touch-action: manipulation; }
+        .learn-lang-toggle {
+            background: var(--btn-bg); border: none; border-radius: 20px; padding: 5px 12px;
+            font-size: 14px; cursor: pointer; touch-action: manipulation; font-weight: 500;
+            white-space: nowrap; transition: all 0.15s; display: inline-flex; align-items: center; gap: 2px;
+        }
+        .learn-lang-toggle:active { transform: scale(var(--active-scale)); background: var(--btn-active); }
+        .learn-lang-toggle .lang-zh, .learn-lang-toggle .lang-en { transition: color 0.2s, font-weight 0.2s; }
+        .learn-lang-toggle .lang-zh { color: var(--text); font-weight: 600; }
+        .learn-lang-toggle .lang-en { color: #bbb; font-weight: 400; }
+        .learn-lang-toggle.en-active .lang-zh { color: #bbb; font-weight: 400; }
+        .learn-lang-toggle.en-active .lang-en { color: var(--text); font-weight: 600; }
+        .display-area { text-align: center; padding: 12px 0 8px; position: relative; display: flex; justify-content: center; align-items: center; }
+        .display-emoji-wrapper { position: relative; display: inline-block; cursor: pointer; }
+        .display-emoji {
+            font-size: 110px; line-height: 1.2; display: block;
+            transition: opacity 0.4s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .display-emoji img { max-width: 140px; max-height: 140px; object-fit: contain; border-radius: 16px; }
+        .display-emoji.dim { opacity: 0.3; }
+        .display-emoji.pop { animation: popAnim 0.6s ease; }
+        @keyframes popAnim {
+            0% { transform: scale(1); } 40% { transform: scale(1.25); } 70% { transform: scale(0.95); } 100% { transform: scale(1); }
+        }
+        .speak-btn {
+            position: absolute; bottom: 0; right: -46px; background: var(--btn-bg);
+            border: none; border-radius: 50%; width: 38px; height: 38px; font-size: 18px;
+            cursor: pointer; touch-action: manipulation; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.15s; z-index: 5;
+        }
+        .speak-btn.speak-hidden { display: none !important; }
+        .speak-btn:active { transform: scale(0.88); background: var(--btn-active); }
+        .speak-btn.speaking { background: #d4c9b8; animation: speakPulse 0.5s ease infinite alternate; }
+        @keyframes speakPulse { from { transform: scale(1); } to { transform: scale(1.12); } }
+        .puzzle-area { position: relative; flex: 1; min-height: 280px; display: flex; flex-direction: column; margin: 8px 0 10px; }
+        .slots-row { flex: 0 0 auto; display: flex; justify-content: center; align-items: center; gap: 8px; padding-bottom: 10px; flex-wrap: wrap; min-height: 60px; }
+        .slot-placeholder { border: 2px dashed var(--border-dashed); border-radius: var(--radius-md); background: var(--card-bg); box-sizing: border-box; }
+        .intact-word { font-size: 40px; font-weight: 700; color: var(--text); background: var(--card-bg); border-radius: 20px; padding: 12px 28px; border: 2px dashed var(--border-dashed); letter-spacing: 2px; }
+        .completed-word { font-size: 36px; font-weight: 700; color: var(--text); background: var(--accent-bg); border-radius: 20px; padding: 10px 28px; border: 2px solid var(--accent); letter-spacing: 2px; }
+        .scramble-container { flex: 1; min-height: 180px; background: var(--card-bg); border-radius: var(--radius-lg); border: 2px dashed var(--border-dashed); box-sizing: border-box; position: relative; overflow: hidden; touch-action: manipulation; }
+        .tiles-layer { position: absolute; inset: 0; pointer-events: none; }
+        .tile {
+            position: absolute; pointer-events: auto; font-weight: 600; color: var(--text);
+            background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow);
+            border: 3px solid transparent; cursor: pointer;
+            transition: left var(--transition), top var(--transition);
+            text-align: center; will-change: left, top; display: flex; align-items: center; justify-content: center;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            overflow: hidden; white-space: nowrap;
+        }
+        .tile:active { transform: scale(0.92); }
+        .tile.placed { border-color: var(--accent); background: var(--accent-bg); opacity: 0.9; }
+        .tile.wrong { border-color: #ffb3a6; background: #fff0ed; }
+        .action-bar { display: flex; gap: 8px; margin-top: 2px; justify-content: center; align-items: center; }
+        .btn {
+            padding: 12px 20px; border: none; border-radius: 60px; font-size: 20px; font-weight: 500;
+            background: var(--btn-bg); color: var(--text-muted); cursor: pointer; touch-action: manipulation;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .btn:active { transform: scale(var(--active-scale)); background: var(--btn-active); }
+        .btn-primary { background: #d4c9b8; color: var(--text); font-weight: 600; padding: 12px 32px; }
+        .btn:disabled { opacity: 0.4; pointer-events: none; }
+        .status-hint { text-align: center; font-size: 16px; color: var(--text-light); margin-top: 6px; min-height: 26px; }
+        .word-strip { display: flex; gap: 8px; overflow-x: auto; padding: 10px 4px 2px; margin-top: 6px; border-top: 2px solid var(--border-soft); -webkit-overflow-scrolling: touch; }
+        .strip-item {
+            flex: 0 0 auto; width: 56px; height: 56px; border-radius: 16px; background: var(--card-bg);
+            border: 2px solid var(--border-soft); display: flex; align-items: center; justify-content: center;
+            font-size: 28px; cursor: pointer; touch-action: manipulation;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .strip-item.active { border-color: var(--accent); background: var(--accent-bg); }
+        .strip-item.disabled { pointer-events: none; opacity: 0.5; }
+        .strip-item img.strip-image { width: 38px; height: 38px; object-fit: cover; border-radius: 8px; }
+        .home-hidden { display: none !important; }
+        .settings-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .settings-overlay.show { display: flex; }
+        .settings-panel {
+            background: #fff; border-radius: var(--radius-lg); padding: 24px 22px 28px;
+            width: 90%; max-width: 400px; box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .settings-panel-header { display: flex; align-items: center; justify-content: space-between; }
+        .settings-panel-title { font-size: 20px; font-weight: 700; color: var(--text); }
+        .settings-panel-close { background: var(--btn-bg); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .settings-section-label { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+        .settings-option-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .settings-option-btn {
+            flex: 1; min-width: 60px; padding: 10px 14px; border: 2px solid var(--border-dashed);
+            border-radius: 24px; background: var(--card-bg); font-size: 15px; font-weight: 500;
+            cursor: pointer; touch-action: manipulation; color: var(--text-muted); text-align: center;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .settings-option-btn:active { transform: scale(0.95); background: #f5f0ea; }
+        .settings-option-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--text); font-weight: 700; }
+        .emoji-panel-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 999;
+            align-items: flex-end; justify-content: center;
+        }
+        .emoji-panel-overlay.show { display: flex; }
+        .emoji-panel {
+            background: #fff; border-radius: 28px 28px 0 0; padding: 16px 14px 28px;
+            width: 100%; max-width: 440px; max-height: 55vh; overflow-y: auto; box-shadow: 0 -8px 30px rgba(0,0,0,0.1);
+        }
+        .emoji-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .emoji-panel-title { font-size: 16px; font-weight: 600; color: var(--text); }
+        .emoji-panel-close { background: var(--btn-bg); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .emoji-panel-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .emoji-panel-item {
+            width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--card-bg);
+            border: 2px solid var(--border-soft); cursor: pointer; font-size: 24px;
+            display: flex; align-items: center; justify-content: center; touch-action: manipulation;
+            transition: all 0.12s; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+        }
+        .emoji-panel-item:active { transform: scale(0.88); background: #f5f0ea; border-color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div id="homePage" class="home-page">
+            <div class="home-title-row">
+                <div class="home-title">📚 Vocab Cards</div>
+                <button class="settings-btn" id="homeSettingsBtn">⚙️ Settings</button>
+            </div>
+            <div id="categoryList"></div>
+            <div class="custom-input-area">
+                <input type="text" id="newWordInput" placeholder="New word (max 6 chars)" maxlength="6">
+                <input type="text" id="newEnInput" class="en-input" placeholder="English (optional)" maxlength="20">
+                <input type="file" id="imageInput" accept="image/*" style="display:none">
+                <button class="emoji-pick-btn" id="pickEmojiBtn" title="Choose Emoji">😊</button>
+                <button class="image-upload-btn" id="pickImageBtn" title="Upload Image">🖼️</button>
+                <span class="preview-badge" id="iconPreview" style="display:none;"></span>
+                <button class="btn btn-primary" id="addWordBtn">➕ Add</button>
+            </div>
+            <div style="font-size:12px;color:#ccc;text-align:center;margin-top:2px;">Upload images or select emojis. Saved locally.</div>
+            <div class="reset-row"><button class="reset-btn" id="resetBtn">🗑️ Clear Custom Words & Reset</button></div>
+        </div>
+        <div id="learnPage" class="learn-page">
+            <div class="learn-top-bar">
+                <button class="back-btn" id="backBtn">‹ Back</button>
+                <button class="learn-lang-toggle" id="learnLangToggle"><span class="lang-zh">中</span>/<span class="lang-en">EN</span></button>
+            </div>
+            <div class="display-area">
+                <div class="display-emoji-wrapper" id="displayWrapper">
+                    <div class="display-emoji" id="displayEmoji">🚂</div>
+                    <button class="speak-btn" id="speakBtn" title="Audio">🔊</button>
+                </div>
+            </div>
+            <div class="puzzle-area" id="puzzleArea">
+                <div class="slots-row" id="slotsRow"></div>
+                <div class="scramble-container" id="scrambleContainer"></div>
+                <div class="tiles-layer" id="tilesLayer"></div>
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary" id="actionBtn">🔀 Shuffle</button>
+            </div>
+            <div class="status-hint" id="statusHint">Tap "Shuffle" to start</div>
+            <div class="word-strip" id="wordStrip"></div>
+        </div>
+    </div>
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-panel-header">
+                <span class="settings-panel-title">⚙️ Settings</span>
+                <button class="settings-panel-close" id="settingsPanelClose">✕</button>
+            </div>
+            <div>
+                <div class="settings-section-label">🌐 Language</div>
+                <div class="settings-option-row" id="settingsLangRow">
+                    <button class="settings-option-btn" data-lang="zh">中文</button>
+                    <button class="settings-option-btn active" data-lang="en">English</button>
+                </div>
+            </div>
+            <div>
+                <div class="settings-section-label">🔊 Audio</div>
+                <div class="settings-option-row" id="settingsSoundRow">
+                    <button class="settings-option-btn" data-sound="mute">🔇 Mute</button>
+                    <button class="settings-option-btn active" data-sound="manual">🔊 Tap</button>
+                    <button class="settings-option-btn" data-sound="auto">🎵 Auto</button>
+                </div>
+            </div>
+            <div>
+                <div class="settings-section-label">🤖 Auto Shuffle</div>
+                <div class="settings-option-row" id="settingsAutoShuffleRow">
+                    <button class="settings-option-btn active" data-autoshuffle="off">❌ Off</button>
+                    <button class="settings-option-btn" data-autoshuffle="on">✅ On</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="emoji-panel-overlay" id="emojiPanelOverlay">
+        <div class="emoji-panel" id="emojiPanel">
+            <div class="emoji-panel-header">
+                <span class="emoji-panel-title">Select an Icon</span>
+                <button class="emoji-panel-close" id="emojiPanelClose">✕</button>
+            </div>
+            <div class="emoji-panel-grid" id="emojiPanelGrid"></div>
+        </div>
+    </div>
+    <!-- 先尝试加载完整词库，失败则使用内置最小词库 -->
+    <script src="data.js"></script>
+    <script>
+        (function() {
+            // 如果 data.js 未提供 DEFAULT_WORDS，则使用内置最小词库
+            if (typeof window.DEFAULT_WORDS === 'undefined') {
+                window.DEFAULT_WORDS = {
+                    '水果': [
+                        { word: '苹果', en: 'apple', en_chunks: ['ap','ple'], emoji: '🍎' },
+                        { word: '香蕉', en: 'banana', en_chunks: ['ba','na','na'], emoji: '🍌' },
+                        { word: '葡萄', en: 'grape', en_chunks: ['gr','ape'], emoji: '🍇' }
+                    ],
+                    '动物': [
+                        { word: '猫', en: 'cat', en_chunks: ['c','at'], emoji: '🐱' },
+                        { word: '狗', en: 'dog', en_chunks: ['d','og'], emoji: '🐶' },
+                        { word: '鸟', en: 'bird', en_chunks: ['b','ird'], emoji: '🐦' }
+                    ],
+                    '交通工具': [
+                        { word: '汽车', en: 'car', en_chunks: ['c','ar'], emoji: '🚗' },
+                        { word: '火车', en: 'train', en_chunks: ['tr','ain'], emoji: '🚂' },
+                        { word: '飞机', en: 'airplane', en_chunks: ['air','plane'], emoji: '✈️' }
+                    ]
+                };
+            }
+            const DEFAULT_WORDS = window.DEFAULT_WORDS;
+            function buildWordEmojiMap() {
+                const map = {};
+                for (const arr of Object.values(DEFAULT_WORDS)) {
+                    for (const item of arr) { if (!map[item.word]) map[item.word] = item.emoji; }
+                }
+                return map;
+            }
+            const WORD_EMOJI_MAP = buildWordEmojiMap();
+            function getEmojiForWord(w) { return WORD_EMOJI_MAP[w] || '🧩'; }
+
+            const state = {
+                vocabData: null,
+                settings: { language: 'en', soundMode: 'manual', autoShuffle: 'off' },
+                isEnglishMode: true,
+                soundMode: 'manual',
+                autoShuffle: 'off',
+                currentCategory: null,
+                currentWordIndex: -1,
+                currentWordObj: null,
+                currentChars: [],
+                tileStates: [],
+                expectedIndex: 0,
+                isShuffled: false,
+                isComplete: false,
+                selectedImageData: null,
+                selectedEmojiData: null,
+                tileLayoutCache: { tileW: 88, tileH: 70, gap: 10 },
+                autoShuffleTimer: null
+            };
+
+            function loadWords() {
+                const stored = localStorage.getItem('myVocabWords');
+                let storedData = {};
+                if (stored) { try { storedData = JSON.parse(stored); } catch (e) {} }
+                const merged = JSON.parse(JSON.stringify(DEFAULT_WORDS));
+                for (const [cat, arr] of Object.entries(storedData)) {
+                    if (merged[cat]) {
+                        const existing = new Set(merged[cat].map(w => w.word));
+                        arr.forEach(item => {
+                            if (!existing.has(item.word)) merged[cat].push({
+                                word: item.word, en: item.en || '', en_chunks: item.en_chunks || null,
+                                emoji: item.emoji, image: item.image, isNumber: item.isNumber || false
+                            });
+                        });
+                    } else { merged[cat] = arr; }
+                }
+                localStorage.setItem('myVocabWords', JSON.stringify(merged));
+                return merged;
+            }
+            function loadSettings() {
+                const stored = localStorage.getItem('myVocabSettings');
+                if (stored) { try { return JSON.parse(stored); } catch (e) {} }
+                return { language: 'en', soundMode: 'manual', autoShuffle: 'off' };
+            }
+            function saveSettings(s) { localStorage.setItem('myVocabSettings', JSON.stringify(s)); }
+
+            const $ = id => document.getElementById(id);
+            const dom = {
+                homePage: $('homePage'), learnPage: $('learnPage'), categoryList: $('categoryList'),
+                displayEmoji: $('displayEmoji'), displayWrapper: $('displayWrapper'),
+                puzzleArea: $('puzzleArea'), slotsRow: $('slotsRow'),
+                scrambleContainer: $('scrambleContainer'), tilesLayer: $('tilesLayer'),
+                actionBtn: $('actionBtn'), backBtn: $('backBtn'), wordStrip: $('wordStrip'),
+                statusHint: $('statusHint'), newWordInput: $('newWordInput'), newEnInput: $('newEnInput'),
+                addWordBtn: $('addWordBtn'), imageInput: $('imageInput'), pickImageBtn: $('pickImageBtn'),
+                pickEmojiBtn: $('pickEmojiBtn'), resetBtn: $('resetBtn'), speakBtn: $('speakBtn'),
+                homeSettingsBtn: $('homeSettingsBtn'), learnLangToggle: $('learnLangToggle'),
+                settingsOverlay: $('settingsOverlay'), settingsPanelClose: $('settingsPanelClose'),
+                emojiPanelOverlay: $('emojiPanelOverlay'), emojiPanelGrid: $('emojiPanelGrid'),
+                emojiPanelCloseBtn: $('emojiPanelClose'), iconPreview: $('iconPreview')
+            };
+
+            function updateLangToggleUI() { dom.learnLangToggle.classList.toggle('en-active', state.isEnglishMode); }
+            function updateSpeakBtnVisibility() { dom.speakBtn.classList.toggle('speak-hidden', state.soundMode === 'mute'); }
+            function updateSettingsPanelUI() {
+                document.querySelectorAll('#settingsLangRow .settings-option-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === (state.isEnglishMode ? 'en' : 'zh'));
+                });
+                document.querySelectorAll('#settingsSoundRow .settings-option-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.sound === state.soundMode);
+                });
+                document.querySelectorAll('#settingsAutoShuffleRow .settings-option-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.autoshuffle === state.autoShuffle);
+                });
+            }
+            function updateIconPreview() {
+                const p = dom.iconPreview;
+                if (state.selectedEmojiData) {
+                    p.style.display = 'inline-flex'; p.innerHTML = '<span class="selected-emoji-preview">'+state.selectedEmojiData+'</span>';
+                } else if (state.selectedImageData) {
+                    p.style.display = 'inline-flex'; p.innerHTML = '<img class="selected-image-preview" src="'+state.selectedImageData+'" alt="preview">';
+                } else { p.style.display = 'none'; p.innerHTML = ''; }
+            }
+
+            function getWordText(item) { return (state.isEnglishMode && item.en) ? item.en : item.word; }
+            function getDisplayWord(item) { return getWordText(item); }
+            function getCharsForWord(item) {
+                if (state.isEnglishMode && item.en) {
+                    if (item.en_chunks && Array.isArray(item.en_chunks)) return item.en_chunks;
+                    const word = item.en; const len = word.length; if (len <= 1) return [word];
+                    const maxSeg = Math.min(4, len); const minSeg = Math.max(2, Math.ceil(len/5));
+                    const seg = minSeg + Math.floor(Math.random()*(maxSeg-minSeg+1));
+                    if (seg >= len) return Array.from(word);
+                    const cuts = []; for (let i=1;i<len;i++) cuts.push(i);
+                    for (let i=cuts.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [cuts[i],cuts[j]]=[cuts[j],cuts[i]]; }
+                    const sel = cuts.slice(0,seg-1).sort((a,b)=>a-b); const res=[]; let s=0;
+                    for (const c of sel){ res.push(word.slice(s,c)); s=c; } res.push(word.slice(s)); return res;
+                }
+                const word = item.word;
+                if (window.Intl && Intl.Segmenter) {
+                    const seg = new Intl.Segmenter('zh', { granularity: 'grapheme' });
+                    return Array.from(seg.segment(word)).map(x=>x.segment);
+                }
+                return Array.from(word);
+            }
+            function renderIcon(item, kind) {
+                if (item.image) { const cls = kind==='card'?'card-image':(kind==='strip'?'strip-image':''); return `<img class="${cls}" src="${item.image}" alt="${item.word}">`; }
+                if (item.isNumber) { const cls = kind==='card'?'num-card':(kind==='strip'?'num-strip':'num-display'); return `<span class="number-badge ${cls}">${item.emoji}</span>`; }
+                if (kind==='card') return `<span class="emoji-big">${item.emoji}</span>`;
+                if (kind==='strip') return `<span>${item.emoji}</span>`;
+                return item.emoji;
+            }
+
+            function makeWordCard(item) {
+                const card = document.createElement('div'); card.className = 'word-card';
+                const displayText = getWordText(item);
+                const wordClass = 'word-text' + (state.isEnglishMode&&item.en?' word-en':'');
+                card.innerHTML = `${renderIcon(item,'card')}<span class="${wordClass}">${displayText}</span>`;
+                card.onclick = () => startLearningByWord(item); return card;
+            }
+            function startLearningByWord(item) {
+                for (const [cat,arr] of Object.entries(state.vocabData)) {
+                    const idx = arr.findIndex(w=>w.word===item.word); if(idx!==-1){ startLearning(cat,idx); return; }
+                }
+            }
+            function buildCategorySection(cat, words) {
+                const section = document.createElement('div'); section.className = 'category-section';
+                section.innerHTML = `<div class="category-label">${cat} <span>${words.length}</span></div>`;
+                const grid = document.createElement('div'); grid.className = 'word-grid'; section.appendChild(grid);
+                dom.categoryList.appendChild(section);
+                let expanded=false, rowCount=null;
+                function makeToggleCard(isExpand) {
+                    const card = document.createElement('div'); card.className = 'word-card expand-card';
+                    card.innerHTML = isExpand?'<span class="expand-icon">⋯</span><span class="word-text">More</span>':'<span class="expand-icon">︿</span><span class="word-text">Less</span>';
+                    card.onclick = () => { expanded=!expanded; renderGrid(); }; return card;
+                }
+                function renderGrid() {
+                    grid.innerHTML = ''; words.forEach(item=>grid.appendChild(makeWordCard(item)));
+                    if(rowCount===null){
+                        const cards=Array.from(grid.children); if(cards.length){ const firstTop=cards[0].offsetTop; rowCount=0; for(const el of cards){ if(el.offsetTop===firstTop) rowCount++; else break; } } else rowCount=0;
+                    }
+                    if(rowCount>0 && words.length>rowCount){
+                        if(!expanded){ const visible=Array.from(grid.children).slice(0,rowCount-1); grid.innerHTML=''; visible.forEach(el=>grid.appendChild(el)); grid.appendChild(makeToggleCard(true)); }
+                        else { grid.appendChild(makeToggleCard(false)); }
+                    }
+                }
+                renderGrid();
+            }
+            function renderHome() { dom.categoryList.innerHTML = ''; for(const [cat,words] of Object.entries(state.vocabData)){ if(words.length) buildCategorySection(cat, words); } }
+
+            function getDecoyChars(wordObj) {
+                if (!state.currentCategory) return [];
+                const pool = (state.vocabData[state.currentCategory]||[]).filter(w=>w.word!==wordObj.word);
+                if(!pool.length) return [];
+                const targetCharSet = new Set(getCharsForWord(wordObj));
+                const safePool = pool.filter(w=>{ const chars=getCharsForWord(w); return !chars.some(ch=>targetCharSet.has(ch)); });
+                const other = (safePool.length?safePool:pool)[Math.floor(Math.random()*(safePool.length||pool.length))];
+                return getCharsForWord(other);
+            }
+
+            function clearAutoShuffleTimer() {
+                if (state.autoShuffleTimer) { clearTimeout(state.autoShuffleTimer); state.autoShuffleTimer = null; }
+            }
+            function scheduleAutoShuffle() {
+                clearAutoShuffleTimer();
+                if (state.autoShuffle === 'on' && !state.isShuffled && !state.isComplete) {
+                    state.autoShuffleTimer = setTimeout(() => {
+                        if (!state.isShuffled && !state.isComplete) shuffleTiles();
+                    }, 2000);
+                }
+            }
+            function loadWord(wordObj) {
+                dom.tilesLayer.innerHTML = ''; state.currentWordObj = wordObj;
+                state.currentChars = getCharsForWord(wordObj);
+                const decoyChars = state.currentChars.length===1 ? getDecoyChars(wordObj) : [];
+                state.tileStates = state.currentChars.map((ch,i)=>({char:ch, correctIndex:i, left:0, top:0, placed:false}))
+                    .concat(decoyChars.map(ch=>({char:ch, correctIndex:-1, left:0, top:0, placed:false, isDecoy:true})));
+                state.expectedIndex=0; state.isShuffled=false; state.isComplete=false;
+                dom.displayEmoji.innerHTML = wordObj.image?`<img src="${wordObj.image}" alt="${wordObj.word}">`:renderIcon(wordObj,'display');
+                dom.displayEmoji.className = 'display-emoji'; dom.actionBtn.textContent='🔀 Shuffle'; dom.actionBtn.disabled=false;
+                dom.statusHint.textContent = 'Tap "Shuffle" to start'; renderTiles(false); renderWordStrip();
+                if(state.soundMode==='auto') setTimeout(()=>speakCurrentWord(),300);
+                scheduleAutoShuffle();
+            }
+            function startLearning(cat, idx) {
+                state.currentCategory=cat; state.currentWordIndex=idx;
+                dom.homePage.classList.add('home-hidden'); dom.learnPage.classList.add('active');
+                loadWord(state.vocabData[cat][idx]); updateLangToggleUI(); updateSpeakBtnVisibility();
+            }
+            function renderWordStrip() {
+                const words = state.vocabData[state.currentCategory]; dom.wordStrip.innerHTML='';
+                const stripDisabled = (state.autoShuffle === 'on' && !state.isComplete);
+                words.forEach((item,idx)=>{
+                    const el=document.createElement('div');
+                    el.className = 'strip-item' + (idx===state.currentWordIndex?' active':'') + (stripDisabled?' disabled':'');
+                    el.innerHTML=renderIcon(item,'strip');
+                    if (!stripDisabled) {
+                        el.onclick = () => { if(idx===state.currentWordIndex) return; state.currentWordIndex=idx; clearAutoShuffleTimer(); loadWord(words[idx]); };
+                    } else {
+                        el.onclick = null;
+                    }
+                    dom.wordStrip.appendChild(el);
+                });
+                const activeEl=dom.wordStrip.querySelector('.strip-item.active');
+                if(activeEl) activeEl.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+            }
+            function renderTiles(shuffled) {
+                if(!state.isShuffled && !state.isComplete){ dom.tilesLayer.innerHTML=''; dom.slotsRow.innerHTML=`<div class="intact-word">${getDisplayWord(state.currentWordObj)}</div>`; return; }
+                if(state.isComplete){ dom.tilesLayer.innerHTML=''; dom.slotsRow.innerHTML=`<div class="completed-word">${getDisplayWord(state.currentWordObj)}</div>`; return; }
+                const cw = dom.puzzleArea.clientWidth||360; const count = state.tileStates.length; if(!count) return;
+                const gap=10; const availableW=(cw-gap*(count+1))/count; const tileW=Math.max(48,Math.min(96,availableW)); const tileH=Math.min(82,tileW*1.2);
+                state.tileLayoutCache={tileW,tileH,gap}; const totalWidth=count*tileW+(count-1)*gap; const startX=(cw-totalWidth)/2;
+                if(!shuffled){ state.tileStates.forEach((t,i)=>{t.left=startX+i*(tileW+gap);t.top=0;t.placed=false;}); state.expectedIndex=0; state.isShuffled=false; state.isComplete=false; dom.displayEmoji.classList.remove('dim','pop'); }
+                dom.slotsRow.innerHTML=''; for(let i=0;i<count;i++){ const ph=document.createElement('div'); ph.className='slot-placeholder'; ph.style.width=tileW+'px'; ph.style.height=tileH+'px'; dom.slotsRow.appendChild(ph); }
+                if(dom.tilesLayer.children.length!==count){ dom.tilesLayer.innerHTML=''; state.tileStates.forEach((t,idx)=>{ const tile=document.createElement('div'); tile.className='tile'; tile.textContent=t.char; tile.onclick=()=>handleTileClick(idx); dom.tilesLayer.appendChild(tile); }); }
+                state.tileStates.forEach((t,idx)=>{ const tile=dom.tilesLayer.children[idx]; tile.className='tile'+(t.placed?' placed':''); tile.style.left=t.left+'px'; tile.style.top=t.top+'px'; tile.style.width=tileW+'px'; tile.style.height=tileH+'px'; tile.style.fontSize=Math.max(22,Math.min(36,tileW*0.55))+'px'; tile.style.zIndex = count-idx; });
+                dom.statusHint.textContent = state.isShuffled?`👆 Tap in order, ${state.currentChars.length-state.expectedIndex} left`:'Tap "Shuffle" to start';
+            }
+            dom.actionBtn.onclick = () => { if(!state.isComplete) state.isShuffled?resetLearn():shuffleTiles(); };
+            function shuffleTiles() {
+                clearAutoShuffleTimer();
+                const {tileW,tileH}=state.tileLayoutCache; const margin=16;
+                const boxTop=dom.scrambleContainer.offsetTop, boxLeft=dom.scrambleContainer.offsetLeft;
+                const boxW=dom.scrambleContainer.clientWidth, boxH=dom.scrambleContainer.clientHeight;
+                const unplaced=state.tileStates.filter(t=>!t.placed); if(!unplaced.length) return;
+                const positions=[]; unplaced.forEach(()=>{ let left,top,overlap,attempts=0; do{ left=boxLeft+margin+Math.random()*Math.max(0,boxW-tileW-2*margin); top=boxTop+margin+Math.random()*Math.max(0,boxH-tileH-2*margin); overlap=positions.some(p=>Math.abs(p.left-left)<tileW/2+5&&Math.abs(p.top-top)<tileH/2+5); attempts++; } while(overlap&&attempts<100); positions.push({left,top}); });
+                unplaced.forEach((t,i)=>{t.left=positions[i].left; t.top=positions[i].top;});
+                if(!state.isShuffled){ state.isShuffled=true; dom.displayEmoji.classList.add('dim'); }
+                state.expectedIndex=state.tileStates.findIndex(t=>!t.placed); if(state.expectedIndex===-1) state.expectedIndex=state.tileStates.length;
+                renderTiles(true); dom.actionBtn.textContent='🔄 Reset';
+                renderWordStrip();
+            }
+            function resetLearn() {
+                clearAutoShuffleTimer();
+                state.tileStates.forEach(t=>{t.left=0;t.top=0;t.placed=false;}); state.expectedIndex=0; state.isShuffled=false; state.isComplete=false;
+                dom.displayEmoji.className='display-emoji'; renderTiles(false); dom.actionBtn.textContent='🔀 Shuffle'; dom.actionBtn.disabled=false;
+                renderWordStrip();
+                scheduleAutoShuffle();
+            }
+            function handleTileClick(idx) {
+                if(state.isComplete||!state.isShuffled){ if(!state.isShuffled) dom.statusHint.textContent='Tap "Shuffle" to start!'; return; }
+                const tile=state.tileStates[idx]; if(tile.placed) return;
+                if(tile.char===state.currentChars[state.expectedIndex]){
+                    tile.placed=true; const cw=dom.puzzleArea.clientWidth||360; const {tileW,gap}=state.tileLayoutCache;
+                    const totalWidth=state.currentChars.length*tileW+(state.currentChars.length-1)*gap; const startX=(cw-totalWidth)/2;
+                    tile.left=startX+state.expectedIndex*(tileW+gap); tile.top=0; state.expectedIndex++;
+                    if(state.soundMode==='auto' && !state.isEnglishMode) speakChar(tile.char);
+                    if(state.expectedIndex===state.currentChars.length){ state.isComplete=true; dom.displayEmoji.classList.remove('dim'); void dom.displayEmoji.offsetWidth; dom.displayEmoji.classList.add('pop'); }
+                    renderTiles(true);
+                    if(state.isComplete){ dom.statusHint.textContent='🎉 Completed! Great job!'; dom.actionBtn.textContent='✅ Done'; dom.actionBtn.disabled=true; if(state.soundMode==='auto') setTimeout(()=>speakCurrentWord(),900); }
+                    else { dom.statusHint.textContent=`👆 Keep going, ${state.currentChars.length-state.expectedIndex} left`; }
+                    renderWordStrip();
+                } else {
+                    const tileEl=dom.tilesLayer.children[idx]; if(tileEl){ tileEl.classList.add('wrong'); setTimeout(()=>tileEl.classList.remove('wrong'),300); }
+                    dom.statusHint.textContent='❌ Try another one!';
+                }
+            }
+
+            function getSpeechVoice(lang) {
+                if(!window.speechSynthesis) return null; const voices=speechSynthesis.getVoices(); if(!voices.length) return null;
+                if(lang==='en') return voices.find(v=>v.lang.startsWith('en-US'))||voices.find(v=>v.lang.startsWith('en'))||null;
+                return voices.find(v=>v.lang.startsWith('zh'))||null;
+            }
+            function speakChar(char) {
+                if(!window.speechSynthesis||state.soundMode==='mute') return; window.speechSynthesis.cancel();
+                const u=new SpeechSynthesisUtterance(char); u.lang='zh-CN'; u.rate=0.8; u.volume=0.9;
+                const voice=getSpeechVoice('zh'); if(voice) u.voice=voice; speechSynthesis.speak(u);
+            }
+            function speakCurrentWord() {
+                if(state.soundMode==='mute') return; if(!state.currentWordObj) return; const text=getDisplayWord(state.currentWordObj); if(!text) return;
+                if(!window.speechSynthesis){ dom.statusHint.textContent='🔇 Speech not supported'; return; }
+                window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
+                u.lang=state.isEnglishMode?'en-US':'zh-CN'; u.rate=0.85; const voice=getSpeechVoice(state.isEnglishMode?'en':'zh'); if(voice) u.voice=voice;
+                dom.speakBtn.classList.add('speaking'); u.onend=u.onerror=()=>dom.speakBtn.classList.remove('speaking'); speechSynthesis.speak(u);
+            }
+            dom.speakBtn.onclick = (e) => { e.stopPropagation(); speakCurrentWord(); };
+            dom.displayWrapper.onclick = () => speakCurrentWord();
+
+            function switchLanguage() {
+                state.isEnglishMode=!state.isEnglishMode; state.settings.language=state.isEnglishMode?'en':'zh'; saveSettings(state.settings);
+                updateLangToggleUI(); updateSettingsPanelUI(); renderHome();
+                if(dom.learnPage.classList.contains('active')&&state.currentWordObj){ clearAutoShuffleTimer(); loadWord(state.vocabData[state.currentCategory][state.currentWordIndex]); }
+            }
+            function setSoundMode(mode) { state.soundMode=mode; state.settings.soundMode=mode; saveSettings(state.settings); updateSpeakBtnVisibility(); updateSettingsPanelUI(); if(mode==='mute'){ window.speechSynthesis&&window.speechSynthesis.cancel(); dom.speakBtn.classList.remove('speaking'); } }
+            function setAutoShuffle(mode) { state.autoShuffle=mode; state.settings.autoShuffle=mode; saveSettings(state.settings); updateSettingsPanelUI(); if(dom.learnPage.classList.contains('active')){ clearAutoShuffleTimer(); if(mode==='on'&&!state.isShuffled&&!state.isComplete) scheduleAutoShuffle(); renderWordStrip(); } }
+            dom.learnLangToggle.onclick = switchLanguage;
+            dom.homeSettingsBtn.onclick = () => { updateSettingsPanelUI(); dom.settingsOverlay.classList.add('show'); };
+            dom.settingsPanelClose.onclick = () => dom.settingsOverlay.classList.remove('show');
+            dom.settingsOverlay.onclick = (e) => { if(e.target===dom.settingsOverlay) dom.settingsOverlay.classList.remove('show'); };
+            document.getElementById('settingsLangRow').addEventListener('click', (e) => { const btn=e.target.closest('.settings-option-btn'); if(!btn) return; const lang=btn.dataset.lang; if((lang==='en')!==state.isEnglishMode) switchLanguage(); });
+            document.getElementById('settingsSoundRow').addEventListener('click', (e) => { const btn=e.target.closest('.settings-option-btn'); if(!btn) return; setSoundMode(btn.dataset.sound); });
+            document.getElementById('settingsAutoShuffleRow').addEventListener('click', (e) => { const btn=e.target.closest('.settings-option-btn'); if(!btn) return; setAutoShuffle(btn.dataset.autoshuffle); });
+
+            dom.backBtn.onclick = () => { dom.learnPage.classList.remove('active'); dom.homePage.classList.remove('home-hidden'); state.currentCategory=null; state.currentWordIndex=-1; state.currentWordObj=null; clearAutoShuffleTimer(); window.speechSynthesis&&window.speechSynthesis.cancel(); dom.speakBtn.classList.remove('speaking'); renderHome(); };
+
+            function addCustomWord() {
+                const raw=dom.newWordInput.value.trim(), rawEn=dom.newEnInput.value.trim(); if(!raw) return;
+                const words=raw.split(/[,，\s]+/).filter(w=>w.length>0&&w.length<=6); if(!words.length){ alert('❌ Please enter valid words (1-6 chars)'); return; }
+                const category='自定义'; if(!state.vocabData[category]) state.vocabData[category]=[];
+                words.forEach(w=>{ let emoji=state.selectedEmojiData||getEmojiForWord(w); const item={word:w,en:rawEn||'',emoji}; if(state.selectedImageData) item.image=state.selectedImageData; if(!state.vocabData[category].some(x=>x.word===w)) state.vocabData[category].push(item); });
+                try{ localStorage.setItem('myVocabWords',JSON.stringify(state.vocabData)); }catch(e){ alert('Save failed'); return; }
+                dom.newWordInput.value=''; dom.newEnInput.value=''; state.selectedImageData=null; state.selectedEmojiData=null; dom.imageInput.value=''; updateIconPreview(); renderHome();
+            }
+            dom.addWordBtn.onclick = addCustomWord;
+            dom.newWordInput.onkeydown = e => { if(e.key==='Enter') addCustomWord(); };
+            dom.newEnInput.onkeydown = e => { if(e.key==='Enter') addCustomWord(); };
+            dom.resetBtn.onclick = () => { if(confirm('Are you sure you want to clear custom words and restore defaults?')){ localStorage.removeItem('myVocabWords'); state.vocabData=loadWords(); state.selectedImageData=null; state.selectedEmojiData=null; dom.imageInput.value=''; updateIconPreview(); renderHome(); } };
+
+            dom.pickImageBtn.onclick = () => dom.imageInput.click();
+            dom.pickEmojiBtn.onclick = () => { dom.emojiPanelOverlay.classList.add('show'); buildEmojiPanel(); };
+            dom.emojiPanelCloseBtn.onclick = () => dom.emojiPanelOverlay.classList.remove('show');
+            dom.emojiPanelOverlay.onclick = (e) => { if (e.target === dom.emojiPanelOverlay) dom.emojiPanelOverlay.classList.remove('show'); };
+            function buildEmojiPanel() {
+                dom.emojiPanelGrid.innerHTML = '';
+                const list = ['🍎','🍌','🍇','🍓','🍊','🍉','🍑','🍐','🍒','🍋','🥭','🍍','🥝','🍞','🍰','🍪','🍕','🍔','🍟','🍜','🍚','🥟','🥚','🥛','🍗','🍦','🍫','🍿','🍣','🥠','🐱','🐶','🐦','🐟','🐰','🐘','🐯','🦁','🦒','🐒','🐻','🐼','🐷','🐮','🐑','🐴','🐸','🦆','🐔','🦋','🐞','🕷️','🐝','🪰','🐬','🐋','🚂','✈️','🚢','🚗','🚲','🚌','🚕','🚑','🚒','🚓','🏍️','🚀','🚁','🚜','⛵','☀️','🌙','⭐','☁️','🌧️','❄️','💨','🌈','⚡','🌫️','🔴','🔵','🟢','🟡','🟠','🟣','⚫','⚪','💗','🟤','👨','👩','👦','👧','👶','👴','👵','🧔','👩‍🦰','⬜','🔺','❤️','🔷','➕','🏃','🚶','🧍','🪑','😴','😄','😢','👏','👋','🤗','🎤','💃','🏫','🏞️','⛰️','🌾','🏖️','🌲','🏜️','🏙️','🌊','🏔️','🧩','🎯','🎨','🎵','📖','✏️','🌟','🔥','💧','🍀','🎈','🎁','🧸','🪀','🛝'];
+                list.forEach(emo => { const btn=document.createElement('button'); btn.className='emoji-panel-item'; btn.textContent=emo; btn.onclick=()=>{ state.selectedEmojiData=emo; state.selectedImageData=null; dom.imageInput.value=''; updateIconPreview(); dom.emojiPanelOverlay.classList.remove('show'); }; dom.emojiPanelGrid.appendChild(btn); });
+            }
+            dom.imageInput.onchange = e => {
+                const file=e.target.files[0]; if(!file) return; const reader=new FileReader();
+                reader.onload=ev=>{ const img=new Image(); img.onload=()=>{ const canvas=document.createElement('canvas'); const MAX_SIZE=200; let w=img.width,h=img.height; if(w>h){ if(w>MAX_SIZE){ h*=MAX_SIZE/w; w=MAX_SIZE; } } else { if(h>MAX_SIZE){ w*=MAX_SIZE/h; h=MAX_SIZE; } } canvas.width=w; canvas.height=h; canvas.getContext('2d').drawImage(img,0,0,w,h); state.selectedImageData=canvas.toDataURL('image/jpeg',0.8); state.selectedEmojiData=null; updateIconPreview(); }; img.src=ev.target.result; }; reader.readAsDataURL(file);
+            };
+
+            window.onresize = () => { if(dom.learnPage.classList.contains('active')&&state.currentWordObj&&state.isShuffled&&!state.isComplete) renderTiles(true); };
+
+            state.vocabData = loadWords();
+            const saved = loadSettings();
+            state.settings = saved;
+            state.isEnglishMode = saved.language === 'en';
+            state.soundMode = saved.soundMode || 'manual';
+            state.autoShuffle = saved.autoShuffle || 'off';
+            updateLangToggleUI(); updateSpeakBtnVisibility(); updateSettingsPanelUI(); updateIconPreview(); renderHome();
+        })();
+    </script>
+</body>
+</html>
