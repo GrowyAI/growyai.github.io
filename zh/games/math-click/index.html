@@ -47,9 +47,128 @@
 
         function rand(a, b) { return a + Math.random() * (b - a); }
 
+        // ---- 全局统一的"卡片/固定格子"视觉规范 ----
+        // 以"拖动滑块"（drawBundleToken / drawAddendGroup 的白底卡片）为基准，
+        // 所有容器的外框（grid 数数方格盘、equationRow 加法算式行、subtractionRow 减法算式行）
+        // 都复用同一套圆角、描边粗细，视觉上和滑块保持统一；
+        // CARD_PAD 用来把容器外框在内容之外再外扩一圈，弥补滑块卡片自带留白、而容器格子紧贴内容显得偏小的问题。
+        const CARD_RADIUS = 14;
+        const CARD_BORDER = 3;
+        const CARD_BORDER_DONE = 5; // 完成态描边保留一点点加粗做庆祝反馈，但比之前的6更克制
+        const CARD_PAD = 8;
+
+        // ---- 水果束（bundle token）通用逻辑 ----
+        // 一个 token 可以代表 N 个计数单位（N=1 就是普通单个水果）。
+        // count by 2/5/10 就是靠这个：点一下 = 一次放进 N 个，数字一次跳 N。
+        // bundleLayout 统一计算卡片尺寸和内部小图标排布，drawBundleToken/bundleRadius 都复用它，避免两处数值不一致。
+        //
+        // 注意：卡片内部小图标大小用固定基准值（不跟着各关卡里"放进格子后的水果图标大小"缩放），
+        // 这样调整水果图标大小时，束卡片的宽度/排列不会跟着变，不会出现卡片放不下的问题。
+        const BUNDLE_ICON_BASE = 20;
+        function bundleLayout(n) {
+            const cols = Math.min(5, n);
+            const rows = Math.ceil(n / cols);
+            const miniR = BUNDLE_ICON_BASE * 0.55;
+            const pitch = miniR * 2.3;
+            const cardW = cols * pitch + miniR * 1.2;
+            const cardH = rows * pitch + miniR * 1.2;
+            return { cols, rows, miniR, pitch, cardW, cardH };
+        }
+
+        function bundleRadius(n) {
+            const L = bundleLayout(n);
+            return Math.max(L.cardW, L.cardH) / 2 + 4;
+        }
+
+        function drawBundleToken(ctx, item) {
+            const n = item.unitCount;
+            const L = bundleLayout(n);
+            ctx.save();
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            roundRect(ctx, -L.cardW / 2, -L.cardH / 2, L.cardW, L.cardH, CARD_RADIUS);
+            ctx.fill();
+            ctx.lineWidth = CARD_BORDER;
+            ctx.strokeStyle = '#ffb74d';
+            ctx.stroke();
+
+            const typeDef = Config.itemTypes[item.type];
+            for (let i = 0; i < n; i++) {
+                const row = Math.floor(i / L.cols);
+                const itemsInRow = Math.min(n - row * L.cols, L.cols);
+                const rowStartX = -((itemsInRow - 1) * L.pitch) / 2;
+                const col = i % L.cols;
+                const x = rowStartX + col * L.pitch;
+                const y = -((L.rows - 1) * L.pitch) / 2 + row * L.pitch;
+                ctx.save();
+                ctx.translate(x, y);
+                if (typeDef && typeDef.draw) typeDef.draw(ctx, L.miniR);
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        // ---- 加法关卡"整组"待拖入水果的绘制：大小、间距和目标行的格子完全一致 ----
+        function drawAddendGroup(ctx, item) {
+            const n = item.count;
+            const pitch = item.cell + item.cellGap;
+            const groupW = n * item.cell + (n - 1) * item.cellGap;
+            const groupH = item.cell;
+
+            // 不透明的白色卡片底板（和其它水果束卡片的风格保持一致，方便小朋友一眼看出这是可以整体拖动的一组）
+            ctx.save();
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            roundRect(ctx, -groupW / 2 - 6, -groupH / 2 - 6, groupW + 12, groupH + 12, CARD_RADIUS);
+            ctx.fill();
+            ctx.lineWidth = CARD_BORDER;
+            ctx.strokeStyle = '#ffb74d';
+            ctx.stroke();
+            ctx.restore();
+
+            const typeDef = Config.itemTypes[item.type];
+            for (let k = 0; k < n; k++) {
+                const x = -groupW / 2 + item.cell / 2 + k * pitch;
+                ctx.save();
+                ctx.translate(x, 0);
+                if (typeDef && typeDef.draw) typeDef.draw(ctx, item.r);
+                ctx.restore();
+            }
+        }
+
+        // 通用的"目标数字"绘制逻辑：所有 containerType 共用同一套视觉规则
+        // （未填满=浅灰色（或自定义 idleColor），填满=放大变彩色并描白边）
+        // container.displayValue 优先于 container.value：
+        //   - "目标模式"（比如数字1-10）：displayValue 恒等于 value，数字本身不随进度变化
+        //   - "数数模式"（比如从11数到20）：displayValue 随每次放入而递增，直观展示"数到几了"
+        function drawContainerLabel(ctx, container) {
+            const full = container.items.length >= container.capacity;
+            const val = container.displayValue !== undefined ? container.displayValue : container.value;
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.translate(container.x, container.labelY);
+            ctx.scale(container.numberScale || 1, container.numberScale || 1);
+            ctx.font = `bold ${container.labelFontSize}px sans-serif`;
+            if (full) {
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = '#ffffff';
+                ctx.strokeText(String(val), 0, 0);
+                ctx.fillStyle = container.completeColor || '#43a047';
+            } else {
+                ctx.fillStyle = container.idleColor || '#cdd8dd';
+            }
+            ctx.fillText(String(val), 0, 0);
+            ctx.restore();
+        }
+
         /* =========================================================
            Config 模块
-           —— 物品类型 / 箱子(容器)类型 / 关卡数据 全部注册在这里
+           —— 物品类型 / 容器类型 / 关卡数据 全部注册在这里
+
+           containerTypes 插件契约（新增容器类型都要实现这四个方法）：
+             computeDims(cw, count, level) -> { width, height, gap, labelFontSize, ...额外字段 }
+             slotLayout(n, dims)           -> [{x,y}, ...]  相对容器中心的偏移坐标
+             draw(ctx, container)          -> 画容器本体 + 空位占位
+             drawLabel(ctx, container)     -> 画容器下方的目标数字（通常直接调用 drawContainerLabel）
         ========================================================= */
         const Config = {
             itemRadius: 20,
@@ -68,8 +187,9 @@
 
             foodTypeKeys: ['apple', 'banana', 'strawberry', 'orange', 'grape', 'watermelon', 'peach', 'cherry'],
 
-            boxTypes: {
-                number: {
+            containerTypes: {
+                // ---- plate：正圆盘子（数字1-10认识数量用）----
+                plate: {
                     // 所有盘子统一大小；外径留足余量，最多允许 10 个水果溢出到第 4 行
                     plateBaseDiameter: 260,
                     // 每行最多 3 个，整体（不只是单行）上下左右居中
@@ -85,7 +205,7 @@
                         const maxAvailable = (cw - sideMargin * 2 - gap * (count - 1)) / count;
                         const plateD = Math.max(150, Math.min(this.plateBaseDiameter, maxAvailable));
                         const labelFontSize = Math.max(70, Math.round(120 * (plateD / this.plateBaseDiameter)));
-                        return { plateD, gap, labelFontSize };
+                        return { width: plateD, height: plateD, gap, labelFontSize };
                     },
 
                     // 生成 n 个水果在盘子里的固定位置：每行最多 3 个，整体居中
@@ -109,11 +229,11 @@
                         return positions;
                     },
 
-                    draw(ctx, box) {
-                        const r = box.r;
-                        const full = box.items.length >= box.capacity;
+                    draw(ctx, container) {
+                        const r = container.width / 2;
+                        const full = container.items.length >= container.capacity;
                         ctx.save();
-                        ctx.translate(box.x, box.y);
+                        ctx.translate(container.x, container.y);
 
                         // 阴影
                         ctx.fillStyle = 'rgba(0,0,0,0.10)';
@@ -145,12 +265,24 @@
                         ctx.strokeStyle = 'rgba(120,170,190,0.5)';
                         ctx.stroke();
 
+                        // 预先摆好的水果（已经会数的部分，静态展示，不需要互动）
+                        if (container.prefillCount) {
+                            const itemDef = Config.itemTypes[container.prefillType];
+                            for (let i = 0; i < container.prefillCount; i++) {
+                                const s = container.slots[i];
+                                ctx.save();
+                                ctx.translate(s.x, s.y);
+                                if (itemDef && itemDef.draw) itemDef.draw(ctx, container.itemR);
+                                ctx.restore();
+                            }
+                        }
+
                         // 空位提示：浅灰色圆形占位（不显示任何数字）
                         ctx.fillStyle = 'rgba(120,140,150,0.18)';
-                        for (let i = box.items.length; i < box.capacity; i++) {
-                            const s = box.slots[i];
+                        for (let i = container.items.length; i < container.capacity; i++) {
+                            const s = container.slots[container.slotOffset + i];
                             ctx.beginPath();
-                            ctx.arc(s.x, s.y, box.itemR, 0, Math.PI * 2);
+                            ctx.arc(s.x, s.y, container.itemR, 0, Math.PI * 2);
                             ctx.fill();
                         }
 
@@ -158,36 +290,548 @@
                     },
 
                     // 目标数字：位于盘子下方，未填满为浅灰，填满后放大变色并弹跳
-                    drawLabel(ctx, box) {
-                        const full = box.items.length >= box.capacity;
-                        ctx.save();
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.translate(box.x, box.labelY);
-                        ctx.scale(box.numberScale || 1, box.numberScale || 1);
-                        ctx.font = `bold ${box.labelFontSize}px sans-serif`;
-                        if (full) {
-                            ctx.lineWidth = 6;
-                            ctx.strokeStyle = '#ffffff';
-                            ctx.strokeText(String(box.value), 0, 0);
-                            ctx.fillStyle = box.completeColor || '#43a047';
-                        } else {
-                            ctx.fillStyle = '#cdd8dd';
+                    drawLabel(ctx, container) { drawContainerLabel(ctx, container); }
+                },
+
+                // ---- grid：方格条（给数字更多/数到100/加减法等后续玩法用的形状，暂未接入关卡）----
+                grid: {
+                    cellSize: 56,
+                    cellGap: 10,
+                    maxCols: 5,
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+
+                    // level.gridCols 可覆盖每行格子数；根据"预填充+互动"两部分的总格子数算出需要几行
+                    computeDims(cw, count, level) {
+                        const cols = (level && level.gridCols) || this.maxCols;
+                        let maxVal = cols;
+                        if (level && level.boxNumbers && level.boxNumbers.length) {
+                            maxVal = Math.max(...level.boxNumbers.map((v, i) =>
+                                v + ((level.prefillCount && level.prefillCount[i]) || 0)));
                         }
-                        ctx.fillText(String(box.value), 0, 0);
+                        const rows = Math.max(1, Math.ceil(maxVal / cols));
+
+                        const sideMargin = 20, outerGap = 24;
+                        const maxAvailableW = (cw - sideMargin * 2 - outerGap * (count - 1)) / count;
+                        const pitchByWidth = (maxAvailableW - (cols - 1) * 4) / cols;
+                        const cell = Math.max(28, Math.min(this.cellSize, pitchByWidth));
+                        const cellGap = Math.max(4, Math.round(cell * 0.15));
+
+                        const width = cols * cell + (cols - 1) * cellGap;
+                        const height = rows * cell + (rows - 1) * cellGap;
+                        const labelFontSize = Math.max(50, Math.round(cell * 1.5));
+                        return { width, height, gap: outerGap, labelFontSize, cols, rows, cell, cellGap };
+                    },
+
+                    // n 个方格按 cols 自动换行，整体（不只单行）上下左右居中
+                    slotLayout(n, dims) {
+                        const { cols, cell, cellGap } = dims;
+                        const rows = Math.max(1, Math.ceil(n / cols));
+                        const pitch = cell + cellGap;
+                        const totalW = cols * cell + (cols - 1) * cellGap;
+                        const totalH = rows * cell + (rows - 1) * cellGap;
+                        const positions = [];
+                        for (let i = 0; i < n; i++) {
+                            const row = Math.floor(i / cols);
+                            const col = i % cols;
+                            positions.push({
+                                x: -totalW / 2 + cell / 2 + col * pitch,
+                                y: -totalH / 2 + cell / 2 + row * pitch
+                            });
+                        }
+                        return positions;
+                    },
+
+                    draw(ctx, container) {
+                        const w = container.width, h = container.height;
+                        const full = container.items.length >= container.capacity;
+                        ctx.save();
+                        ctx.translate(container.x, container.y);
+
+                        // 外框整体外扩 CARD_PAD，视觉尺寸和拖动滑块的白卡片保持一致（不影响内部水果的实际位置）
+                        const pw = w + CARD_PAD * 2, ph = h + CARD_PAD * 2;
+
+                        // 阴影
+                        ctx.fillStyle = 'rgba(0,0,0,0.10)';
+                        roundRect(ctx, -pw / 2, -ph / 2 + ph * 0.05, pw, ph, CARD_RADIUS);
+                        ctx.fill();
+
+                        // 底板
+                        const bg = ctx.createLinearGradient(0, -ph / 2, 0, ph / 2);
+                        bg.addColorStop(0, '#ffffff');
+                        bg.addColorStop(1, '#dff0f7');
+                        ctx.fillStyle = bg;
+                        roundRect(ctx, -pw / 2, -ph / 2, pw, ph, CARD_RADIUS);
+                        ctx.fill();
+                        ctx.lineWidth = full ? CARD_BORDER_DONE : CARD_BORDER;
+                        ctx.strokeStyle = full ? '#43a047' : '#9fc9de';
+                        ctx.stroke();
+
+                        // 预先摆好的水果（已经会数的部分，静态展示，不需要互动）
+                        if (container.prefillCount) {
+                            const itemDef = Config.itemTypes[container.prefillType];
+                            for (let i = 0; i < container.prefillCount; i++) {
+                                const s = container.slots[i];
+                                ctx.save();
+                                ctx.translate(s.x, s.y);
+                                if (itemDef && itemDef.draw) itemDef.draw(ctx, container.itemR);
+                                ctx.restore();
+                            }
+                        }
+
+                        // 空位提示：浅灰色方形占位
+                        ctx.fillStyle = 'rgba(120,140,150,0.18)';
+                        const size = (container.cell || 40) * 0.82;
+                        for (let i = container.items.length; i < container.capacity; i++) {
+                            const s = container.slots[container.slotOffset + i];
+                            roundRect(ctx, s.x - size / 2, s.y - size / 2, size, size, 8);
+                            ctx.fill();
+                        }
+
+                        ctx.restore();
+                    },
+
+                    drawLabel(ctx, container) { drawContainerLabel(ctx, container); }
+                },
+
+                // ---- equationRow：一排格子，前一部分预先摆好（加数a），后一部分要拖水果进去（加数b）----
+                // 用于"10以内加法"：下方文字显示 "a + b = ?"，放满后变成 "a + b = 和"
+                equationRow: {
+                    cellSize: 56,
+                    aZoneColor: '#dff0f7',     // 已经摆好的a：浅蓝底
+                    bZoneColor: '#ffe9c7',     // 等着拖入的b：浅橙底
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+
+                    // 一整条连续的格子（不是c个分开的方块），一排放下 level.sum 个位置，会自动缩小以放得下
+                    computeDims(cw, count, level) {
+                        const cols = level.sum;
+                        const sideMargin = 20, outerGap = 24;
+                        const maxAvailableW = (cw - sideMargin * 2 - outerGap * (count - 1)) / count;
+                        const pitchByWidth = (maxAvailableW - (cols - 1) * 4) / cols;
+                        const cell = Math.max(24, Math.min(this.cellSize, pitchByWidth));
+                        const cellGap = Math.max(4, Math.round(cell * 0.15));
+                        const width = cols * cell + (cols - 1) * cellGap;
+                        const height = cell;
+                        // 算式文字比其它关卡放大一倍；超宽屏幕能放下时按此大小，等式过长时 drawLabel 里会按需缩小避免溢出
+                        const labelFontSize = Math.max(48, Math.min(72, Math.round(cw * 0.15)));
+                        return {
+                            width, height, gap: outerGap, labelFontSize, cols, cell, cellGap,
+                            maxLabelWidth: cw - 40,
+                            eqA: level.a, eqB: level.b, eqSum: level.sum
+                        };
+                    },
+
+                    // n 个位置排成一行，整体居中（只用来定位水果，不再各自画边框）
+                    slotLayout(n, dims) {
+                        const { cell, cellGap } = dims;
+                        const pitch = cell + cellGap;
+                        const totalW = n * cell + (n - 1) * cellGap;
+                        const positions = [];
+                        for (let i = 0; i < n; i++) {
+                            positions.push({ x: -totalW / 2 + cell / 2 + i * pitch, y: 0 });
+                        }
+                        return positions;
+                    },
+
+                    draw(ctx, container) {
+                        const w = container.width, h = container.height;
+                        const full = container.items.length >= container.capacity;
+                        const prefillN = container.prefillCount || 0;
+                        const aW = (w * prefillN) / container.cols;
+                        ctx.save();
+                        ctx.translate(container.x, container.y);
+
+                        // 外框整体外扩 CARD_PAD，视觉尺寸和拖动滑块的白卡片保持一致；
+                        // 左右两块底色的分界线仍然对齐实际内容（水果）所在的位置，只是外框边缘各自往外多包一圈
+                        const pw = w + CARD_PAD * 2, ph = h + CARD_PAD * 2;
+                        const leftZoneW = CARD_PAD + aW;
+
+                        // 阴影
+                        ctx.fillStyle = 'rgba(0,0,0,0.10)';
+                        roundRect(ctx, -pw / 2, -ph / 2 + ph * 0.05, pw, ph, CARD_RADIUS);
+                        ctx.fill();
+
+                        // 一整条连续的底板，裁剪出左右两块底色区分"已经有的a"和"要加的b"，
+                        // 但整体只有一个外框，不是一格一格分开的
+                        ctx.save();
+                        roundRect(ctx, -pw / 2, -ph / 2, pw, ph, CARD_RADIUS);
+                        ctx.clip();
+                        ctx.fillStyle = this.aZoneColor;
+                        ctx.fillRect(-pw / 2, -ph / 2, leftZoneW, ph);
+                        if (prefillN < container.cols) {
+                            ctx.fillStyle = this.bZoneColor;
+                            ctx.fillRect(-pw / 2 + leftZoneW, -ph / 2, pw - leftZoneW, ph);
+                        }
+                        ctx.restore();
+
+                        ctx.lineWidth = full ? CARD_BORDER_DONE : CARD_BORDER;
+                        ctx.strokeStyle = full ? '#43a047' : '#9fc9de';
+                        roundRect(ctx, -pw / 2, -ph / 2, pw, ph, CARD_RADIUS);
+                        ctx.stroke();
+
+                        // 预先摆好的水果（加数a，静态展示，和后面要拖进来的b水果品种不同）
+                        if (prefillN) {
+                            ctx.fillStyle = '#000000'; //重置透明度
+                            const itemDef = Config.itemTypes[container.prefillType];
+                            for (let i = 0; i < prefillN; i++) {
+                                const s = container.slots[i];
+                                ctx.save();
+                                ctx.translate(s.x, s.y);
+                                if (itemDef && itemDef.draw) itemDef.draw(ctx, container.itemR);
+                                ctx.restore();
+                            }
+                        }
+
+                        // 还空着等待拖入的目标位置：用不透明的橙色圆环标出来（不是淡淡的色块）
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = '#ffa726';
+                        for (let i = container.items.length; i < container.capacity; i++) {
+                            const s = container.slots[container.slotOffset + i];
+                            ctx.beginPath();
+                            ctx.arc(s.x, s.y, container.itemR * 0.5, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+
+                        ctx.restore();
+                    },
+
+                    // 下方文字："a + b = " 部分从始至终都是实色不透明；
+                    // 只有 "c"（得数）在没完成时是半透明占位，完成后才变彩色、放大弹跳。
+                    // 字号是其它关卡的2倍；如果太长放不下会按比例缩小避免溢出屏幕。
+                    drawLabel(ctx, container) {
+                        const full = container.items.length >= container.capacity;
+                        const leftText = `${container.eqA} + ${container.eqB} = `;
+                        const rightText = full ? String(container.eqSum) : '?';
+
+                        ctx.save();
+                        ctx.textBaseline = 'middle';
+                        let fontSize = container.labelFontSize;
+                        ctx.font = `bold ${fontSize}px sans-serif`;
+                        let totalW = ctx.measureText(leftText).width + ctx.measureText(rightText).width;
+                        if (totalW > container.maxLabelWidth) {
+                            fontSize = Math.max(20, Math.floor(fontSize * container.maxLabelWidth / totalW));
+                            ctx.font = `bold ${fontSize}px sans-serif`;
+                            totalW = ctx.measureText(leftText).width + ctx.measureText(rightText).width;
+                        }
+                        const leftW = ctx.measureText(leftText).width;
+                        const rightW = totalW - leftW;
+                        const baseX = container.x - totalW / 2;
+                        const baseY = container.labelY;
+
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#2b5876';
+                        ctx.fillText(leftText, baseX, baseY);
+
+                        ctx.save();
+                        ctx.translate(baseX + leftW + rightW / 2, baseY);
+                        ctx.scale(container.numberScale || 1, container.numberScale || 1);
+                        ctx.textAlign = 'center';
+                        if (full) {
+                            ctx.lineWidth = 5;
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.strokeText(rightText, 0, 0);
+                            ctx.fillStyle = container.completeColor || '#43a047';
+                        } else {
+                            ctx.fillStyle = 'rgba(43,88,118,0.32)';
+                        }
+                        ctx.fillText(rightText, 0, 0);
+                        ctx.restore();
+
+                        ctx.restore();
+                    }
+                },
+
+                // ---- subtractionRow：10以内减法 a－b＝c ----
+                // 顶部：一整排 a 个同一种水果，用底色分成左边 c 个（保留区）+ 右边 b 个（将被拿走区）；
+                // 中间：算式文字 "a－b＝?"；
+                // 底部：居中的 b 个空格子，等着承接从顶部拖下来的那一组水果。
+                // 顶部 b 区本身不画水果——那部分水果由一个可拖动的"整组卡片"表示，
+                // 初始就摆在 b 区正上方（视觉上像是这一行本来的一部分），拖到底部格子后才算数。
+                subtractionRow: {
+                    cellSize: 56,
+                    keepZoneColor: '#dff0f7',    // c：保留区，浅蓝底
+                    removeZoneColor: '#ffe0b2',  // b：将被拿走区，浅橙底
+                    targetZoneColor: '#ffe9c7',  // 底部承接格子，浅橙底（呼应上面要拿走的部分）
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+
+                    // 顶部行按 a 个格子算宽度（a 是这一排里最多的格子数），
+                    // 底部行只有 b 个格子，居中摆在顶部行下方；两行格子大小/间距完全一致
+                    computeDims(cw, count, level) {
+                        const cols = level.a;
+                        const sideMargin = 20, outerGap = 24;
+                        const maxAvailableW = (cw - sideMargin * 2 - outerGap * (count - 1)) / count;
+                        const pitchByWidth = (maxAvailableW - (cols - 1) * 4) / cols;
+                        const cell = Math.max(24, Math.min(this.cellSize, pitchByWidth));
+                        const cellGap = Math.max(4, Math.round(cell * 0.15));
+
+                        const topRowW = cols * cell + (cols - 1) * cellGap;
+                        const bottomRowW = level.b * cell + Math.max(0, level.b - 1) * cellGap;
+                        const width = Math.max(topRowW, bottomRowW);
+
+                        const labelFontSize = Math.max(40, Math.min(64, Math.round(cw * 0.13)));
+                        const rowGap = 18;           // 顶部行 与 算式文字 之间
+                        const labelToBottomGap = 18; // 算式文字 与 底部格子 之间
+                        const topRowH = cell, bottomRowH = cell, labelH = labelFontSize;
+                        const height = topRowH + rowGap + labelH + labelToBottomGap + bottomRowH;
+
+                        const topRowY = -height / 2 + topRowH / 2;
+                        const labelYOffset = topRowY + topRowH / 2 + rowGap + labelH / 2;
+                        const bottomRowY = height / 2 - bottomRowH / 2;
+
+                        return {
+                            width, height, gap: outerGap, labelFontSize, cell, cellGap,
+                            cols, topRowW, bottomRowW, topRowY, bottomRowY, labelYOffset,
+                            prefillCount: level.a, maxLabelWidth: cw - 40,
+                            eqA: level.a, eqB: level.b, eqC: level.c,
+                            // 松手判定区专门框住底部承接格子（而不是整个容器），
+                            // 避免孩子没拖动就手指一点，因为顶部b区本来就在容器范围内而被误判成"已放好"
+                            dropZone: { dx: 0, dy: bottomRowY, halfW: bottomRowW / 2, halfH: cell / 2 }
+                        };
+                    },
+
+                    // 前 a 个位置排在顶部行（居中），之后 b 个位置排在底部行（各自居中）
+                    slotLayout(n, dims) {
+                        const { cell, cellGap, prefillCount: a, topRowW, bottomRowW, topRowY, bottomRowY } = dims;
+                        const pitch = cell + cellGap;
+                        const positions = [];
+                        for (let i = 0; i < n; i++) {
+                            if (i < a) {
+                                positions.push({ x: -topRowW / 2 + cell / 2 + i * pitch, y: topRowY });
+                            } else {
+                                const j = i - a;
+                                positions.push({ x: -bottomRowW / 2 + cell / 2 + j * pitch, y: bottomRowY });
+                            }
+                        }
+                        return positions;
+                    },
+
+                    draw(ctx, container) {
+                        const full = container.items.length >= container.capacity;
+                        const a = container.eqA, c = container.eqC;
+                        const cell = container.cell;
+                        ctx.save();
+                        ctx.translate(container.x, container.y);
+
+                        // 顶部行：一整条连续底板，裁剪成 c(保留/浅蓝) + b(将被拿走/浅橙) 两块颜色
+                        // 外框整体外扩 CARD_PAD，视觉尺寸和拖动滑块的白卡片保持一致；
+                        // 颜色分界线仍对齐实际内容（水果）所在位置，只是外框边缘往外多包一圈
+                        const topRowW = container.topRowW, topY = container.topRowY;
+                        const pTopW = topRowW + CARD_PAD * 2, pRowH = cell + CARD_PAD * 2;
+                        const cW = topRowW * c / a;
+                        const leftZoneW = CARD_PAD + cW;
+                        ctx.save();
+                        roundRect(ctx, -pTopW / 2, topY - pRowH / 2, pTopW, pRowH, CARD_RADIUS);
+                        ctx.clip();
+                        ctx.fillStyle = this.keepZoneColor;
+                        ctx.fillRect(-pTopW / 2, topY - pRowH / 2, leftZoneW, pRowH);
+                        ctx.fillStyle = this.removeZoneColor;
+                        ctx.fillRect(-pTopW / 2 + leftZoneW, topY - pRowH / 2, pTopW - leftZoneW, pRowH);
+                        ctx.restore();
+                        ctx.lineWidth = CARD_BORDER;
+                        ctx.strokeStyle = '#9fc9de';
+                        roundRect(ctx, -pTopW / 2, topY - pRowH / 2, pTopW, pRowH, CARD_RADIUS);
+                        ctx.stroke();
+
+                        // c 个保留的水果：从头到尾静态显示，不参与拖拽
+                        const typeDef = Config.itemTypes[container.prefillType];
+                        for (let i = 0; i < c; i++) {
+                            const s = container.slots[i];
+                            ctx.save();
+                            ctx.translate(s.x, s.y);
+                            if (typeDef && typeDef.draw) typeDef.draw(ctx, container.itemR);
+                            ctx.restore();
+                        }
+                        // 注意：b 个待拿走的水果不在这里画——由 ItemManager.initSubtractGroup
+                        // 生成的可拖动"整组卡片"来表示，初始位置正好盖在这个 b 区上方
+
+                        // 底部行：b 个空格子，等待承接拖过来的水果（同样外扩 CARD_PAD）
+                        const bottomRowW = container.bottomRowW, botY = container.bottomRowY;
+                        const pBotW = bottomRowW + CARD_PAD * 2;
+                        ctx.fillStyle = 'rgba(0,0,0,0.10)';
+                        roundRect(ctx, -pBotW / 2, botY - pRowH / 2 + pRowH * 0.05, pBotW, pRowH, CARD_RADIUS);
+                        ctx.fill();
+                        ctx.fillStyle = this.targetZoneColor;
+                        roundRect(ctx, -pBotW / 2, botY - pRowH / 2, pBotW, pRowH, CARD_RADIUS);
+                        ctx.fill();
+                        ctx.lineWidth = full ? CARD_BORDER_DONE : CARD_BORDER;
+                        ctx.strokeStyle = full ? '#43a047' : '#9fc9de';
+                        roundRect(ctx, -pBotW / 2, botY - pRowH / 2, pBotW, pRowH, CARD_RADIUS);
+                        ctx.stroke();
+
+                        // 还空着的格子：橙色圆环提示
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = '#ffa726';
+                        for (let i = container.items.length; i < container.capacity; i++) {
+                            const s = container.slots[container.slotOffset + i];
+                            ctx.beginPath();
+                            ctx.arc(s.x, s.y, container.itemR * 0.5, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+
+                        ctx.restore();
+                    },
+
+                    // 下方文字 "a－b＝"部分从始至终不透明；"c"（得数）在没完成时是半透明占位，
+                    // 完成后放大变色弹跳。位置在顶部行和底部行之间（不是容器最下方）。
+                    drawLabel(ctx, container) {
+                        const full = container.items.length >= container.capacity;
+                        const leftText = `${container.eqA} － ${container.eqB} ＝ `;
+                        const rightText = full ? String(container.eqC) : '?';
+
+                        ctx.save();
+                        ctx.textBaseline = 'middle';
+                        let fontSize = container.labelFontSize;
+                        ctx.font = `bold ${fontSize}px sans-serif`;
+                        let totalW = ctx.measureText(leftText).width + ctx.measureText(rightText).width;
+                        if (totalW > container.maxLabelWidth) {
+                            fontSize = Math.max(20, Math.floor(fontSize * container.maxLabelWidth / totalW));
+                            ctx.font = `bold ${fontSize}px sans-serif`;
+                            totalW = ctx.measureText(leftText).width + ctx.measureText(rightText).width;
+                        }
+                        const leftW = ctx.measureText(leftText).width;
+                        const rightW = totalW - leftW;
+                        const baseX = container.x - totalW / 2;
+                        const baseY = container.y + container.labelYOffset;
+
+                        ctx.textAlign = 'left';
+                        ctx.fillStyle = '#2b5876';
+                        ctx.fillText(leftText, baseX, baseY);
+
+                        ctx.save();
+                        ctx.translate(baseX + leftW + rightW / 2, baseY);
+                        ctx.scale(container.numberScale || 1, container.numberScale || 1);
+                        ctx.textAlign = 'center';
+                        if (full) {
+                            ctx.lineWidth = 5;
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.strokeText(rightText, 0, 0);
+                            ctx.fillStyle = container.completeColor || '#43a047';
+                        } else {
+                            ctx.fillStyle = 'rgba(43,88,118,0.32)';
+                        }
+                        ctx.fillText(rightText, 0, 0);
+                        ctx.restore();
+
                         ctx.restore();
                     }
                 }
             },
 
+            // 模式分组：用于开局的"选择模式"菜单，同一组内用"继续"按钮循环
+            groups: [
+                { id: 'digits', title: '认识 1-10' },
+                { id: 'seq20', title: '认识 20 以内' },
+                { id: 'hundred', title: '认识 100 以内' },
+                { id: 'addition', title: '10以内加法' },
+                { id: 'subtraction', title: '10以内减法' }
+            ],
+
             levels: [
-                { id: 1, title: '认识 1 · 2', boxNumbers: [1, 2], itemType: 'apple', boxType: 'number' },
-                { id: 2, title: '认识 3 · 4', boxNumbers: [3, 4], itemType: 'apple', boxType: 'number' },
-                { id: 3, title: '认识 5 · 6', boxNumbers: [5, 6], itemType: 'apple', boxType: 'number' },
-                { id: 4, title: '认识 7 · 8', boxNumbers: [7, 8], itemType: 'apple', boxType: 'number' },
-                { id: 5, title: '认识 9 · 10', boxNumbers: [9, 10], itemType: 'apple', boxType: 'number' }
+                { id: 1, group: 'digits', title: '认识 1 · 2', boxNumbers: [1, 2], itemType: 'apple', containerType: 'plate' },
+                { id: 2, group: 'digits', title: '认识 3 · 4', boxNumbers: [3, 4], itemType: 'apple', containerType: 'plate' },
+                { id: 3, group: 'digits', title: '认识 5 · 6', boxNumbers: [5, 6], itemType: 'apple', containerType: 'plate' },
+                { id: 4, group: 'digits', title: '认识 7 · 8', boxNumbers: [7, 8], itemType: 'apple', containerType: 'plate' },
+                { id: 5, group: 'digits', title: '认识 9 · 10', boxNumbers: [9, 10], itemType: 'apple', containerType: 'plate' },
+
+                // ---- 以下是"认识20以内"分组：新架构的演示关卡 ----
+
+                // 数数模式：屏幕上先摆好10个水果（代表已经会数的10个），
+                // 数字从10开始，每点一个新水果就往后数一个，一直数到20
+                {
+                    id: 6, group: 'seq20', title: '数一数：10 到 20',
+                    boxNumbers: [10], labelStart: [11], prefillCount: [10],
+                    itemType: 'apple', containerType: 'grid', gridCols: 5
+                },
+
+                // ---- count by X 到 20：一次点一"束"，数字一次跳 N ----
+                {
+                    id: 8, group: 'seq20', title: '1个1个数，数到20',
+                    boxNumbers: [20], labelStart: [1], bundleSize: 1,
+                    itemType: 'apple', containerType: 'grid', gridCols: 5
+                },
+                {
+                    id: 9, group: 'seq20', title: '2个2个数，数到20',
+                    boxNumbers: [20], labelStart: [1], bundleSize: 2,
+                    itemType: 'apple', containerType: 'grid', gridCols: 5
+                },
+                {
+                    id: 10, group: 'seq20', title: '5个5个数，数到20',
+                    boxNumbers: [20], labelStart: [1], bundleSize: 5,
+                    itemType: 'apple', containerType: 'grid', gridCols: 5
+                },
+                {
+                    id: 11, group: 'seq20', title: '10个10个数，数到20',
+                    boxNumbers: [20], labelStart: [1], bundleSize: 10,
+                    itemType: 'apple', containerType: 'grid', gridCols: 5
+                },
+
+                // ---- count by X 到 100：一行10个，格子和水果会自动缩小以放得下 ----
+                {
+                    id: 15, group: 'hundred', title: '10个10个数，数到100',
+                    boxNumbers: [100], labelStart: [1], bundleSize: 10,
+                    itemType: 'apple', containerType: 'grid', gridCols: 10
+                },
+                {
+                    id: 12, group: 'hundred', title: '1个1个数，数到100',
+                    boxNumbers: [100], labelStart: [1], bundleSize: 1,
+                    itemType: 'apple', containerType: 'grid', gridCols: 10
+                },
+                {
+                    id: 13, group: 'hundred', title: '2个2个数，数到100',
+                    boxNumbers: [100], labelStart: [1], bundleSize: 2,
+                    itemType: 'apple', containerType: 'grid', gridCols: 10
+                },
+                {
+                    id: 14, group: 'hundred', title: '5个5个数，数到100',
+                    boxNumbers: [100], labelStart: [1], bundleSize: 5,
+                    itemType: 'apple', containerType: 'grid', gridCols: 10
+                }
             ]
         };
+
+        // ---- 生成"10以内加法"关卡：得数 x 从 2 到 10，
+        //      每个得数按 (x-1)+1、(x-2)+2 ... 1+(x-1) 的顺序练习所有拆法 ----
+        // a = 已经摆好的部分（预填充），b = 需要拖水果进去补上的部分
+        (function buildAdditionLevels() {
+            let nextId = 900;
+            for (let sum = 2; sum <= 10; sum++) {
+                for (let a = sum - 1; a >= 1; a--) {
+                    const b = sum - a;
+                    Config.levels.push({
+                        id: nextId++,
+                        group: 'addition',
+                        title: `${a}+${b}`,
+                        itemType: 'apple',
+                        containerType: 'equationRow',
+                        interaction: 'drag',
+                        sum, a, b,
+                        boxNumbers: [b],
+                        prefillCount: [a]
+                    });
+                }
+            }
+        })();
+
+        // ---- 生成"10以内减法"关卡：被减数 a 从 2 到 10 作为关卡分组，
+        //      每个 a 内按 b 从 1 递增到 a-1 的顺序练习（c = a - b）----
+        (function buildSubtractionLevels() {
+            let nextId = 2000;
+            for (let a = 2; a <= 10; a++) {
+                for (let b = 1; b <= a - 1; b++) {
+                    const c = a - b;
+                    Config.levels.push({
+                        id: nextId++,
+                        group: 'subtraction',
+                        title: `${a}－${b}`,
+                        itemType: 'apple',
+                        containerType: 'subtractionRow',
+                        interaction: 'drag',
+                        a, b, c,
+                        boxNumbers: [b],
+                        prefillCount: [a]
+                    });
+                }
+            }
+        })();
 
         /* =========================================================
            Animation 模块
@@ -219,132 +863,393 @@
         };
 
         /* =========================================================
-           BoxManager 模块
+           ContainerManager 模块
+           —— 管理各种容器（盘子/方格条/...），不关心具体形状，
+              只依赖 containerTypes 插件暴露的统一接口
         ========================================================= */
-        const BoxManager = {
-            boxes: [],
+        const ContainerManager = {
+            containers: [],
             scatterTop: 0,
 
-            init(level, cw, topOffset) {
-                this.boxes = [];
-                const typeDef = Config.boxTypes[level.boxType];
+            init(level, cw, topOffset, foodType, foodTypeB) {
+                this.containers = [];
+                const typeDef = Config.containerTypes[level.containerType];
                 const count = level.boxNumbers.length;
-                const { plateD, gap, labelFontSize } = typeDef.computeDims(cw, count);
-                const totalW = plateD * count + gap * (count - 1);
-                const centerY = topOffset + plateD / 2;
+                const dims = typeDef.computeDims(cw, count, level);
+                const { width, height, gap, labelFontSize } = dims;
+
+                // 水果图标大小：plate（认识数字1-10）固定20不变；
+                // grid / equationRow 格子如果因为列数多、屏幕窄而被压小了（比如一行10个），
+                // 图标跟着适当缩小，但优先保证孩子手指点得到——
+                // 允许图标比格子略大、稍微拥挤，也不要缩得太小
+                const cellBased = (level.containerType === 'grid' || level.containerType === 'equationRow' || level.containerType === 'subtractionRow') && dims.cell;
+                Config.itemRadius = cellBased
+                    ? Math.max(15, Math.min(23, dims.cell * 0.62)) * (dims.cols >= 10 ? 0.9 : 1)
+                    : 20;
+
+                const totalW = width * count + gap * (count - 1);
+                const centerY = topOffset + height / 2;
                 const labelGap = 18;
-                const labelY = centerY + plateD / 2 + labelGap + labelFontSize * 0.5;
+                const labelY = centerY + height / 2 + labelGap + labelFontSize * 0.5;
                 let curX = (cw - totalW) / 2;
 
                 level.boxNumbers.forEach((value, i) => {
-                    const x = curX + plateD / 2;
-                    const slots = typeDef.slotLayout(value);
-                    const box = {
-                        id: 'box' + i,
-                        type: level.boxType,
+                    const x = curX + width / 2;
+                    // 预填充的格子（已经会数的部分，静态展示），互动格子（value 个，需要玩家放）
+                    const prefillCount = (level.prefillCount && level.prefillCount[i]) || 0;
+                    const totalCells = value + prefillCount;
+                    const slots = typeDef.slotLayout(totalCells, dims);
+                    const container = Object.assign({
+                        id: 'c' + i,
+                        type: level.containerType,
                         value,
                         capacity: value,
+                        prefillCount,
+                        slotOffset: prefillCount,
+                        prefillType: foodType,
+                        targetType: foodTypeB || foodType,
                         items: [],
                         x, y: centerY,
-                        r: plateD / 2,
+                        width, height,
                         itemR: Config.itemRadius,
                         slots,
                         labelY,
                         labelFontSize,
                         numberScale: 1,
                         completeColor: null
-                    };
-                    this.boxes.push(box);
-                    curX += plateD + gap;
+                    }, dims);
+
+                    // 数数模式：数字从 labelStart 开始，随每次放入递增（比如从11数到20）
+                    // 而不是像"认识数字"那样恒定显示目标值
+                    if (level.labelStart) {
+                        container.labelMode = 'count';
+                        container.labelStart = level.labelStart[i];
+                        container.idleColor = level.idleColor || '#4a90c4';
+                        container.displayValue = container.labelStart - 1;
+                    }
+
+                    this.containers.push(container);
+                    curX += width + gap;
                 });
 
                 this.scatterTop = labelY + labelFontSize * 0.6 + 24;
             },
 
-            slotPosition(box, index) {
-                const s = box.slots[index];
-                return { x: box.x + s.x, y: box.y + s.y };
+            slotPosition(container, index) {
+                const s = container.slots[container.slotOffset + index];
+                return { x: container.x + s.x, y: container.y + s.y };
             },
 
-            findAvailableBox() {
-                return this.boxes.find(b => b.items.length < b.capacity) || null;
+            findAvailableContainer() {
+                return this.containers.find(c => c.items.length < c.capacity) || null;
             },
 
-            tryPlace(box, item) {
-                if (box.items.length >= box.capacity) return false;
-                box.items.push(item);
-                const nowFull = box.items.length >= box.capacity;
+            tryPlace(container, item) {
+                if (container.items.length >= container.capacity) return false;
+                container.items.push(item);
+                if (container.labelMode === 'count') {
+                    container.displayValue = container.labelStart - 1 + container.items.length;
+                }
+                const nowFull = container.items.length >= container.capacity;
                 if (nowFull) {
-                    const palette = Config.boxTypes[box.type].completeColors;
-                    box.completeColor = palette[Math.floor(Math.random() * palette.length)];
-                    Animation.pulse(box, 'numberScale', 1, 1.6, 420);
+                    const palette = Config.containerTypes[container.type].completeColors;
+                    container.completeColor = palette[Math.floor(Math.random() * palette.length)];
+                    Animation.pulse(container, 'numberScale', 1, 1.6, 420);
                 } else {
-                    Animation.pulse(box, 'numberScale', 1, 1.12, 220);
+                    Animation.pulse(container, 'numberScale', 1, 1.12, 220);
                 }
                 return true;
             },
 
+            // 一次性放入一整束（N个计数单位）：一次点击、数字一次跳N。
+            // 逻辑上和 tryPlace 相同（占位/更新数字/判断完成），只是一次占 N 个格子而不是1个。
+            // 立刻创建 N 个"已放置"的子水果对象占住格子（初始都堆在束的原始位置，
+            // 后续由 ItemManager.moveBundleToSlots 把它们分别飞到各自的格子）。
+            tryPlaceBundle(container, bundleToken) {
+                const n = bundleToken.unitCount || 1;
+                if (container.items.length + n > container.capacity) return null;
+                const startIndex = container.items.length;
+                const subItems = [];
+                for (let k = 0; k < n; k++) {
+                    const sub = {
+                        id: bundleToken.id + '_' + k,
+                        type: bundleToken.type,
+                        r: Config.itemRadius,
+                        x: bundleToken.x, y: bundleToken.y,
+                        homeX: bundleToken.x, homeY: bundleToken.y,
+                        boxed: true,
+                        dragging: false,
+                        scale: 0.4
+                    };
+                    container.items.push(sub);
+                    subItems.push(sub);
+                }
+                if (container.labelMode === 'count') {
+                    container.displayValue = container.labelStart - 1 + container.items.length;
+                }
+                const nowFull = container.items.length >= container.capacity;
+                if (nowFull) {
+                    const palette = Config.containerTypes[container.type].completeColors;
+                    container.completeColor = palette[Math.floor(Math.random() * palette.length)];
+                    Animation.pulse(container, 'numberScale', 1, 1.6, 420);
+                } else {
+                    Animation.pulse(container, 'numberScale', 1, 1.12, 220);
+                }
+                return { startIndex, subItems };
+            },
+
+            // 加法关卡专用：把拖过来的"一整组"水果（b个）一次性放进目标区。
+            // 每个子水果的起始位置按组内实际的排布算出来（和主行格子同样的间距），
+            // 这样落位动画只是"轻轻对齐"一下，不会有明显的跳动。
+            tryPlaceGroup(container, group) {
+                const n = group.count;
+                if (container.items.length + n > container.capacity) return null;
+                const startIndex = container.items.length;
+                const pitch = group.cell + group.cellGap;
+                const groupW = n * group.cell + (n - 1) * group.cellGap;
+                const subItems = [];
+                for (let k = 0; k < n; k++) {
+                    const sx = group.x - groupW / 2 + group.cell / 2 + k * pitch;
+                    const sub = {
+                        id: group.id + '_' + k,
+                        type: group.type,
+                        r: container.itemR,
+                        x: sx, y: group.y,
+                        homeX: sx, homeY: group.y,
+                        boxed: true,
+                        dragging: false,
+                        scale: 1
+                    };
+                    container.items.push(sub);
+                    subItems.push(sub);
+                }
+                const nowFull = container.items.length >= container.capacity;
+                if (nowFull) {
+                    const palette = Config.containerTypes[container.type].completeColors;
+                    container.completeColor = palette[Math.floor(Math.random() * palette.length)];
+                    Animation.pulse(container, 'numberScale', 1, 1.6, 420);
+                } else {
+                    Animation.pulse(container, 'numberScale', 1, 1.12, 220);
+                }
+                return { startIndex, subItems };
+            },
+
             isAllComplete() {
-                return this.boxes.every(b => b.items.length === b.capacity);
+                return this.containers.every(c => c.items.length === c.capacity);
             }
         };
 
         /* =========================================================
            ItemManager 模块
+           —— 新增 WaveSpawner 能力：数量很大时不会一次性把屏幕铺满，
+              每次最多同时出现 batchSize 个（默认20），点完/放完当前这批，
+              才会自动补出下一批。数量少的关卡（<= batchSize）行为和以前完全一样。
         ========================================================= */
         const ItemManager = {
             items: [],
             moveLock: false,
+            cw: 0, ch: 0, scatterTop: 0, foodType: 'apple',
+            totalNeeded: 0,
+            spawnedTotal: 0,
+            batchSize: 20,
+            bundleSize: 1,
 
             init(level, cw, ch, scatterTop, foodType) {
                 this.items = [];
                 this.moveLock = false;
-                const total = level.boxNumbers.reduce((a, b) => a + b, 0);
-                const r = Config.itemRadius;
-                const positions = [];
-                const marginX = r + 14, marginY = r + 14;
-                const bottom = ch - marginY;
+                this.cw = cw; this.ch = ch; this.scatterTop = scatterTop; this.foodType = foodType;
 
-                for (let i = 0; i < total; i++) {
-                    let pos = null, tries = 0;
-                    while (tries < 300) {
-                        const cand = { x: rand(marginX, cw - marginX), y: rand(scatterTop + marginY, bottom) };
-                        if (positions.every(p => dist(p.x, p.y, cand.x, cand.y) > r * 2.3)) {
-                            pos = cand; break;
-                        }
-                        tries++;
+                // 加法/减法关卡（拖拽交互）：b 个水果当成"一整组"一起出现，不走 WaveSpawner 那一套
+                if (level.interaction === 'drag') {
+                    if (level.containerType === 'subtractionRow') {
+                        this.initSubtractGroup(level, foodType);
+                    } else {
+                        this.initAddendGroup(level, foodType);
                     }
-                    if (!pos) {
-                        const cols = Math.max(1, Math.floor((cw - 2 * marginX) / (r * 2.3)));
-                        pos = {
-                            x: marginX + (i % cols) * r * 2.3,
-                            y: scatterTop + marginY + Math.floor(i / cols) * r * 2.3
-                        };
-                    }
-                    positions.push(pos);
+                    return;
+                }
+
+                this.bundleSize = level.bundleSize || 1;
+                // count by N 的关卡里，totalNeeded 数的是"要点几次/几个 token"，
+                // 不是水果的总数量（比如 20 个水果、每次点2个 = 只需要10个 token）
+                const totalUnits = level.boxNumbers.reduce((a, b) => a + b, 0);
+                this.totalNeeded = Math.ceil(totalUnits / this.bundleSize);
+                this.spawnedTotal = 0;
+                this.batchSize = level.batchSize || 20;
+                this.spawnWave();
+            },
+
+            // 生成加法关卡里那"一整组"待拖入的水果：大小、间距和目标行的格子完全一致，
+            // 这样拖动时看起来就像是要把这一截"接"到主行上，而不是零散地一个个放
+            initAddendGroup(level, foodType) {
+                const container = ContainerManager.containers[0];
+                const n = level.b;
+                const cell = container.cell, cellGap = container.cellGap;
+                const groupW = n * cell + (n - 1) * cellGap;
+                const groupH = cell;
+
+                const marginX = groupW / 2 + 20;
+                const marginY = groupH / 2 + 20;
+                const areaTop = this.scatterTop + marginY;
+                const areaBottom = this.ch - marginY;
+                const xLo = Math.min(marginX, this.cw - marginX);
+                const xHi = Math.max(marginX, this.cw - marginX);
+                const yLo = Math.min(areaTop, areaBottom);
+                const yHi = Math.max(areaTop, areaBottom);
+                const x = rand(xLo, xHi);
+                const y = rand(yLo, yHi);
+
+                this.items = [{
+                    id: 'addendGroup',
+                    isGroup: true,
+                    type: foodType,
+                    count: n,
+                    cell, cellGap,
+                    r: container.itemR,
+                    x, y,
+                    homeX: x, homeY: y,
+                    boxed: false,
+                    dragging: false,
+                    scale: 1
+                }];
+                this.totalNeeded = n;
+                this.spawnedTotal = n;
+            },
+
+            // 生成减法关卡里那"一整组"待拖走的水果：初始位置正好摆在顶部行的 b 区（要拿走的那一段）上方，
+            // 大小、间距和顶部行的格子完全一致，看起来就像是从这一排里把最后 b 个"拎"出来，
+            // 拖到下方 a－b＝? 算式下面的目标格子里
+            initSubtractGroup(level, foodType) {
+                const container = ContainerManager.containers[0];
+                const n = level.b;
+                const c = level.c;
+                const cell = container.cell, cellGap = container.cellGap;
+
+                // b 区（顶部行里 c 之后的 b 个格子）在容器坐标系里的中心位置
+                const bSlots = container.slots.slice(c, c + n);
+                const relX = bSlots.reduce((s, sl) => s + sl.x, 0) / n;
+                const relY = bSlots.reduce((s, sl) => s + sl.y, 0) / n;
+                const x = container.x + relX;
+                const y = container.y + relY;
+
+                this.items = [{
+                    id: 'subtractGroup',
+                    isGroup: true,
+                    type: foodType,
+                    count: n,
+                    cell, cellGap,
+                    r: container.itemR,
+                    x, y,
+                    homeX: x, homeY: y,
+                    boxed: false,
+                    dragging: false,
+                    scale: 1
+                }];
+                this.totalNeeded = n;
+                this.spawnedTotal = n;
+            },
+
+            // 一个 token 的"点击判定半径"：单个水果就是 Config.itemRadius；
+            // 水果束（bundleSize>1）用统一的 bundleRadius()，保证点击范围足够大、好点
+            tokenRadius() {
+                return this.bundleSize > 1 ? bundleRadius(this.bundleSize) : Config.itemRadius;
+            },
+
+            // 一个 token 排布时真正占用的宽高（用于计算屏幕上能摆几行几列）。
+            // 水果束卡片往往是"宽而扁"的（比如5个一组是一整排），如果排布时
+            // 也按（宽/高中较大的那个）当正方形来占地，会白白浪费很多空间，
+            // 导致明明卡片不高、其实能多摆几排，却被误判成放不下。
+            // 所以这里分别用卡片的真实宽度和高度，卡片本身大小完全不受影响。
+            tokenFootprint() {
+                if (this.bundleSize > 1) {
+                    const L = bundleLayout(this.bundleSize);
+                    return { w: L.cardW, h: L.cardH };
+                }
+                const d = Config.itemRadius * 2;
+                return { w: d, h: d };
+            },
+
+            // 生成一批新 token：用"网格+轻微抖动"摆放，而不是纯随机撒点。
+            // 之前用纯随机+失败兜底的方式，兜底逻辑没检查是否会和已有物品重叠，
+            // 一旦随机撒点失败（大水果束、位置紧张时很容易失败），就会把新物品几乎
+            // 摞在已有物品正上方，导致下面那个被完全挡住、点不到——这是之前的bug。
+            // 现在改成：先按当前可视区域能摆下几行几列算出网格，再在每个格子中心
+            // 加一点抖动，保证不重叠、不出屏幕；这一批放不下的数量会自动留到下一批。
+            spawnWave() {
+                const remaining = this.totalNeeded - this.spawnedTotal;
+                if (remaining <= 0) return;
+
+                const r = this.tokenRadius();
+                const fp = this.tokenFootprint();
+                const pad = 10;
+                const spacingX = fp.w + pad, spacingY = fp.h + pad;
+                const marginX = fp.w / 2 + pad, marginY = fp.h / 2 + pad;
+                const areaW = this.cw - marginX * 2;
+                const areaH = (this.ch - marginY) - (this.scatterTop + marginY);
+                const cols = Math.max(1, Math.floor(areaW / spacingX));
+                const rows = Math.max(1, Math.floor(areaH / spacingY));
+                const areaCapacity = cols * rows;
+
+                // 这一批最多只生成"当前屏幕真正放得下"的数量，避免物品被挤没了
+                const waveCount = Math.min(this.batchSize, remaining, areaCapacity);
+
+                // 已经在屏幕上但还没被拿走的 token，占用对应的网格格子，新的要避开
+                const usedCells = new Set();
+                this.items.filter(it => !it.boxed).forEach(it => {
+                    const col = Math.round((it.x - marginX - spacingX / 2) / spacingX);
+                    const rowIdx = Math.round((it.y - (this.scatterTop + marginY) - spacingY / 2) / spacingY);
+                    usedCells.add(rowIdx * cols + col);
+                });
+
+                let placed = 0;
+                for (let cell = 0; cell < cols * rows && placed < waveCount; cell++) {
+                    if (usedCells.has(cell)) continue;
+                    const col = cell % cols;
+                    const rowIdx = Math.floor(cell / cols);
+                    const jitterX = spacingX * 0.12, jitterY = spacingY * 0.12;
+                    const x = marginX + col * spacingX + spacingX / 2 + rand(-jitterX, jitterX);
+                    const y = this.scatterTop + marginY + rowIdx * spacingY + spacingY / 2 + rand(-jitterY, jitterY);
+
                     this.items.push({
-                        id: 'item' + i,
-                        type: foodType,
+                        id: 'item' + this.spawnedTotal,
+                        type: this.foodType,
+                        unitCount: this.bundleSize,
                         r,
-                        x: pos.x, y: pos.y,
-                        homeX: pos.x, homeY: pos.y,
+                        x, y,
+                        homeX: x, homeY: y,
                         boxed: false,
                         dragging: false,
                         scale: 1
                     });
+                    this.spawnedTotal++;
+                    placed++;
                 }
+            },
+
+            // 每次成功放入后调用：如果当前这批已经全部被放走、
+            // 且还有没生成的 token，就自动补下一批
+            maybeSpawnNextWave() {
+                if (this.totalNeeded - this.spawnedTotal <= 0) return;
+                const liveUnboxed = this.items.some(it => !it.boxed);
+                if (!liveUnboxed) this.spawnWave();
             },
 
             itemAt(x, y) {
                 for (let i = this.items.length - 1; i >= 0; i--) {
                     const it = this.items[i];
                     if (it.boxed || it.dragging) continue;
-                    if (dist(x, y, it.x, it.y) <= it.r * 1.5) return it;
+                    if (it.isGroup) {
+                        const w = it.count * it.cell + (it.count - 1) * it.cellGap + 20;
+                        const h = it.cell + 20;
+                        if (Math.abs(x - it.x) <= w / 2 && Math.abs(y - it.y) <= h / 2) return it;
+                    } else if (dist(x, y, it.x, it.y) <= it.r * 1.5) {
+                        return it;
+                    }
                 }
                 return null;
             },
 
-            moveToBoxSlot(item, box, slot, onDone) {
+            moveToBoxSlot(item, container, slot, onDone) {
                 item.boxed = true;
                 let completed = 0;
                 const tryDone = () => { completed++; if (completed >= 2 && onDone) onDone(); };
@@ -353,14 +1258,57 @@
                 Animation.add(item, 'scale', 1, 1.35, 120, () => {
                     Animation.add(item, 'scale', 1.35, 1, 120, null);
                 });
+            },
+
+            // 水果束落位动画：原 token 缩小消失，同时"炸开"成 N 个小水果，
+            // 各自飞向自己的格子。全部动画完成后才调用 onDone。
+            moveBundleToSlots(bundleToken, container, startIndex, subItems, onDone) {
+                bundleToken.boxed = true;
+                let pending = 0;
+                const done = () => { pending--; if (pending <= 0 && onDone) onDone(); };
+
+                pending++;
+                Animation.add(bundleToken, 'scale', 1, 0, 200, done);
+
+                subItems.forEach((sub, k) => {
+                    this.items.push(sub);
+                    const slot = ContainerManager.slotPosition(container, startIndex + k);
+                    pending += 3;
+                    Animation.add(sub, 'x', sub.x, slot.x, 260, done);
+                    Animation.add(sub, 'y', sub.y, slot.y, 260, done);
+                    Animation.add(sub, 'scale', 0.4, 1, 260, done);
+                });
+            },
+
+            // 加法关卡"整组拖入"落位动画：去掉原来的整组 token，换成 n 个独立小水果，
+            // 因为大小间距在生成时就已经和目标行对齐了，这里只是轻轻对齐滑入各自的格子
+            moveGroupToSlots(group, container, startIndex, subItems, onDone) {
+                const idx = this.items.indexOf(group);
+                if (idx !== -1) this.items.splice(idx, 1);
+
+                if (subItems.length === 0) { if (onDone) onDone(); return; }
+                let pending = 0;
+                const done = () => { pending--; if (pending <= 0 && onDone) onDone(); };
+
+                subItems.forEach((sub, k) => {
+                    this.items.push(sub);
+                    const slot = ContainerManager.slotPosition(container, startIndex + k);
+                    pending += 2;
+                    Animation.add(sub, 'x', sub.x, slot.x, 220, done);
+                    Animation.add(sub, 'y', sub.y, slot.y, 220, done);
+                });
             }
         };
 
         /* =========================================================
            LevelManager 模块
+           —— 关卡按 group 分组（比如"认识1-10" / "认识20以内"），
+              进入某个模式后，"继续"按钮只在该组内循环，不会跨组
         ========================================================= */
         const LevelManager = {
-            currentIndex: 0,
+            currentGroup: null,
+            groupLevels: [],
+            indexInGroup: 0,
             currentFoodType: 'apple',
 
             randomFoodType() {
@@ -368,21 +1316,103 @@
                 return keys[Math.floor(Math.random() * keys.length)];
             },
 
-            load(cw, ch, idx) {
-                this.currentIndex = idx;
-                const level = Config.levels[idx];
+            // 加法关卡用：a 和 b 两部分水果品种不同，随机挑两个不重复的
+            randomFoodTypePair() {
+                const keys = Config.foodTypeKeys;
+                const a = keys[Math.floor(Math.random() * keys.length)];
+                let b = a;
+                while (b === a) b = keys[Math.floor(Math.random() * keys.length)];
+                return [a, b];
+            },
+
+            levelsInGroup(groupId) {
+                return Config.levels.filter(l => l.group === groupId);
+            },
+
+            // 选关下拉菜单要显示的条目：大多数分组直接列出每一关；
+            // "10以内加法"关卡太多（45关），改成只列 9 个"和为X"，点击后跳到 (x-1)+1 的第一个拆法
+            menuEntries() {
+                if (this.currentGroup === 'addition') {
+                    const seen = new Set();
+                    const entries = [];
+                    this.groupLevels.forEach((lv, i) => {
+                        if (!seen.has(lv.sum)) {
+                            seen.add(lv.sum);
+                            entries.push({ index: i, title: `和为 ${lv.sum}`, sum: lv.sum });
+                        }
+                    });
+                    return entries;
+                }
+                // "10以内减法"关卡也很多（45关），改成只列 9 个"被减数为X"，点击后跳到 b=1 的第一个拆法
+                if (this.currentGroup === 'subtraction') {
+                    const seen = new Set();
+                    const entries = [];
+                    this.groupLevels.forEach((lv, i) => {
+                        if (!seen.has(lv.a)) {
+                            seen.add(lv.a);
+                            entries.push({ index: i, title: `被减数为 ${lv.a}`, a: lv.a });
+                        }
+                    });
+                    return entries;
+                }
+                return this.groupLevels.map((lv, i) => ({ index: i, title: lv.title }));
+            },
+
+            // 判断下拉菜单里的某一项是否对应当前关卡
+            // （加法按"和"匹配，减法按"被减数"匹配，其它分组按精确 index 匹配）
+            isMenuEntryCurrent(entry) {
+                if (this.currentGroup === 'addition') {
+                    return this.currentLevel().sum === entry.sum;
+                }
+                if (this.currentGroup === 'subtraction') {
+                    return this.currentLevel().a === entry.a;
+                }
+                return entry.index === this.indexInGroup;
+            },
+
+            // 从菜单进入某个模式，从该组第一关开始
+            startGroup(cw, ch, groupId) {
+                this.currentGroup = groupId;
+                this.groupLevels = this.levelsInGroup(groupId);
+                this.indexInGroup = 0;
+                this.loadCurrent(cw, ch);
+            },
+
+            loadCurrent(cw, ch) {
+                const level = this.groupLevels[this.indexInGroup];
                 const topOffset = ch * 0.05 + 30;
-                this.currentFoodType = this.randomFoodType();
-                BoxManager.init(level, cw, topOffset);
-                ItemManager.init(level, cw, ch, BoxManager.scatterTop, this.currentFoodType);
+
+                if (level.interaction === 'drag' && level.containerType === 'subtractionRow') {
+                    // 减法：被减去的所有水果都是同一种，只随机挑一种水果类型
+                    const food = this.randomFoodType();
+                    this.currentFoodType = food;
+                    ContainerManager.init(level, cw, topOffset, food, food);
+                    ItemManager.init(level, cw, ch, ContainerManager.scatterTop, food);
+                } else if (level.interaction === 'drag') {
+                    // 加数(a，已摆好)和被拖入的数(b)用两种不同的水果，方便孩子分清"原来有的"和"要加的"
+                    const [foodA, foodB] = this.randomFoodTypePair();
+                    this.currentFoodType = foodA;
+                    ContainerManager.init(level, cw, topOffset, foodA, foodB);
+                    ItemManager.init(level, cw, ch, ContainerManager.scatterTop, foodB);
+                } else {
+                    this.currentFoodType = this.randomFoodType();
+                    ContainerManager.init(level, cw, topOffset, this.currentFoodType);
+                    ItemManager.init(level, cw, ch, ContainerManager.scatterTop, this.currentFoodType);
+                }
                 UI.reset();
             },
 
-            currentLevel() { return Config.levels[this.currentIndex]; },
-            reloadCurrent(cw, ch) { this.load(cw, ch, this.currentIndex); },
+            currentLevel() { return this.groupLevels[this.indexInGroup]; },
+            reloadCurrent(cw, ch) { this.loadCurrent(cw, ch); },
             nextLevel(cw, ch) {
-                const next = (this.currentIndex + 1) % Config.levels.length;
-                this.load(cw, ch, next);
+                this.indexInGroup = (this.indexInGroup + 1) % this.groupLevels.length;
+                this.loadCurrent(cw, ch);
+            },
+            // 家长用的"选关"菜单：直接跳到该组内任意一关
+            goToLevel(cw, ch, index) {
+                if (index < 0 || index >= this.groupLevels.length) return;
+                this.indexInGroup = index;
+                this.loadCurrent(cw, ch);
             }
         };
 
@@ -393,14 +1423,100 @@
             complete: false,
             celebrateScale: 1,
             continueBtn: null,
+            continueVisible: false,
+            continueTimer: null,
+            menuButtons: [],
+            backBtn: null,
+            levelMenuOpen: false,
+            levelMenuItems: [],
+            levelMenuBox: null,
+            titleArrowBtn: null,
 
-            reset() { this.complete = false; },
+            reset() {
+                this.complete = false;
+                this.continueVisible = false;
+                this.levelMenuOpen = false;
+                if (this.continueTimer) { clearTimeout(this.continueTimer); this.continueTimer = null; }
+            },
+
+            // ---- 开局的"选择模式"菜单 ----
+            layoutMenu(cw, ch) {
+                const btnW = Math.min(280, cw - 60);
+                const btnH = 76;
+                const gap = 24;
+                const groups = Config.groups;
+                const totalH = groups.length * btnH + (groups.length - 1) * gap;
+                let y = ch / 2 - totalH / 2;
+                this.menuButtons = groups.map(g => {
+                    const btn = { id: g.id, title: g.title, x: cw / 2 - btnW / 2, y, w: btnW, h: btnH };
+                    y += btnH + gap;
+                    return btn;
+                });
+            },
+
+            drawMenu(ctx, cw, ch) {
+                ctx.save();
+                ctx.fillStyle = '#eaf7ff';
+                ctx.fillRect(0, 0, cw, ch);
+                ctx.font = 'bold 26px sans-serif';
+                ctx.fillStyle = '#2b5876';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('选择模式', cw / 2, this.menuButtons[0] ? this.menuButtons[0].y - 60 : ch / 2 - 120);
+
+                this.menuButtons.forEach(b => {
+                    ctx.fillStyle = '#43a047';
+                    roundRect(ctx, b.x, b.y, b.w, b.h, 24);
+                    ctx.fill();
+                    ctx.font = 'bold 26px sans-serif';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(b.title, b.x + b.w / 2, b.y + b.h / 2);
+                });
+                ctx.restore();
+            },
+
+            hitMenu(x, y) {
+                const b = this.menuButtons.find(btn => x > btn.x && x < btn.x + btn.w && y > btn.y && y < btn.y + btn.h);
+                return b ? b.id : null;
+            },
+
+            // ---- 游戏中左上角的"返回菜单"按钮 ----
+            layoutBackButton() {
+                this.backBtn = { x: 12, y: 8, w: 64, h: 32 };
+            },
+
+            drawBackButton(ctx) {
+                const b = this.backBtn;
+                ctx.save();
+                ctx.fillStyle = 'rgba(43,88,118,0.15)';
+                roundRect(ctx, b.x, b.y, b.w, b.h, 10);
+                ctx.fill();
+                ctx.font = 'bold 15px sans-serif';
+                ctx.fillStyle = '#2b5876';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('菜单', b.x + b.w / 2, b.y + b.h / 2 + 1);
+                ctx.restore();
+            },
+
+            hitBack(x, y) {
+                const b = this.backBtn;
+                if (!b) return false;
+                return x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h;
+            },
 
             showComplete(cw, ch) {
                 this.complete = true;
-                this.celebrateScale = 0.5;
-                Animation.add(this, 'celebrateScale', 0.5, 1, 380, null);
-                this.continueBtn = { x: cw / 2 - 95, y: ch * 0.46, w: 190, h: 66 };
+                this.continueVisible = false;
+                // 底部居中的"继续"按钮，留出安全边距
+                this.continueBtn = { x: cw / 2 - 95, y: ch - 66 - 34, w: 190, h: 66 };
+                // 过2秒再显示按钮，方便先看清后面数一数的画面
+                if (this.continueTimer) clearTimeout(this.continueTimer);
+                this.continueTimer = setTimeout(() => {
+                    this.continueVisible = true;
+                    this.celebrateScale = 0.5;
+                    Animation.add(this, 'celebrateScale', 0.5, 1, 380, null);
+                }, 1000);
             },
 
             drawTitle(ctx, cw) {
@@ -411,15 +1527,104 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillText(level.title, cw / 2, 10);
+
+                // 标题右侧一个低调的小箭头，供家长展开"选关"菜单（触控区域比图形本身大一些）
+                const textW = ctx.measureText(level.title).width;
+                const arrowCx = cw / 2 + textW / 2 + 18;
+                const arrowCy = 10 + 11;
+                this.titleArrowBtn = { x: arrowCx - 16, y: 2, w: 32, h: 28 };
+                ctx.fillStyle = this.levelMenuOpen ? '#2b5876' : 'rgba(43,88,118,0.45)';
+                ctx.beginPath();
+                if (this.levelMenuOpen) {
+                    // 展开时箭头朝上
+                    ctx.moveTo(arrowCx - 6, arrowCy + 3);
+                    ctx.lineTo(arrowCx + 6, arrowCy + 3);
+                    ctx.lineTo(arrowCx, arrowCy - 4);
+                } else {
+                    ctx.moveTo(arrowCx - 6, arrowCy - 3);
+                    ctx.lineTo(arrowCx + 6, arrowCy - 3);
+                    ctx.lineTo(arrowCx, arrowCy + 4);
+                }
+                ctx.closePath();
+                ctx.fill();
                 ctx.restore();
             },
 
-            // 只保留一个"继续"按钮，去掉庆祝表情与文字，避免干扰
-            drawComplete(ctx, cw, ch) {
+            // ---- 选关下拉菜单（低调，主要给家长用）----
+            layoutLevelMenu(cw) {
+                const entries = LevelManager.menuEntries();
+                const rowH = 44;
+                const menuW = Math.min(260, cw - 40);
+                const top = 44;
+                this.levelMenuItems = entries.map((entry, i) => ({
+                    index: entry.index,
+                    x: cw / 2 - menuW / 2,
+                    y: top + i * rowH,
+                    w: menuW,
+                    h: rowH,
+                    title: entry.title,
+                    isCurrent: LevelManager.isMenuEntryCurrent(entry)
+                }));
+                this.levelMenuBox = { x: cw / 2 - menuW / 2, y: top, w: menuW, h: rowH * entries.length };
+            },
+
+            drawLevelMenu(ctx, cw) {
+                if (!this.levelMenuOpen) return;
+                const box = this.levelMenuBox;
                 ctx.save();
-                ctx.fillStyle = 'rgba(234,247,255,0.6)';
-                ctx.fillRect(0, 0, cw, ch);
+                ctx.fillStyle = 'rgba(0,0,0,0.35)';
+                ctx.fillRect(0, box.y, cw, 4000);
+                ctx.fillStyle = '#ffffff';
+                roundRect(ctx, box.x, box.y, box.w, box.h, 14);
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#cfe8f5';
+                ctx.stroke();
+
+                this.levelMenuItems.forEach((it, i) => {
+                    const isCur = it.isCurrent;
+                    if (isCur) {
+                        ctx.fillStyle = 'rgba(67,160,71,0.14)';
+                        roundRect(ctx, it.x + 4, it.y + 3, it.w - 8, it.h - 6, 10);
+                        ctx.fill();
+                    }
+                    ctx.font = isCur ? 'bold 18px sans-serif' : '16px sans-serif';
+                    ctx.fillStyle = isCur ? '#43a047' : '#2b5876';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(it.title, it.x + 18, it.y + it.h / 2 + 1);
+                    if (i < this.levelMenuItems.length - 1) {
+                        ctx.strokeStyle = '#eef4f7';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(it.x + 12, it.y + it.h);
+                        ctx.lineTo(it.x + it.w - 12, it.y + it.h);
+                        ctx.stroke();
+                    }
+                });
                 ctx.restore();
+            },
+
+            hitTitleArrow(x, y) {
+                const b = this.titleArrowBtn;
+                if (!b) return false;
+                return x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h;
+            },
+
+            // 返回点中的关卡 index；点在菜单框外则返回 'outside'；都没点中返回 null
+            hitLevelMenu(x, y) {
+                if (!this.levelMenuOpen) return null;
+                const item = this.levelMenuItems.find(it => x > it.x && x < it.x + it.w && y > it.y && y < it.y + it.h);
+                if (item) return item.index;
+                const box = this.levelMenuBox;
+                if (box && x > box.x && x < box.x + box.w && y > box.y && y < box.y + box.h) return null;
+                return 'outside';
+            },
+
+            // 只保留一个"继续"按钮，去掉庆祝表情、文字和遮罩，避免挡住后面的数字画面
+            // 按钮延迟1秒后才出现（continueVisible 由 showComplete 里的定时器控制）
+            drawComplete(ctx, cw, ch) {
+                if (!this.continueVisible) return;
 
                 const b = this.continueBtn;
                 ctx.save();
@@ -437,6 +1642,7 @@
             },
 
             hitContinue(x, y) {
+                if (!this.continueVisible) return false;
                 const b = this.continueBtn;
                 if (!b) return false;
                 return x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h;
@@ -458,25 +1664,39 @@
             render(cw, ch) {
                 const ctx = this.ctx;
                 ctx.clearRect(0, 0, cw, ch);
+
+                if (Game.mode === 'menu') {
+                    UI.drawMenu(ctx, cw, ch);
+                    return;
+                }
+
                 ctx.fillStyle = '#eaf7ff';
                 ctx.fillRect(0, 0, cw, ch);
 
                 UI.drawTitle(ctx, cw);
+                UI.drawBackButton(ctx);
 
-                BoxManager.boxes.forEach(box => Config.boxTypes[box.type].draw(ctx, box));
+                ContainerManager.containers.forEach(c => Config.containerTypes[c.type].draw(ctx, c));
 
                 ItemManager.items.forEach(item => {
                     ctx.save();
                     ctx.translate(item.x, item.y);
                     ctx.scale(item.scale, item.scale);
-                    const typeDef = Config.itemTypes[item.type];
-                    if (typeDef && typeDef.draw) typeDef.draw(ctx, item.r);
+                    if (item.isGroup) {
+                        drawAddendGroup(ctx, item);
+                    } else if (item.unitCount && item.unitCount > 1) {
+                        drawBundleToken(ctx, item);
+                    } else {
+                        const typeDef = Config.itemTypes[item.type];
+                        if (typeDef && typeDef.draw) typeDef.draw(ctx, item.r);
+                    }
                     ctx.restore();
                 });
 
-                BoxManager.boxes.forEach(box => Config.boxTypes[box.type].drawLabel(ctx, box));
+                ContainerManager.containers.forEach(c => Config.containerTypes[c.type].drawLabel(ctx, c));
 
                 if (UI.complete) UI.drawComplete(ctx, cw, ch);
+                UI.drawLevelMenu(ctx, cw);
             }
         };
 
@@ -485,9 +1705,12 @@
         ========================================================= */
         const Input = {
             bind(canvas, getSize) {
+                let dragItem = null, dragDX = 0, dragDY = 0;
+
                 const toLocal = (e) => {
                     const rect = canvas.getBoundingClientRect();
-                    const p = e.touches ? e.touches[0] : e;
+                    const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+                    const p = touch || e;
                     return { x: p.clientX - rect.left, y: p.clientY - rect.top };
                 };
 
@@ -496,11 +1719,62 @@
                     const { x, y } = toLocal(e);
                     const { cw, ch } = getSize();
 
+                    if (Game.mode === 'menu') {
+                        const groupId = UI.hitMenu(x, y);
+                        if (groupId) {
+                            Game.mode = 'playing';
+                            LevelManager.startGroup(cw, ch, groupId);
+                        }
+                        return;
+                    }
+
+                    // 选关下拉菜单打开时，优先处理菜单内的点击
+                    if (UI.levelMenuOpen) {
+                        const hit = UI.hitLevelMenu(x, y);
+                        UI.levelMenuOpen = false;
+                        if (typeof hit === 'number') {
+                            dragItem = null;
+                            LevelManager.goToLevel(cw, ch, hit);
+                        }
+                        return;
+                    }
+
+                    if (UI.hitTitleArrow(x, y)) {
+                        UI.layoutLevelMenu(cw);
+                        UI.levelMenuOpen = true;
+                        return;
+                    }
+
+                    if (UI.hitBack(x, y)) {
+                        dragItem = null;
+                        Game.mode = 'menu';
+                        UI.reset();
+                        return;
+                    }
+
                     if (UI.complete) {
                         if (UI.hitContinue(x, y)) {
+                            dragItem = null;
                             UI.complete = false;
                             LevelManager.nextLevel(cw, ch);
                         }
+                        return;
+                    }
+
+                    const level = LevelManager.currentLevel();
+
+                    // ---- 拖拽交互（目前用于加法/减法关卡）：按下先"拿起"水果，跟随手指移动，松手再判定 ----
+                    if (level && level.interaction === 'drag') {
+                        if (dragItem) return;
+                        const item = ItemManager.itemAt(x, y);
+                        if (!item) return;
+                        item.dragging = true;
+                        // 注意：拖动的这一组水果大小要和目标行完全一致，所以这里不做"拿起变大"的弹出效果，
+                        // 避免拖动前后（以及放下后）出现大小不一致的视觉落差
+                        if (!item.isGroup) item.scale = 1.15;
+                        dragItem = item;
+                        dragDX = x - item.x;
+                        dragDY = y - item.y;
                         return;
                     }
 
@@ -508,32 +1782,100 @@
                     const item = ItemManager.itemAt(x, y);
                     if (!item) return;
 
-                    const targetBox = BoxManager.findAvailableBox();
-                    if (!targetBox) return;
+                    const targetContainer = ContainerManager.findAvailableContainer();
+                    if (!targetContainer) return;
 
                     ItemManager.moveLock = true;
-                    const placed = BoxManager.tryPlace(targetBox, item);
-                    if (!placed) {
+                    const onPlaced = () => {
                         ItemManager.moveLock = false;
-                        return;
-                    }
-
-                    const slot = BoxManager.slotPosition(targetBox, targetBox.items.length - 1);
-                    ItemManager.moveToBoxSlot(item, targetBox, slot, () => {
-                        ItemManager.moveLock = false;
-                        if (BoxManager.isAllComplete()) {
+                        ItemManager.maybeSpawnNextWave();
+                        if (ContainerManager.isAllComplete()) {
                             const sz = getSize();
                             setTimeout(() => UI.showComplete(sz.cw, sz.ch), 260);
                         }
-                    });
+                    };
+
+                    if (item.unitCount && item.unitCount > 1) {
+                        // 水果束：一次点击占 N 个格子，N 个小水果各自飞进各自的格子
+                        const result = ContainerManager.tryPlaceBundle(targetContainer, item);
+                        if (!result) { ItemManager.moveLock = false; return; }
+                        ItemManager.moveBundleToSlots(item, targetContainer, result.startIndex, result.subItems, onPlaced);
+                    } else {
+                        const placed = ContainerManager.tryPlace(targetContainer, item);
+                        if (!placed) { ItemManager.moveLock = false; return; }
+                        const slot = ContainerManager.slotPosition(targetContainer, targetContainer.items.length - 1);
+                        ItemManager.moveToBoxSlot(item, targetContainer, slot, onPlaced);
+                    }
+                };
+
+                const move = (e) => {
+                    if (!dragItem) return;
+                    e.preventDefault();
+                    const { x, y } = toLocal(e);
+                    dragItem.x = x - dragDX;
+                    dragItem.y = y - dragDY;
+                };
+
+                const up = (e) => {
+                    if (!dragItem) return;
+                    const item = dragItem;
+                    dragItem = null;
+                    item.dragging = false;
+
+                    const { cw, ch } = getSize();
+
+                    // 松手时判定是否落在目标格子附近（留出比格子本身大一些的容错范围，方便小朋友拖放）
+                    const targetContainer = ContainerManager.containers.find(c => c.items.length < c.capacity);
+                    let validDrop = false;
+                    if (targetContainer) {
+                        // 大多数容器类型没有 dropZone，就用整个容器的范围判定；
+                        // 减法关卡的 subtractionRow 专门指定了 dropZone（底部承接格子），
+                        // 因为它的容器范围同时包含了顶部行（水果本来就在里面），不能直接用整个容器判定
+                        const dz = targetContainer.dropZone;
+                        const cx = targetContainer.x + (dz ? dz.dx : 0);
+                        const cy = targetContainer.y + (dz ? dz.dy : 0);
+                        const halfW = (dz ? dz.halfW : targetContainer.width / 2) + 30;
+                        const halfH = (dz ? dz.halfH : targetContainer.height / 2) + 40;
+                        if (Math.abs(item.x - cx) <= halfW && Math.abs(item.y - cy) <= halfH) {
+                            validDrop = true;
+                        }
+                    }
+
+                    if (validDrop) {
+                        const onPlaced = () => {
+                            ItemManager.maybeSpawnNextWave();
+                            if (ContainerManager.isAllComplete()) {
+                                setTimeout(() => UI.showComplete(cw, ch), 260);
+                            }
+                        };
+                        if (item.isGroup) {
+                            const result = ContainerManager.tryPlaceGroup(targetContainer, item);
+                            if (result) {
+                                ItemManager.moveGroupToSlots(item, targetContainer, result.startIndex, result.subItems, onPlaced);
+                                return;
+                            }
+                        } else {
+                            const placed = ContainerManager.tryPlace(targetContainer, item);
+                            if (placed) {
+                                const slot = ContainerManager.slotPosition(targetContainer, targetContainer.items.length - 1);
+                                ItemManager.moveToBoxSlot(item, targetContainer, slot, onPlaced);
+                                return;
+                            }
+                        }
+                    }
+
+                    // 没放对地方：飞回原来出现的位置
+                    Animation.add(item, 'x', item.x, item.homeX, 260, null);
+                    Animation.add(item, 'y', item.y, item.homeY, 260, null);
+                    Animation.add(item, 'scale', item.scale, 1, 200, null);
                 };
 
                 canvas.addEventListener('mousedown', down);
-                canvas.addEventListener('mousemove', () => {});
-                window.addEventListener('mouseup', () => {});
+                canvas.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', up);
                 canvas.addEventListener('touchstart', down, { passive: false });
-                canvas.addEventListener('touchmove', () => {}, { passive: false });
-                window.addEventListener('touchend', () => {});
+                canvas.addEventListener('touchmove', move, { passive: false });
+                window.addEventListener('touchend', up);
             }
         };
 
@@ -544,6 +1886,7 @@
             canvas: null,
             cw: 0, ch: 0, dpr: 1,
             lastTime: 0,
+            mode: 'menu',
 
             init() {
                 this.canvas = document.getElementById('gameCanvas');
@@ -551,7 +1894,8 @@
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
                 Input.bind(this.canvas, () => ({ cw: this.cw, ch: this.ch }));
-                LevelManager.load(this.cw, this.ch, 0);
+                UI.layoutBackButton();
+                UI.layoutMenu(this.cw, this.ch);
                 requestAnimationFrame((t) => this.loop(t));
             },
 
@@ -565,7 +1909,8 @@
                 this.canvas.width = this.cw * this.dpr;
                 this.canvas.height = this.ch * this.dpr;
                 Renderer.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-                if (BoxManager.boxes.length) LevelManager.reloadCurrent(this.cw, this.ch);
+                UI.layoutMenu(this.cw, this.ch);
+                if (this.mode === 'playing') LevelManager.reloadCurrent(this.cw, this.ch);
             },
 
             loop(time) {
