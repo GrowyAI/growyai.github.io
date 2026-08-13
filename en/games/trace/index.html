@@ -13,13 +13,13 @@
             height: 100%;
             overflow: hidden;
             background-color: #E0F7FA;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             -webkit-user-select: none;
             user-select: none;
             touch-action: none;
         }
 
-        /* ===== Top: Category Bar ===== */
+        /* ===== 顶部：分类标签（数字/大写/小写/形状），允许横向滑动，为后续新增分类留出空间 ===== */
         #categoryBar {
             position: fixed;
             top: 0;
@@ -41,11 +41,11 @@
             border-radius: 24px;
             box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
             max-width: 100%;
+            min-width: 0; /* flex子项默认min-width:auto，会拒绝收缩到比内容窄，导致max-width和overflow-x都不生效 */
             overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
-            touch-action: pan-x;
+            scrollbar-width: none;
+            touch-action: pan-x; /* 覆盖 body 上的 touch-action: none，允许在这条带上横向滑动 */
         }
         #categoryTabs::-webkit-scrollbar {
             display: none;
@@ -53,25 +53,24 @@
         .tab-btn {
             border: none;
             background: transparent;
-            color: #888;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 14px;
+            color: var(--tab-color, #888);
+            font-size: 21px;
+            font-weight: 800;
+            padding: 7px 14px;
             border-radius: 20px;
             cursor: pointer;
             white-space: nowrap;
             transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
-            flex: 0 0 auto;
         }
         .tab-btn.active {
-            background: #4FC3F7;
+            background: var(--tab-color, #4FC3F7);
             color: #fff;
         }
         .tab-btn:active {
             transform: scale(0.94);
         }
 
-        /* ===== Bottom: Item Strip ===== */
+        /* ===== 底部：条目横向滑动带（一个分类下所有可选项，左右滑动挑选） ===== */
         #itemBar {
             position: fixed;
             bottom: 0;
@@ -90,7 +89,7 @@
             scroll-snap-type: x proximity;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            touch-action: pan-x;
+            touch-action: pan-x; /* 覆盖 body 上的 touch-action: none，允许在这条带上横向滑动 */
         }
         #itemStrip::-webkit-scrollbar {
             display: none;
@@ -154,15 +153,18 @@
     <script>
         "use strict";
 
-        // ========================= Tracing Data =========================
-        // Numbers/Uppercase/Lowercase stroke data comes from Hershey Text vector font.
-        // M: Move to (start new stroke), L: Line to.
+        // ========================= 描红练习：分类数据 =========================
+        // 数字/大写字母/小写字母 用的是公有领域 Hershey Fonts（"Sans 1-stroke" / futural）
+        // 单线矢量字体骨架数据，来自开源移植 hersheytextjs（github.com/techninja/hersheytextjs）。
+        // "d" 里 M 表示抬笔换新的一笔，L 后面的坐标是连续连线。
+        // 形状类走程序生成（generator 对应下面引擎里的生成函数）。
+        // 以后要调整某个字符的比例/新增符号，直接改这里的数字/字符串就行，不用碰下面的引擎逻辑。
         window.TRACE_DATA = {
             categories: [
-                { id: 'numbers', label: '🔢 Numbers', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
-                { id: 'uppercase', label: '🔠 Uppercase', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
-                { id: 'lowercase', label: '🔡 Lowercase', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
-                { id: 'shapes', label: '🔷 Shapes', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] }
+                { id: 'numbers', label: '123', color: '#FF6B6B', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
+                { id: 'uppercase', label: 'ABC', color: '#4FC3F7', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
+                { id: 'lowercase', label: 'abc', color: '#66BB6A', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
+                { id: 'shapes', label: '▲◆', color: '#AB47BC', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] }
             ],
             items: {
                 '0': { type: 'hershey', d: 'M9,1 L6,2 4,5 3,10 3,13 4,18 6,21 9,22 11,22 14,21 16,18 17,13 17,10 16,5 14,2 11,1 9,1' },
@@ -240,6 +242,18 @@
             }
         };
 
+        // 两位数 10~30：不手写21条d字符串，运行时用单字符数据现拼（见 composeDigitsRawStrokes）。
+        // 以后要扩到31~99或者调间距，改一处composeDigitsRawStrokes就行，不用碰这里的数据。
+        (function addTwoDigitNumbers() {
+            const twoDigitIds = [];
+            for (let n = 10; n <= 30; n++) {
+                const id = String(n);
+                window.TRACE_DATA.items[id] = { type: 'hershey-compound', chars: id.split('') };
+                twoDigitIds.push(id);
+            }
+            window.TRACE_DATA.categories[0].items = window.TRACE_DATA.categories[0].items.concat(twoDigitIds);
+        })();
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -259,39 +273,42 @@
         let fishIndex = 0;
         let isDragging = false;
         let isSuccess = false;
-        let strokeTransitionLock = false;
+        let strokeTransitionLock = false; // 一笔写完后短暂停顿，锁住输入，营造"歇一下再写下一笔"的节奏
 
         const FISH_LEAD_POINTS = 40;
         const TOLERANCE_RADIUS = 100;
         const LOOK_AHEAD_POINTS = 35;
 
+        // 屏幕四周留给UI/呼吸浮动/猫鱼emoji的边距，图形/字母的真实可用范围就是屏幕减去这些边距
         const CANVAS_MARGIN = {
-            top: 110,
-            bottom: 130,
-            side: 48
+            top: 110,    // 顶部分类栏
+            bottom: 130, // 底部选图案条（含安全区）
+            side: 48     // 左右留白，防止圆滑鼓起/呼吸浮动贴边被裁切
         };
 
+        // 追逐对配置：每次 startGame 随机选一对，避免孩子只看猫和鱼看腻
         const CHASE_PAIRS = [
-            { hunter: '🐱', prey: '🐟' },
-            { hunter: '🐶', prey: '🦴' },
-            { hunter: '🐦', prey: '🐛' },
-            { hunter: '🐒', prey: '🍌' },
-            { hunter: '🐰', prey: '🥕' },
-            { hunter: '🐮', prey: '🌿' }
+            { hunter: '🐱', prey: '🐟' }, // 猫吃鱼
+            { hunter: '🐶', prey: '🦴' }, // 狗啃骨头
+            { hunter: '🐦', prey: '🐛' }, // 鸟吃虫
+            { hunter: '🐒', prey: '🍌' }, // 猴子吃香蕉
+            { hunter: '🐰', prey: '🥕' }, // 兔子吃胡萝卜
+            { hunter: '🐮', prey: '🌿' }  // 牛吃草
         ];
         let currentPair = CHASE_PAIRS[0];
 
-        let fishWigglePhase = 0;
-        let catBobPhase = 0;
-        let catBreath = 1;
-        const FISH_WIGGLE_SPEED = 3.6;
-        const FISH_WIGGLE_AMOUNT = 0.10;
-        const CAT_BOB_SPEED = 1.8;
-        const CAT_BOB_AMOUNT = 2;
-        const CAT_BREATH_AMOUNT = 0.022;
-        const PREY_FONT_SIZE = 45;
+        // ===== 轻量idle动效（参考"小猫吃鱼"主游戏的wigglePhase/bobPhase/squash思路，做emoji版的简化实现）=====
+        let fishWigglePhase = 0;   // 鱼身摆动相位
+        let catBobPhase = 0;       // 猫上下浮动相位
+        let catBreath = 1;         // 猫呼吸缩放（仅在非拖动时生效，拖动时立即恢复为1，避免和抓取反馈打架）
+        const FISH_WIGGLE_SPEED = 3.6;   // 摆动速度（调小，不那么抢眼）
+        const FISH_WIGGLE_AMOUNT = 0.10; // 摆动幅度（弧度，约6度）
+        const CAT_BOB_SPEED = 1.8;       // 猫浮动速度
+        const CAT_BOB_AMOUNT = 2;        // 猫上下浮动幅度（像素）
+        const CAT_BREATH_AMOUNT = 0.022; // 猫呼吸幅度（2.2%）
+        const PREY_FONT_SIZE = 45;       // 食物图标字号（56px×0.8），比猎手小一圈，方向感更明确
 
-        /* ========================= Effects Manager ========================= */
+        /* ========================= 特效管理 ========================= */
         class EffectsManager {
             constructor() {
                 this.particles = [];
@@ -365,7 +382,7 @@
 
         const effects = new EffectsManager();
 
-        /* ========================= Path Generation ========================= */
+        /* ========================= 轨迹生成 ========================= */
         function getLinePath(p1, p2, step = 2) {
             const path = [];
             const dx = p2.x - p1.x;
@@ -406,6 +423,7 @@
         }
 
         function generateSquarePath(cx, cy, size) {
+            // 起点改为左上角顶点（原来是上边中点），顺时针画一圈回到起点
             const corner1 = { x: cx - size, y: cy - size };
             const corner2 = { x: cx + size, y: cy - size };
             const corner3 = { x: cx + size, y: cy + size };
@@ -442,6 +460,7 @@
             return [].concat(...segments);
         }
 
+        // 通用"N边正多边形"辅助函数，供五边形复用，逻辑和六边形一致，只是顶点数不同
         function generatePolygonPath(cx, cy, size, sides) {
             const vertices = [];
             for (let i = 0; i < sides; i++) {
@@ -460,8 +479,10 @@
             return generatePolygonPath(cx, cy, size, 5);
         }
 
+        // 椭圆：复用circle的参数方程，只是x/y半径不同（不是等半径，所以形状和圆能明显区分）
         function generateEllipsePath(cx, cy, rx, ry, step = 2) {
             const path = [];
+            // 用较大的那个半径估算周长采样密度，保证疏密和其它图形一致
             const approxCircumference = 2 * Math.PI * Math.max(rx, ry);
             const numPoints = Math.floor(approxCircumference / step);
             const startAngle = -Math.PI / 2;
@@ -472,6 +493,7 @@
             return path;
         }
 
+        // 长方形：复用square的四角连线逻辑，只是宽高不同（不是等边，和正方形能明显区分）
         function generateRectPath(cx, cy, halfW, halfH) {
             const corner1 = { x: cx - halfW, y: cy - halfH };
             const corner2 = { x: cx + halfW, y: cy - halfH };
@@ -485,6 +507,8 @@
             return [].concat(l1, l2, l3, l4);
         }
 
+        // 菱形：四个顶点在上下左右，但左右到中心的距离（halfW）和上下到中心的距离（halfH）不同，
+        // 四条边长度依然相等（都是 sqrt(halfW²+halfH²)），符合菱形定义，同时不会退化成"转了45度的正方形"
         function generateRhombusPath(cx, cy, halfW, halfH) {
             const top = { x: cx, y: cy - halfH };
             const right = { x: cx + halfW, y: cy };
@@ -498,6 +522,8 @@
             return [].concat(l1, l2, l3, l4);
         }
 
+        // 五角星：5个外尖角 + 5个内凹角交替连线，一共10个顶点，沿轮廓描边（和其它图形逻辑一致，
+        // 不做"一笔跳过顶点连线"那种画法）。innerRatio 控制内凹角离中心多近，0.382是视觉上比较"标准"的五角星比例
         function generateStarPath(cx, cy, outerR, innerRatio = 0.382) {
             const innerR = outerR * innerRatio;
             const vertices = [];
@@ -514,18 +540,39 @@
             return [].concat(...segments);
         }
 
+        // 心形：不是直线多边形，用经典的心形参数曲线公式直接生成密集点，本身就是圆滑曲线，
+        // 不需要走那套"角度判断+圆角平滑"的逻辑（和circle一样属于解析曲线）
         function generateHeartPath(cx, cy, size, numPoints = 260) {
             const path = [];
             for (let i = 0; i <= numPoints; i++) {
                 const t = (i / numPoints) * 2 * Math.PI;
                 const hx = 16 * Math.pow(Math.sin(t), 3);
                 const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                // 心形公式原始坐标范围大约x:[-16,16] y:[-17,12]，按size/17做缩放，让心形整体和其它图形视觉大小一致
                 path.push({ x: cx + hx * (size / 17), y: cy + hy * (size / 17) });
             }
             return path;
         }
 
-        /* ========================= Path Utils ========================= */
+        /* ========================= 通用路径工具（字母 / 未来汉字 都复用这套） =========================
+         * 设计思路：
+         * 1. 每个字母定义在一个统一的“本地坐标框”里：x 0~100，y 0~130（居中点 50,65）。
+         *    这样比例、笔顺一目了然，改比例只需改数字，不用重新推导三角函数。
+         * 2. 直线用 resamplePolyline 直接给顶点；弧线/曲线先用 denseCubic 采样出密集点，
+         *    再统一丢进 resamplePolyline，按弧长重新等间距采样。
+         *    这保证了不管是直线、贝塞尔曲线还是椭圆弧，点的疏密都一致——
+         *    这正是猫咪追鱼的"最近点搜索"逻辑（LOOK_AHEAD_POINTS）能稳定工作的前提，
+         *    原来的写法（sin 近似造弧）疏密不均，容易导致小猫在弯道处判定跳动。
+         * 3. 以后要加新字母，只需在本地坐标框里描出关键点/控制点，调用同一套函数即可，
+         *    不用为每个字母单独发明一种参数化数学公式。
+         * 4. 以后要加汉字：手写笔画公式几乎不现实（几千个字，笔顺规则复杂）。
+         *    更好的方式是引入开源的 Hanzi Writer 数据（https://chanind.github.io/hanzi-writer/）：
+         *    它为每个汉字提供了标准笔顺的 "medians"（笔画骨架点数组），格式和这里的
+         *    allStrokes（笔画数组 -> 点数组）几乎一致，可以直接喂给 resamplePolyline
+         *    做等距重采样后使用，游戏机制（猫追鱼、涂色、笔画切换）完全不用改。
+         */
+
+        // 按弧长把任意折线/密集采样点重新采成等间距的点（step 像素一个点）
         function resamplePolyline(points, step) {
             if (points.length < 2) return points.slice();
             const cum = [0];
@@ -548,6 +595,7 @@
             return result;
         }
 
+        // Catmull-Rom 插值点：用于把折线变成圆滑曲线
         function catmullRomPoint(p0, p1, p2, p3, t) {
             const t2 = t * t, t3 = t2 * t;
             return {
@@ -556,6 +604,14 @@
             };
         }
 
+        // 保留尖角的圆滑处理：Hershey 字体的曲线部分其实是很多段短直线拼出来的折线，
+        // 直接连线在放大后会看出棱角。这个函数会先判断每个折点的转弯角度——
+        // 转弯很小（比如圆弧上的点）就当作"曲线的一部分"用 Catmull-Rom 抹圆滑；
+        // 转弯很大（比如 A 的尖顶、直线转角）就当作"真正的角"保留原样，不去磨圆它。
+        // 做法：在做曲线插值时，靠近"真角"的那一侧，把切线控制点收缩成该点本身，
+        // 曲线自然贴着角走，不会又鼓出一个不该有的圆边。
+        // smoothPull：控制圆角的"鼓起半径"——1 = 完全按原始邻点画弧（半径最大)，
+        // 数值越小，即使某个点被误判成"曲线的一部分"，鼓起的幅度也越小，误判的代价更低。
         function smoothStroke(points, cornerThresholdDeg = 30, subdivisions = 8, smoothPull = 0.55) {
             const n = points.length;
             if (n < 3) return points.slice();
@@ -578,6 +634,9 @@
                 const p1 = points[i], p2 = points[i + 1];
                 const rawP0 = (i === 0) ? p1 : points[i - 1];
                 const rawP3 = (i + 2 >= n) ? p2 : points[i + 2];
+                // 硬角：控制点直接收缩成自身，曲线贴着角走。
+                // 非硬角：控制点只朝原始邻点方向"拉"smoothPull这么多，而不是直接用邻点本身——
+                // 这样鼓起的弧度半径变小，就算判断错了也不会鼓得太夸张。
                 const p0 = isHardCorner[i] ? p1 : { x: p1.x + (rawP0.x - p1.x) * smoothPull, y: p1.y + (rawP0.y - p1.y) * smoothPull };
                 const p3 = isHardCorner[i + 1] ? p2 : { x: p2.x + (rawP3.x - p2.x) * smoothPull, y: p2.y + (rawP3.y - p2.y) * smoothPull };
                 for (let s = 1; s <= subdivisions; s++) {
@@ -587,7 +646,12 @@
             return result;
         }
 
-        /* ========================= Hershey Vector Font Engine ========================= */
+        /* ========================= Hershey 单线矢量字体：解析与渲染 =========================
+         * 具体每个字符的骨架数据在上面的 TRACE_DATA.items 里，
+         * 这里只保留"怎么画"的引擎逻辑，方便复用于数字/大写/小写任何字符。
+         */
+
+        // 解析 Hershey 的 "d" 字符串：M 开始新的一笔（抬笔），L 后面跟的多组坐标都算连续 lineto
         function parseHersheyStrokes(d) {
             const tokens = d.trim().split(/\s+/);
             const strokes = [];
@@ -602,11 +666,17 @@
             return strokes;
         }
 
-        function generateHersheyLetterStrokes(cx, cy, size, glyph, heightRatio = 1.9) {
-            let rawStrokes = parseHersheyStrokes(glyph.d);
-            if (glyph.order && glyph.order.length === rawStrokes.length) {
-                rawStrokes = glyph.order.map(idx => rawStrokes[idx]);
-            }
+        // 把 Hershey 字形（自带坐标系）按自身的实际包围盒居中、等比缩放到画布上，
+        // 再统一用 resamplePolyline 重采样成等距点——这样不管字形坐标疏密如何，
+        // 猫追鱼的"最近点搜索"逻辑都能稳定工作
+        //
+        // 注意：Hershey 原始数据里"抬笔次数=第几笔"这个顺序，是照绘图仪画着方便的顺序来的，
+        // 不一定符合英文手写教学的笔顺（比如 Z 原始顺序是"斜线→上横→下横"，
+        // 但手写应该是"上横→斜线→下横"）。所以字符数据里可以加一个可选的 order 字段，
+        // 按手写笔顺重新排列这几笔的绘制顺序（只调整顺序，不改变每一笔本身的方向）。
+        // 共用的"居中 + 等比缩放 + 重采样"逻辑：不管 rawStrokes 是单个字符解析出来的，
+        // 还是多个字符拼接出来的复合图形（比如两位数），都走这一条路，保证行为一致。
+        function rawStrokesToCanvas(cx, cy, size, rawStrokes, heightRatio = 1.9) {
             let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
             for (const s of rawStrokes) for (const p of s) {
                 if (p.x < minX) minX = p.x;
@@ -626,11 +696,53 @@
             });
         }
 
-        /* ========================= Stroke Dispatcher ========================= */
+        function generateHersheyLetterStrokes(cx, cy, size, glyph, heightRatio = 1.9) {
+            let rawStrokes = parseHersheyStrokes(glyph.d);
+            if (glyph.order && glyph.order.length === rawStrokes.length) {
+                rawStrokes = glyph.order.map(idx => rawStrokes[idx]);
+            }
+            return rawStrokesToCanvas(cx, cy, size, rawStrokes, heightRatio);
+        }
+
+        // 把多个单字符 Hershey 字形横向拼成一个复合图形（比如两位数 "10"~"30"）。
+        // 每个字符占用的"区域"就是它自己实际墨迹的宽度（而不是一个所有字符共用的固定宽度）——
+        // 之前用统一的固定格子宽度时，"1"这种窄字符自己的墨迹远小于格子，两侧会留出比自身
+        // 还宽的空白，看起来像是孤零零飘在格子一侧、离另一个数字异常远。改成按自身宽度分配
+        // 区域后，每个数字都紧贴自己的实际笔画（这也自然等价于"在自己的区域内居中"，因为
+        // 区域大小就是它本身），字符之间只留一个固定的小间隙（GAP）。
+        // 笔顺按数字从左到右的自然读写顺序（先十位后个位）依次拼接。
+        function composeDigitsRawStrokes(chars) {
+            const GAP = 4.5;
+            let cursorX = 0;
+            const all = [];
+            for (const ch of chars) {
+                const glyph = window.TRACE_DATA.items[ch];
+                let strokes = parseHersheyStrokes(glyph.d);
+                if (glyph.order && glyph.order.length === strokes.length) {
+                    strokes = glyph.order.map(idx => strokes[idx]);
+                }
+                let minX = Infinity, maxX = -Infinity;
+                for (const s of strokes) for (const p of s) {
+                    if (p.x < minX) minX = p.x;
+                    if (p.x > maxX) maxX = p.x;
+                }
+                const shiftX = cursorX - minX;
+                for (const s of strokes) {
+                    all.push(s.map(p => ({ x: p.x + shiftX, y: p.y })));
+                }
+                cursorX += (maxX - minX) + GAP;
+            }
+            return all;
+        }
+
+        /* ========================= 笔画生成入口：从数据条目分派到对应引擎 ========================= */
         function generateStrokesForItem(cx, cy, size, item) {
             if (!item) return [generateCirclePath(cx, cy, size)];
             if (item.type === 'hershey') {
                 return generateHersheyLetterStrokes(cx, cy, size, item);
+            }
+            if (item.type === 'hershey-compound') {
+                return rawStrokesToCanvas(cx, cy, size, composeDigitsRawStrokes(item.chars), item.heightRatio || 1.9);
             }
             if (item.type === 'procedural') {
                 switch (item.generator) {
@@ -641,15 +753,19 @@
                     case 'pentagon': return [generatePentagonPath(cx, cy, size)];
                     case 'star': return [generateStarPath(cx, cy, size)];
                     case 'heart': return [generateHeartPath(cx, cy, size)];
-                    case 'ellipse': return [generateEllipsePath(cx, cy, size * 1.3, size * 0.87)];
-                    case 'rectangle': return [generateRectPath(cx, cy, size * 1.2, size * 0.8)];
-                    case 'rhombus': return [generateRhombusPath(cx, cy, size * 0.75, size * 1.05)];
+                    case 'ellipse': return [generateEllipsePath(cx, cy, size * 1.3, size * 0.87)]; // 3:2 宽高比，和圆形能明显区分
+                    case 'rectangle': return [generateRectPath(cx, cy, size * 1.2, size * 0.8)];   // 3:2 宽高比，和正方形能明显区分
+                    case 'rhombus': return [generateRhombusPath(cx, cy, size * 0.75, size * 1.05)]; // 上下比左右稍长，和正方形转45度能明显区分
                     default: return [generateCirclePath(cx, cy, size)];
                 }
             }
             return [generateCirclePath(cx, cy, size)];
         }
 
+        // 自动量尺寸：不同图形/字母在同一个"size"参数下，实际占用的上下左右范围完全不同
+        // （比如三角形只往下延伸0.5*size，圆形/六边形往四面都是1*size；椭圆左右比上下宽很多）。
+        // 与其给每个图形手动猜一个缩放系数，不如先用一个参考尺寸真的生成一次，量出它实际的
+        // 上下左右四个方向各伸出多远，再反推出"贴着屏幕能显示下的最大size"——这样新加图形也自动适配，不用每次手调。
         function fitSizeToScreen(cx, cy, item, budgetLeft, budgetRight, budgetUp, budgetDown) {
             const TEST_SIZE = 100;
             const testStrokes = generateStrokesForItem(cx, cy, TEST_SIZE, item);
@@ -675,6 +791,7 @@
         function startGame(itemId) {
             currentShape = itemId;
             const cx = width / 2;
+            // 上下留白：分类栏和选图案条各占一块，可用区域取正中间，这样才能真正"尽量占满"而不是拍脑袋往下挪40px
             const cy = CANVAS_MARGIN.top + (height - CANVAS_MARGIN.top - CANVAS_MARGIN.bottom) / 2;
 
             allStrokes = [];
@@ -700,7 +817,7 @@
             effects.ripples = [];
         }
 
-        /* ========================= Input Handling ========================= */
+        /* ========================= 交互逻辑 ========================= */
         function handleInput(x, y, isStart) {
             if (currentPath.length === 0 || isSuccess || strokeTransitionLock) return;
 
@@ -737,13 +854,16 @@
                     catIndex = nextIndex;
                     fishIndex = Math.min(catIndex + FISH_LEAD_POINTS, currentPath.length - 1);
 
+                    // 检查当前笔画是否接近完成
                     if (catIndex >= currentPath.length - 12) {
                         catIndex = currentPath.length - 1;
                         isDragging = false;
                         const strokeEndPos = currentPath[currentPath.length - 1];
                         effects.spawnEffect(strokeEndPos.x, strokeEndPos.y);
 
+                        // 检查是否还有下一笔
                         if (currentStrokeIndex < allStrokes.length - 1) {
+                            // 先停顿一下，让孩子感受到"这一笔写完了"，再出现下一笔
                             strokeTransitionLock = true;
                             setTimeout(() => {
                                 currentStrokeIndex++;
@@ -754,6 +874,7 @@
                                 strokeTransitionLock = false;
                             }, 500);
                         } else {
+                            // 全部完成
                             isSuccess = true;
                             setTimeout(() => {
                                 startGame(currentShape);
@@ -765,11 +886,11 @@
         }
 
         window.addEventListener('touchstart', e => {
-            if (e.target.closest('#itemBar') || e.target.closest('#categoryBar')) return;
+            if (e.target.closest('#itemBar') || e.target.closest('#categoryBar')) return; // 顶部分类条 / 底部选图案条自己处理触摸（横向滑动选择），不走小猫拖拽逻辑
             handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
         }, { passive: false });
         window.addEventListener('touchmove', e => {
-            if (e.target.closest('#itemBar') || e.target.closest('#categoryBar')) return;
+            if (e.target.closest('#itemBar') || e.target.closest('#categoryBar')) return; // 同上：放行，让浏览器原生横向滑动生效
             e.preventDefault();
             if (e.touches.length > 0) handleInput(e.touches[0].clientX, e.touches[0].clientY, false);
         }, { passive: false });
@@ -787,22 +908,24 @@
             startGame(currentShape);
         });
 
-        /* ========================= Render Loop ========================= */
+        /* ========================= 渲染循环 ========================= */
         let lastTime = performance.now();
 
         function loop(timestamp) {
             const dt = Math.min(0.05, (timestamp - lastTime) / 1000);
             lastTime = timestamp;
 
+            // 更新idle动效相位
             fishWigglePhase += dt * FISH_WIGGLE_SPEED;
             catBobPhase += dt * CAT_BOB_SPEED;
+            // 猫呼吸：非拖动时跟随sin波轻微起伏；拖动时快速抚平为1，交给现有的78→84px抓取反馈，两者不打架
             const catBreathTarget = isDragging ? 1 : (1 + Math.sin(catBobPhase) * CAT_BREATH_AMOUNT);
             catBreath += (catBreathTarget - catBreath) * Math.min(1, dt * 10);
 
             ctx.clearRect(0, 0, width, height);
 
             if (allStrokes.length > 0 && currentPath.length > 0) {
-                // 1. Base track dot pattern
+                // 1. 底色轨道点阵（所有笔画）
                 ctx.save();
                 ctx.globalAlpha = 1.0;
                 ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
@@ -816,7 +939,7 @@
                 }
                 ctx.restore();
 
-                // 2. Color tracer path
+                // 2. 彩笔涂色轨迹
                 ctx.save();
                 ctx.globalAlpha = 1.0;
                 ctx.strokeStyle = pathColor;
@@ -824,6 +947,7 @@
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
 
+                // 已完成笔画
                 for (let s = 0; s < currentStrokeIndex; s++) {
                     const stroke = allStrokes[s];
                     if (stroke.length > 0) {
@@ -836,6 +960,7 @@
                     }
                 }
 
+                // 当前笔画（已追踪部分）
                 if (catIndex > 0 && currentPath.length > 0) {
                     ctx.beginPath();
                     ctx.moveTo(currentPath[0].x, currentPath[0].y);
@@ -846,7 +971,7 @@
                 }
                 ctx.restore();
 
-                // 3. Prey
+                // 3. 小鱼（轻微左右扭身摆动，暗示"活着、在往前游"）
                 if (!isSuccess) {
                     const fishPos = currentPath[fishIndex];
                     const fishWiggle = Math.sin(fishWigglePhase) * FISH_WIGGLE_AMOUNT;
@@ -862,11 +987,11 @@
                     ctx.restore();
                 }
 
-                // 4. Visual effects
+                // 4. 特效
                 effects.update(dt);
                 effects.render(ctx);
 
-                // 5. Hunter
+                // 5. 小猫（拖动时微微放大：84px，正常78px；非拖动时轻微呼吸+上下浮动，暗示"想动、等着被拖走"）
                 const catPos = currentPath[catIndex];
                 const catBobY = isDragging ? 0 : Math.sin(catBobPhase) * CAT_BOB_AMOUNT;
                 ctx.save();
@@ -884,12 +1009,13 @@
             requestAnimationFrame(loop);
         }
 
-        /* ========================= UI Controller ========================= */
+        /* ========================= 分类标签栏 / 条目滑动带 ========================= */
         function buildCategoryUI() {
             const tabsEl = document.getElementById('categoryTabs');
             const itemsEl = document.getElementById('itemStrip');
             let activeCategoryId = window.TRACE_DATA.categories[0].id;
 
+            // 高亮当前条目，并把它滚动到滑动带的可见范围内（居中显示）
             function setActiveItem(itemId) {
                 Array.from(itemsEl.children).forEach(btn => {
                     const isActive = btn.dataset.itemId === itemId;
@@ -904,7 +1030,7 @@
                 if (!cat || cat.items.length === 0) {
                     const tip = document.createElement('span');
                     tip.className = 'item-empty-tip';
-                    tip.textContent = 'Coming Soon ✨';
+                    tip.textContent = '敬请期待 ✨';
                     itemsEl.appendChild(tip);
                     return;
                 }
@@ -927,13 +1053,15 @@
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn' + (cat.id === activeCategoryId ? ' active' : '');
                 btn.textContent = cat.label;
+                if (cat.color) btn.style.setProperty('--tab-color', cat.color);
                 btn.onclick = () => {
                     if (cat.id === activeCategoryId) return;
                     activeCategoryId = cat.id;
                     tabsEl.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); // 和底部条目条一样，点了自动居中
                     renderItems(cat.id);
+                    // 切换大类后，直接进入这一类的第一项，不用再多点一次
                     if (cat.items.length > 0) {
                         setActiveItem(cat.items[0]);
                         startGame(cat.items[0]);
