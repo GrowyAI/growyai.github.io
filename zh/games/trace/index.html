@@ -19,7 +19,7 @@
             touch-action: none;
         }
 
-        /* ===== 顶部：分类标签（数字/大写/小写/形状），常驻不换行，只有4个所以不用滚动 ===== */
+        /* ===== 顶部：分类标签（数字/大写/小写/形状），允许横向滑动，为后续新增分类留出空间 ===== */
         #categoryBar {
             position: fixed;
             top: 0;
@@ -40,21 +40,30 @@
             padding: 5px;
             border-radius: 24px;
             box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
+            max-width: 100%;
+            min-width: 0; /* flex子项默认min-width:auto，会拒绝收缩到比内容窄，导致max-width和overflow-x都不生效 */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            touch-action: pan-x; /* 覆盖 body 上的 touch-action: none，允许在这条带上横向滑动 */
+        }
+        #categoryTabs::-webkit-scrollbar {
+            display: none;
         }
         .tab-btn {
             border: none;
             background: transparent;
-            color: #888;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 14px;
+            color: var(--tab-color, #888);
+            font-size: 21px;
+            font-weight: 800;
+            padding: 7px 14px;
             border-radius: 20px;
             cursor: pointer;
             white-space: nowrap;
             transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
         }
         .tab-btn.active {
-            background: #4FC3F7;
+            background: var(--tab-color, #4FC3F7);
             color: #fff;
         }
         .tab-btn:active {
@@ -152,10 +161,10 @@
         // 以后要调整某个字符的比例/新增符号，直接改这里的数字/字符串就行，不用碰下面的引擎逻辑。
         window.TRACE_DATA = {
             categories: [
-                { id: 'numbers', label: '🔢 数字', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
-                { id: 'uppercase', label: '🔠 大写字母', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
-                { id: 'lowercase', label: '🔡 小写字母', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
-                { id: 'shapes', label: '🔷 形状', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] }
+                { id: 'numbers', label: '123', color: '#FF6B6B', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
+                { id: 'uppercase', label: 'ABC', color: '#4FC3F7', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
+                { id: 'lowercase', label: 'abc', color: '#66BB6A', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
+                { id: 'shapes', label: '▲◆', color: '#AB47BC', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] }
             ],
             items: {
                 '0': { type: 'hershey', d: 'M9,1 L6,2 4,5 3,10 3,13 4,18 6,21 9,22 11,22 14,21 16,18 17,13 17,10 16,5 14,2 11,1 9,1' },
@@ -232,6 +241,18 @@
                 rhombus: { type: 'procedural', label: '♦️', generator: 'rhombus' }
             }
         };
+
+        // 两位数 10~30：不手写21条d字符串，运行时用单字符数据现拼（见 composeDigitsRawStrokes）。
+        // 以后要扩到31~99或者调间距，改一处composeDigitsRawStrokes就行，不用碰这里的数据。
+        (function addTwoDigitNumbers() {
+            const twoDigitIds = [];
+            for (let n = 10; n <= 30; n++) {
+                const id = String(n);
+                window.TRACE_DATA.items[id] = { type: 'hershey-compound', chars: id.split('') };
+                twoDigitIds.push(id);
+            }
+            window.TRACE_DATA.categories[0].items = window.TRACE_DATA.categories[0].items.concat(twoDigitIds);
+        })();
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -653,11 +674,9 @@
         // 不一定符合英文手写教学的笔顺（比如 Z 原始顺序是"斜线→上横→下横"，
         // 但手写应该是"上横→斜线→下横"）。所以字符数据里可以加一个可选的 order 字段，
         // 按手写笔顺重新排列这几笔的绘制顺序（只调整顺序，不改变每一笔本身的方向）。
-        function generateHersheyLetterStrokes(cx, cy, size, glyph, heightRatio = 1.9) {
-            let rawStrokes = parseHersheyStrokes(glyph.d);
-            if (glyph.order && glyph.order.length === rawStrokes.length) {
-                rawStrokes = glyph.order.map(idx => rawStrokes[idx]);
-            }
+        // 共用的"居中 + 等比缩放 + 重采样"逻辑：不管 rawStrokes 是单个字符解析出来的，
+        // 还是多个字符拼接出来的复合图形（比如两位数），都走这一条路，保证行为一致。
+        function rawStrokesToCanvas(cx, cy, size, rawStrokes, heightRatio = 1.9) {
             let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
             for (const s of rawStrokes) for (const p of s) {
                 if (p.x < minX) minX = p.x;
@@ -677,11 +696,53 @@
             });
         }
 
+        function generateHersheyLetterStrokes(cx, cy, size, glyph, heightRatio = 1.9) {
+            let rawStrokes = parseHersheyStrokes(glyph.d);
+            if (glyph.order && glyph.order.length === rawStrokes.length) {
+                rawStrokes = glyph.order.map(idx => rawStrokes[idx]);
+            }
+            return rawStrokesToCanvas(cx, cy, size, rawStrokes, heightRatio);
+        }
+
+        // 把多个单字符 Hershey 字形横向拼成一个复合图形（比如两位数 "10"~"30"）。
+        // 每个字符占用的"区域"就是它自己实际墨迹的宽度（而不是一个所有字符共用的固定宽度）——
+        // 之前用统一的固定格子宽度时，"1"这种窄字符自己的墨迹远小于格子，两侧会留出比自身
+        // 还宽的空白，看起来像是孤零零飘在格子一侧、离另一个数字异常远。改成按自身宽度分配
+        // 区域后，每个数字都紧贴自己的实际笔画（这也自然等价于"在自己的区域内居中"，因为
+        // 区域大小就是它本身），字符之间只留一个固定的小间隙（GAP）。
+        // 笔顺按数字从左到右的自然读写顺序（先十位后个位）依次拼接。
+        function composeDigitsRawStrokes(chars) {
+            const GAP = 4.5;
+            let cursorX = 0;
+            const all = [];
+            for (const ch of chars) {
+                const glyph = window.TRACE_DATA.items[ch];
+                let strokes = parseHersheyStrokes(glyph.d);
+                if (glyph.order && glyph.order.length === strokes.length) {
+                    strokes = glyph.order.map(idx => strokes[idx]);
+                }
+                let minX = Infinity, maxX = -Infinity;
+                for (const s of strokes) for (const p of s) {
+                    if (p.x < minX) minX = p.x;
+                    if (p.x > maxX) maxX = p.x;
+                }
+                const shiftX = cursorX - minX;
+                for (const s of strokes) {
+                    all.push(s.map(p => ({ x: p.x + shiftX, y: p.y })));
+                }
+                cursorX += (maxX - minX) + GAP;
+            }
+            return all;
+        }
+
         /* ========================= 笔画生成入口：从数据条目分派到对应引擎 ========================= */
         function generateStrokesForItem(cx, cy, size, item) {
             if (!item) return [generateCirclePath(cx, cy, size)];
             if (item.type === 'hershey') {
                 return generateHersheyLetterStrokes(cx, cy, size, item);
+            }
+            if (item.type === 'hershey-compound') {
+                return rawStrokesToCanvas(cx, cy, size, composeDigitsRawStrokes(item.chars), item.heightRatio || 1.9);
             }
             if (item.type === 'procedural') {
                 switch (item.generator) {
@@ -825,11 +886,11 @@
         }
 
         window.addEventListener('touchstart', e => {
-            if (e.target.closest('#itemBar')) return; // 底部选图案条自己处理触摸（横向滑动选择），不走小猫拖拽逻辑
+            if (e.target.closest('#itemBar') || e.target.closest('#categoryBar')) return; // 顶部分类条 / 底部选图案条自己处理触摸（横向滑动选择），不走小猫拖拽逻辑
             handleInput(e.touches[0].clientX, e.touches[0].clientY, true);
         }, { passive: false });
         window.addEventListener('touchmove', e => {
-            if (e.target.closest('#itemBar')) return; // 同上：放行，让浏览器原生横向滑动生效
+            if (e.target.closest('#itemBar') || e.target.closest('#categoryBar')) return; // 同上：放行，让浏览器原生横向滑动生效
             e.preventDefault();
             if (e.touches.length > 0) handleInput(e.touches[0].clientX, e.touches[0].clientY, false);
         }, { passive: false });
@@ -992,11 +1053,13 @@
                 const btn = document.createElement('button');
                 btn.className = 'tab-btn' + (cat.id === activeCategoryId ? ' active' : '');
                 btn.textContent = cat.label;
+                if (cat.color) btn.style.setProperty('--tab-color', cat.color);
                 btn.onclick = () => {
                     if (cat.id === activeCategoryId) return;
                     activeCategoryId = cat.id;
                     tabsEl.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
+                    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); // 和底部条目条一样，点了自动居中
                     renderItems(cat.id);
                     // 切换大类后，直接进入这一类的第一项，不用再多点一次
                     if (cat.items.length > 0) {
