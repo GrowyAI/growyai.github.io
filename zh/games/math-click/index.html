@@ -23,12 +23,258 @@
         background: #eaf7ff;
         touch-action: none;
     }
+    /* 设置入口按钮：跟"返回菜单"按钮同一种浅色风格，避免视觉割裂 */
+    .settings-toggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: rgba(43,88,118,0.15);
+        color: #2b5876;
+        font-size: 18px;
+        line-height: 36px;
+        text-align: center;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+    /* 遮罩层 */
+    .settings-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .settings-overlay.show {
+        display: flex;
+    }
+
+    /* 弹窗卡片 */
+    .settings-panel {
+        background: #fff;
+        border-radius: 28px;
+        padding: 24px 22px 28px;
+        width: 90%;
+        max-width: 360px;
+        box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    /* 头部 */
+    .settings-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .settings-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2b5876;
+    }
+    .settings-close {
+        background: #f0ebe4;
+        border: none;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    /* 每个设置组 */
+    .setting-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .setting-label {
+        font-size: 15px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    /* 选项按钮行 */
+    .option-row {
+        display: flex;
+        gap: 10px;
+    }
+    .option-btn {
+        flex: 1;
+        padding: 10px 14px;
+        border: 2px solid #e0dad4;
+        border-radius: 24px;
+        background: #fcfaf8;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        text-align: center;
+        color: #555;
+        transition: all 0.15s;
+    }
+    .option-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* 选中状态 */
+    .option-btn.active {
+        border-color: #b8d4a8;
+        background: #f1f8ea;
+        color: #1a1a1a;
+        font-weight: 700;
+    }
 </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+    <button id="settingsToggle" class="settings-toggle" aria-label="设置">⚙️</button>
+    <div id="settingsOverlay" class="settings-overlay">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <div class="settings-title">设置</div>
+                <button id="settingsClose" class="settings-close">✕</button>
+            </div>
+            <div class="setting-group">
+                <div class="setting-label">语言 Language</div>
+                <div class="option-row">
+                    <button id="optLangZh" class="option-btn">中文</button>
+                    <button id="optLangEn" class="option-btn">EN</button>
+                </div>
+            </div>
+            <div class="setting-group">
+                <div class="setting-label">声音 Sound</div>
+                <div class="option-row">
+                    <button id="optSoundOn" class="option-btn">🔊 开启</button>
+                    <button id="optSoundOff" class="option-btn">🔇 静音</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         'use strict';
+
+        /* =========================================================
+           中英文切换
+        ========================================================= */
+        let isEnglish = false;
+
+        const translations = {
+            selectMode: { zh: '选择模式', en: 'Select Mode' },
+            menu: { zh: '菜单', en: 'Menu' },
+            continueBtn: { zh: '继续', en: 'Continue' }
+        };
+
+        function t(key) {
+            return translations[key][isEnglish ? 'en' : 'zh'];
+        }
+
+        // 分组/关卡标题：有 titleEn 且当前是英文就用 titleEn，否则用中文原文
+        function groupTitle(g) {
+            return (isEnglish && g.titleEn) ? g.titleEn : g.title;
+        }
+        function levelTitle(level) {
+            return (isEnglish && level.titleEn) ? level.titleEn : level.title;
+        }
+
+        function setLanguage(en) {
+            isEnglish = en;
+            // 菜单按钮 / 选关下拉菜单的文字是布局时就存好的，切换语言后需要重新布局才能刷新
+            if (Game.mode === 'menu') UI.layoutMenu(Game.cw, Game.ch);
+            if (UI.levelMenuOpen) UI.layoutLevelMenu(Game.cw);
+            document.getElementById('optLangZh').classList.toggle('active', !isEnglish);
+            document.getElementById('optLangEn').classList.toggle('active', isEnglish);
+        }
+
+        /* =========================================================
+           发音引擎（数字 & 算式朗读，中英文跟随语言设置）
+        ========================================================= */
+        function numToZh(n) {
+            const map = ['零','一','二','三','四','五','六','七','八','九','十'];
+            if (n <= 10) return map[n];
+            if (n < 20) return '十' + (n % 10 ? map[n % 10] : '');
+            if (n < 100) {
+                const tens = Math.floor(n / 10);
+                const ones = n % 10;
+                return map[tens] + '十' + (ones ? map[ones] : '');
+            }
+            return String(n);
+        }
+        function numToEn(n) {
+            const map = ['zero','one','two','three','four','five','six','seven','eight','nine','ten',
+                'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+            return n <= 20 ? map[n] : String(n);
+        }
+
+        const Sound = {
+            enabled: true,
+            _cachedVoices: { zh: null, en: null },
+
+            getVoice(lang) {
+                if (!window.speechSynthesis) return null;
+                const voices = speechSynthesis.getVoices();
+                if (!voices.length) return null;
+                if (this._cachedVoices[lang]) return this._cachedVoices[lang];
+                let voice;
+                if (lang === 'en') {
+                    voice = voices.find(v => v.lang.startsWith('en-US')) ||
+                            voices.find(v => v.lang.startsWith('en')) || null;
+                } else {
+                    voice = voices.find(v => v.lang.startsWith('zh-CN')) ||
+                            voices.find(v => v.lang.startsWith('zh')) || null;
+                }
+                this._cachedVoices[lang] = voice;
+                return voice;
+            },
+
+            speak(text, lang) {
+                if (!this.enabled || !text || !window.speechSynthesis) return;
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(String(text));
+                u.lang = lang === 'en' ? 'en-US' : 'zh-CN';
+                u.rate = 0.85;
+                u.pitch = 1.1;
+                const voice = this.getVoice(lang);
+                if (voice) u.voice = voice;
+                speechSynthesis.speak(u);
+            },
+
+            // 数字发音：放入水果时读出当前容器展示的数字
+            speakNumber(n) {
+                if (n === undefined || n === null) return;
+                const lang = isEnglish ? 'en' : 'zh';
+                const text = isEnglish ? numToEn(n) : numToZh(n);
+                this.speak(text, lang);
+            },
+
+            // 算式发音：关卡完成时读出完整加法/减法算式
+            speakFormula(a, op, b, result) {
+                if (isEnglish) {
+                    const opWord = op === '+' ? 'plus' : 'minus';
+                    this.speak(`${numToEn(a)} ${opWord} ${numToEn(b)} equals ${numToEn(result)}`, 'en');
+                } else {
+                    const opZh = op === '+' ? '加' : '减';
+                    this.speak(`${numToZh(a)}${opZh}${numToZh(b)}等于${numToZh(result)}`, 'zh');
+                }
+            },
+
+            toggle() {
+                this.enabled = !this.enabled;
+                if (!this.enabled && window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+                return this.enabled;
+            }
+        };
 
         /* =========================================================
            工具函数
@@ -718,70 +964,70 @@
 
             // 模式分组：用于开局的"选择模式"菜单，同一组内用"继续"按钮循环
             groups: [
-                { id: 'digits', title: '认识 1-10' },
-                { id: 'seq20', title: '认识 20 以内' },
-                { id: 'hundred', title: '认识 100 以内' },
-                { id: 'addition', title: '10以内加法' },
-                { id: 'subtraction', title: '10以内减法' }
+                { id: 'digits', title: '认识 1-10', titleEn: 'Numbers 1-10' },
+                { id: 'seq20', title: '认识 20 以内', titleEn: 'Up to 20' },
+                { id: 'hundred', title: '认识 100 以内', titleEn: 'Up to 100' },
+                { id: 'addition', title: '10以内加法', titleEn: 'Addition to 10' },
+                { id: 'subtraction', title: '10以内减法', titleEn: 'Subtraction to 10' }
             ],
 
             levels: [
-                { id: 1, group: 'digits', title: '认识 1 · 2', boxNumbers: [1, 2], itemType: 'apple', containerType: 'plate' },
-                { id: 2, group: 'digits', title: '认识 3 · 4', boxNumbers: [3, 4], itemType: 'apple', containerType: 'plate' },
-                { id: 3, group: 'digits', title: '认识 5 · 6', boxNumbers: [5, 6], itemType: 'apple', containerType: 'plate' },
-                { id: 4, group: 'digits', title: '认识 7 · 8', boxNumbers: [7, 8], itemType: 'apple', containerType: 'plate' },
-                { id: 5, group: 'digits', title: '认识 9 · 10', boxNumbers: [9, 10], itemType: 'apple', containerType: 'plate' },
+                { id: 1, group: 'digits', title: '认识 1 · 2', titleEn: 'Numbers 1 · 2', boxNumbers: [1, 2], itemType: 'apple', containerType: 'plate' },
+                { id: 2, group: 'digits', title: '认识 3 · 4', titleEn: 'Numbers 3 · 4', boxNumbers: [3, 4], itemType: 'apple', containerType: 'plate' },
+                { id: 3, group: 'digits', title: '认识 5 · 6', titleEn: 'Numbers 5 · 6', boxNumbers: [5, 6], itemType: 'apple', containerType: 'plate' },
+                { id: 4, group: 'digits', title: '认识 7 · 8', titleEn: 'Numbers 7 · 8', boxNumbers: [7, 8], itemType: 'apple', containerType: 'plate' },
+                { id: 5, group: 'digits', title: '认识 9 · 10', titleEn: 'Numbers 9 · 10', boxNumbers: [9, 10], itemType: 'apple', containerType: 'plate' },
 
                 // ---- 以下是"认识20以内"分组：新架构的演示关卡 ----
 
                 // 数数模式：屏幕上先摆好10个水果（代表已经会数的10个），
                 // 数字从10开始，每点一个新水果就往后数一个，一直数到20
                 {
-                    id: 6, group: 'seq20', title: '数一数：10 到 20',
+                    id: 6, group: 'seq20', title: '数一数：10 到 20', titleEn: 'Count: 10 to 20',
                     boxNumbers: [10], labelStart: [11], prefillCount: [10],
                     itemType: 'apple', containerType: 'grid', gridCols: 5
                 },
 
                 // ---- count by X 到 20：一次点一"束"，数字一次跳 N ----
                 {
-                    id: 8, group: 'seq20', title: '1个1个数，数到20',
+                    id: 8, group: 'seq20', title: '1个1个数，数到20', titleEn: 'Count by 1s to 20',
                     boxNumbers: [20], labelStart: [1], bundleSize: 1,
                     itemType: 'apple', containerType: 'grid', gridCols: 5
                 },
                 {
-                    id: 9, group: 'seq20', title: '2个2个数，数到20',
+                    id: 9, group: 'seq20', title: '2个2个数，数到20', titleEn: 'Count by 2s to 20',
                     boxNumbers: [20], labelStart: [1], bundleSize: 2,
                     itemType: 'apple', containerType: 'grid', gridCols: 5
                 },
                 {
-                    id: 10, group: 'seq20', title: '5个5个数，数到20',
+                    id: 10, group: 'seq20', title: '5个5个数，数到20', titleEn: 'Count by 5s to 20',
                     boxNumbers: [20], labelStart: [1], bundleSize: 5,
                     itemType: 'apple', containerType: 'grid', gridCols: 5
                 },
                 {
-                    id: 11, group: 'seq20', title: '10个10个数，数到20',
+                    id: 11, group: 'seq20', title: '10个10个数，数到20', titleEn: 'Count by 10s to 20',
                     boxNumbers: [20], labelStart: [1], bundleSize: 10,
                     itemType: 'apple', containerType: 'grid', gridCols: 5
                 },
 
                 // ---- count by X 到 100：一行10个，格子和水果会自动缩小以放得下 ----
                 {
-                    id: 15, group: 'hundred', title: '10个10个数，数到100',
+                    id: 15, group: 'hundred', title: '10个10个数，数到100', titleEn: 'Count by 10s to 100',
                     boxNumbers: [100], labelStart: [1], bundleSize: 10,
                     itemType: 'apple', containerType: 'grid', gridCols: 10
                 },
                 {
-                    id: 12, group: 'hundred', title: '1个1个数，数到100',
+                    id: 12, group: 'hundred', title: '1个1个数，数到100', titleEn: 'Count by 1s to 100',
                     boxNumbers: [100], labelStart: [1], bundleSize: 1,
                     itemType: 'apple', containerType: 'grid', gridCols: 10
                 },
                 {
-                    id: 13, group: 'hundred', title: '2个2个数，数到100',
+                    id: 13, group: 'hundred', title: '2个2个数，数到100', titleEn: 'Count by 2s to 100',
                     boxNumbers: [100], labelStart: [1], bundleSize: 2,
                     itemType: 'apple', containerType: 'grid', gridCols: 10
                 },
                 {
-                    id: 14, group: 'hundred', title: '5个5个数，数到100',
+                    id: 14, group: 'hundred', title: '5个5个数，数到100', titleEn: 'Count by 5s to 100',
                     boxNumbers: [100], labelStart: [1], bundleSize: 5,
                     itemType: 'apple', containerType: 'grid', gridCols: 10
                 }
@@ -800,6 +1046,7 @@
                         id: nextId++,
                         group: 'addition',
                         title: `${a}+${b}`,
+                        titleEn: `${a} + ${b}`,
                         itemType: 'apple',
                         containerType: 'equationRow',
                         interaction: 'drag',
@@ -822,6 +1069,7 @@
                         id: nextId++,
                         group: 'subtraction',
                         title: `${a}－${b}`,
+                        titleEn: `${a} - ${b}`,
                         itemType: 'apple',
                         containerType: 'subtractionRow',
                         interaction: 'drag',
@@ -861,6 +1109,19 @@
                 }
             }
         };
+
+        // 放置水果时的发音策略：
+        //   - 加减法算式行（equationRow / subtractionRow）：放置过程中不发音，只在整个算式完成时读一次完整算式
+        //   - "数数"模式（labelMode === 'count'，比如11数到20、按束数到100）：每放一个/一束都读出当前数到几，念的就是数数过程
+        //   - "认识数字"模式（比如认识3，盘子容量=3）：放置过程中不重复读同一个数字，只在盘子被放满的那一刻读一次目标数字
+        function speakOnPlace(container) {
+            if (container.type === 'equationRow' || container.type === 'subtractionRow') return;
+            if (container.labelMode === 'count') {
+                Sound.speakNumber(container.displayValue);
+            } else if (container.items.length >= container.capacity) {
+                Sound.speakNumber(container.value);
+            }
+        }
 
         /* =========================================================
            ContainerManager 模块
@@ -958,6 +1219,7 @@
                 } else {
                     Animation.pulse(container, 'numberScale', 1, 1.12, 220);
                 }
+                speakOnPlace(container);
                 return true;
             },
 
@@ -995,6 +1257,7 @@
                 } else {
                     Animation.pulse(container, 'numberScale', 1, 1.12, 220);
                 }
+                speakOnPlace(container);
                 return { startIndex, subItems };
             },
 
@@ -1031,6 +1294,7 @@
                 } else {
                     Animation.pulse(container, 'numberScale', 1, 1.12, 220);
                 }
+                // 加法拖组：放置过程中不发音，完成后统一在 showComplete 里读整个算式
                 return { startIndex, subItems };
             },
 
@@ -1338,7 +1602,7 @@
                     this.groupLevels.forEach((lv, i) => {
                         if (!seen.has(lv.sum)) {
                             seen.add(lv.sum);
-                            entries.push({ index: i, title: `和为 ${lv.sum}`, sum: lv.sum });
+                            entries.push({ index: i, title: isEnglish ? `Sum = ${lv.sum}` : `和为 ${lv.sum}`, sum: lv.sum });
                         }
                     });
                     return entries;
@@ -1350,12 +1614,12 @@
                     this.groupLevels.forEach((lv, i) => {
                         if (!seen.has(lv.a)) {
                             seen.add(lv.a);
-                            entries.push({ index: i, title: `被减数为 ${lv.a}`, a: lv.a });
+                            entries.push({ index: i, title: isEnglish ? `Minuend = ${lv.a}` : `被减数为 ${lv.a}`, a: lv.a });
                         }
                     });
                     return entries;
                 }
-                return this.groupLevels.map((lv, i) => ({ index: i, title: lv.title }));
+                return this.groupLevels.map((lv, i) => ({ index: i, title: levelTitle(lv) }));
             },
 
             // 判断下拉菜单里的某一项是否对应当前关卡
@@ -1441,14 +1705,14 @@
 
             // ---- 开局的"选择模式"菜单 ----
             layoutMenu(cw, ch) {
-                const btnW = Math.min(280, cw - 60);
-                const btnH = 76;
-                const gap = 24;
+                const btnW = Math.min(240, cw - 70);
+                const btnH = 58;
+                const gap = 16;
                 const groups = Config.groups;
                 const totalH = groups.length * btnH + (groups.length - 1) * gap;
                 let y = ch / 2 - totalH / 2;
                 this.menuButtons = groups.map(g => {
-                    const btn = { id: g.id, title: g.title, x: cw / 2 - btnW / 2, y, w: btnW, h: btnH };
+                    const btn = { id: g.id, title: groupTitle(g), x: cw / 2 - btnW / 2, y, w: btnW, h: btnH };
                     y += btnH + gap;
                     return btn;
                 });
@@ -1458,17 +1722,17 @@
                 ctx.save();
                 ctx.fillStyle = '#eaf7ff';
                 ctx.fillRect(0, 0, cw, ch);
-                ctx.font = 'bold 26px sans-serif';
+                ctx.font = 'bold 22px sans-serif';
                 ctx.fillStyle = '#2b5876';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('选择模式', cw / 2, this.menuButtons[0] ? this.menuButtons[0].y - 60 : ch / 2 - 120);
+                ctx.fillText(t('selectMode'), cw / 2, this.menuButtons[0] ? this.menuButtons[0].y - 46 : ch / 2 - 100);
 
                 this.menuButtons.forEach(b => {
-                    ctx.fillStyle = '#43a047';
-                    roundRect(ctx, b.x, b.y, b.w, b.h, 24);
+                    ctx.fillStyle = '#6fae6a';
+                    roundRect(ctx, b.x, b.y, b.w, b.h, 18);
                     ctx.fill();
-                    ctx.font = 'bold 26px sans-serif';
+                    ctx.font = 'bold 19px sans-serif';
                     ctx.fillStyle = '#fff';
                     ctx.fillText(b.title, b.x + b.w / 2, b.y + b.h / 2);
                 });
@@ -1495,7 +1759,7 @@
                 ctx.fillStyle = '#2b5876';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('菜单', b.x + b.w / 2, b.y + b.h / 2 + 1);
+                ctx.fillText(t('menu'), b.x + b.w / 2, b.y + b.h / 2 + 1);
                 ctx.restore();
             },
 
@@ -1509,7 +1773,17 @@
                 this.complete = true;
                 this.continueVisible = false;
                 // 底部居中的"继续"按钮，留出安全边距
-                this.continueBtn = { x: cw / 2 - 95, y: ch - 66 - 34, w: 190, h: 66 };
+                this.continueBtn = { x: cw / 2 - 78, y: ch - 52 - 32, w: 156, h: 52 };
+
+                // 🔊 关卡完成：只有加/减法关卡在这里读一次完整算式；
+                // 数数类关卡（11-20、按束数到100等）在放置过程中已经逐个数过了，这里不重复播报
+                const level = LevelManager.currentLevel();
+                if (level.containerType === 'equationRow') {
+                    Sound.speakFormula(level.a, '+', level.b, level.sum);
+                } else if (level.containerType === 'subtractionRow') {
+                    Sound.speakFormula(level.a, '-', level.b, level.c);
+                }
+
                 // 过2秒再显示按钮，方便先看清后面数一数的画面
                 if (this.continueTimer) clearTimeout(this.continueTimer);
                 this.continueTimer = setTimeout(() => {
@@ -1526,10 +1800,10 @@
                 ctx.fillStyle = '#2b5876';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
-                ctx.fillText(level.title, cw / 2, 10);
+                ctx.fillText(levelTitle(level), cw / 2, 10);
 
                 // 标题右侧一个低调的小箭头，供家长展开"选关"菜单（触控区域比图形本身大一些）
-                const textW = ctx.measureText(level.title).width;
+                const textW = ctx.measureText(levelTitle(level)).width;
                 const arrowCx = cw / 2 + textW / 2 + 18;
                 const arrowCy = 10 + 11;
                 this.titleArrowBtn = { x: arrowCx - 16, y: 2, w: 32, h: 28 };
@@ -1553,8 +1827,8 @@
             // ---- 选关下拉菜单（低调，主要给家长用）----
             layoutLevelMenu(cw) {
                 const entries = LevelManager.menuEntries();
-                const rowH = 44;
-                const menuW = Math.min(260, cw - 40);
+                const rowH = 38;
+                const menuW = Math.min(230, cw - 40);
                 const top = 44;
                 this.levelMenuItems = entries.map((entry, i) => ({
                     index: entry.index,
@@ -1584,15 +1858,15 @@
                 this.levelMenuItems.forEach((it, i) => {
                     const isCur = it.isCurrent;
                     if (isCur) {
-                        ctx.fillStyle = 'rgba(67,160,71,0.14)';
+                        ctx.fillStyle = 'rgba(111,174,106,0.14)';
                         roundRect(ctx, it.x + 4, it.y + 3, it.w - 8, it.h - 6, 10);
                         ctx.fill();
                     }
-                    ctx.font = isCur ? 'bold 18px sans-serif' : '16px sans-serif';
-                    ctx.fillStyle = isCur ? '#43a047' : '#2b5876';
+                    ctx.font = isCur ? 'bold 16px sans-serif' : '15px sans-serif';
+                    ctx.fillStyle = isCur ? '#6fae6a' : '#2b5876';
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(it.title, it.x + 18, it.y + it.h / 2 + 1);
+                    ctx.fillText(it.title, it.x + 16, it.y + it.h / 2 + 1);
                     if (i < this.levelMenuItems.length - 1) {
                         ctx.strokeStyle = '#eef4f7';
                         ctx.lineWidth = 1;
@@ -1630,14 +1904,14 @@
                 ctx.save();
                 ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
                 ctx.scale(this.celebrateScale, this.celebrateScale);
-                ctx.fillStyle = '#43a047';
-                roundRect(ctx, -b.w / 2, -b.h / 2, b.w, b.h, 33);
+                ctx.fillStyle = '#6fae6a';
+                roundRect(ctx, -b.w / 2, -b.h / 2, b.w, b.h, 26);
                 ctx.fill();
-                ctx.font = 'bold 26px sans-serif';
+                ctx.font = 'bold 21px sans-serif';
                 ctx.fillStyle = '#fff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('继续', 0, 0);
+                ctx.fillText(t('continueBtn'), 0, 0);
                 ctx.restore();
             },
 
@@ -1922,7 +2196,8 @@
             }
         };
 
-        Game.init();
-    </script>
-</body>
-</html>
+        // 齿轮按钮：打开居中的设置弹窗（语言 + 声音，都是"两个选项二选一"的直观样式）
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const optLangZh = document.getElementById('optLangZh');
+        const optLangEn = document.getElementById('optLangEn');
+        const optSoun
