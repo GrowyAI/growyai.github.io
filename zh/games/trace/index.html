@@ -136,6 +136,20 @@
             left: 0;
             z-index: 1;
         }
+        #hanziLoading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.72);
+            color: #fff;
+            font-size: 15px;
+            padding: 10px 18px;
+            border-radius: 20px;
+            display: none;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -149,7 +163,12 @@
     </div>
 
     <canvas id="gameCanvas"></canvas>
+    <div id="hanziLoading">加载中…</div>
 
+    <!-- 汉字笔画数据放在单独的文件里，脚本抓完数据直接覆盖这个文件就行，不用碰下面的逻辑代码。
+         用 <script src> 而不是 fetch(json)，是因为这样直接双击打开 html（file:// 协议）也能用，
+         不会被浏览器的本地文件 CORS 限制卡住。 -->
+    <script src="hanzi-data.js"></script>
     <script>
         "use strict";
 
@@ -164,7 +183,76 @@
                 { id: 'numbers', label: '123', color: '#FF6B6B', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
                 { id: 'uppercase', label: 'ABC', color: '#4FC3F7', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
                 { id: 'lowercase', label: 'abc', color: '#66BB6A', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
-                { id: 'shapes', label: '▲◆', color: '#AB47BC', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] }
+                { id: 'shapes', label: '▲◆', color: '#AB47BC', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] },
+                // 汉字主题分类：items 里每一项是 { id: '字', icon }，icon 是这个字专属的追逐动效图标
+                // （追逐动效里被追的那个固定显示"当前第几笔"的数字，跟这个字是什么无关，
+                // 所以每个字只需要配一个 icon，不需要一对）。按钮本身永远显示汉字本身，不受影响。
+                // 分类 id 只要以 'hanzi' 开头，就会被 registerHanziData() 自动识别、按需接笔画数据，
+                // 不用改任何引擎代码；数据没有的字会在浏览器里自动从 CDN 现拉。
+                // 数字：icon 用带圈数字，跟"这个字表示几"对应得上。
+                {
+                    id: 'hanzi-numbers', label: '数字', color: '#42A5F5',
+                    items: [
+                        { id: '一', icon: '①' },
+                        { id: '二', icon: '②' },
+                        { id: '三', icon: '③' },
+                        { id: '四', icon: '④' },
+                        { id: '五', icon: '⑤' },
+                        { id: '六', icon: '⑥' },
+                        { id: '七', icon: '⑦' },
+                        { id: '八', icon: '⑧' },
+                        { id: '九', icon: '⑨' },
+                        { id: '十', icon: '⑩' }
+                    ]
+                },
+                // 十二生肖：icon 用用户指定的代表图标。
+                {
+                    id: 'hanzi-zodiac', label: '生肖', color: '#EF6C00',
+                    items: [
+                        { id: '鼠', icon: '🐀' },
+                        { id: '牛', icon: '🐃' },
+                        { id: '虎', icon: '🐅' },
+                        { id: '兔', icon: '🐇' },
+                        { id: '龙', icon: '🐉' },
+                        { id: '蛇', icon: '🐍' },
+                        { id: '马', icon: '🐎' },
+                        { id: '羊', icon: '🐏' },
+                        { id: '猴', icon: '🐒' },
+                        { id: '鸡', icon: '🐓' },
+                        { id: '狗', icon: '🐕' },
+                        { id: '猪', icon: '🐖' }
+                    ]
+                },
+                // 衣食：日常吃穿用字。
+                {
+                    id: 'hanzi-food-clothing', label: '衣食', color: '#43A047',
+                    items: [
+                        { id: '水', icon: '💧' },
+                        { id: '饭', icon: '🍚' },
+                        { id: '面', icon: '🍜' },
+                        { id: '菜', icon: '🥬' },
+                        { id: '衣', icon: '👕' },
+                        { id: '裤', icon: '👖' },
+                        { id: '鞋', icon: '👟' },
+                        { id: '袜', icon: '🧦' }
+                    ]
+                },
+                // 住行：桌/椅本来共用🪑会分不清，改成桌用🗄️、椅用🪑；
+                // 火/卡/机是"火车/卡车/飞机"里挑出来的单字，直接用对应交通工具的图标。
+                {
+                    id: 'hanzi-housing-transport', label: '住行', color: '#5C6BC0',
+                    items: [
+                        { id: '房', icon: '🏠' },
+                        { id: '床', icon: '🛏️' },
+                        { id: '桌', icon: '🗄️' },
+                        { id: '椅', icon: '🪑' },
+                        { id: '车', icon: '🚗' },
+                        { id: '火', icon: '🚂' },
+                        { id: '卡', icon: '🚛' },
+                        { id: '船', icon: '🚢' },
+                        { id: '机', icon: '✈️' }
+                    ]
+                }
             ],
             items: {
                 '0': { type: 'hershey', d: 'M9,1 L6,2 4,5 3,10 3,13 4,18 6,21 9,22 11,22 14,21 16,18 17,13 17,10 16,5 14,2 11,1 9,1' },
@@ -239,6 +327,8 @@
                 ellipse: { type: 'procedural', label: '⬭', generator: 'ellipse' },
                 rectangle: { type: 'procedural', label: '▭', generator: 'rectangle' },
                 rhombus: { type: 'procedural', label: '♦️', generator: 'rhombus' }
+                // 汉字数据不再写在这里了，见 hanzi-data.js（type 'hanzi' + medians），
+                // 页面加载时会自动从 window.HANZI_DATA 合并进来，见下面 registerHanziData()。
             }
         };
 
@@ -297,6 +387,11 @@
         ];
         let currentPair = CHASE_PAIRS[0];
 
+        // 汉字专用：猎物（小图标）改成"当前第几笔"，用纯文本数字，不封顶，比 emoji 键帽简单可靠
+        function strokeNumberLabel(n) {
+            return String(n);
+        }
+
         // ===== 轻量idle动效（参考"小猫吃鱼"主游戏的wigglePhase/bobPhase/squash思路，做emoji版的简化实现）=====
         let fishWigglePhase = 0;   // 鱼身摆动相位
         let catBobPhase = 0;       // 猫上下浮动相位
@@ -306,7 +401,7 @@
         const CAT_BOB_SPEED = 1.8;       // 猫浮动速度
         const CAT_BOB_AMOUNT = 2;        // 猫上下浮动幅度（像素）
         const CAT_BREATH_AMOUNT = 0.022; // 猫呼吸幅度（2.2%）
-        const PREY_FONT_SIZE = 45;       // 食物图标字号（56px×0.8），比猎手小一圈，方向感更明确
+        const PREY_FONT_SIZE = 36;       // 食物图标字号（45px×0.8，整体缩小20%左右），比猎手小一圈，方向感更明确
 
         /* ========================= 特效管理 ========================= */
         class EffectsManager {
@@ -704,6 +799,107 @@
             return rawStrokesToCanvas(cx, cy, size, rawStrokes, heightRatio);
         }
 
+        // 汉字数据（hanzi-writer-data / Make Me a Hanzi）沿用的是字体字形常见的
+        // "y 向上为正"坐标系（跟 Hershey 这份数据、以及 canvas 的"y 向下为正"正好相反）。
+        // hanzi-writer.js 官方渲染时也是靠一个 scale(1,-1) 的变换来翻转的；我们这里
+        // 简单地把每个点的 y 取负号，交给 rawStrokesToCanvas 统一做居中缩放，效果等价。
+        function generateHanziStrokes(cx, cy, size, item, heightRatio = 1.9) {
+            const rawStrokes = item.medians.map(stroke => stroke.map(([x, y]) => ({ x, y: -y })));
+            return rawStrokesToCanvas(cx, cy, size, rawStrokes, heightRatio);
+        }
+
+        /* ===== 汉字数据的按需加载 + 本地缓存 =====
+           思路：TRACE_DATA.items 里的汉字条目一开始可能只有 { type: 'hanzi' }（没有 medians）。
+           这样 categories 列表里可以放几百上千个字，而不用在源码里手写每一笔的坐标。
+           真正用到某个字（进入它所在分类 / 点开它）时，才去 CDN 拉那一个字的 JSON，
+           拉到后写回 items[char].medians，并存一份到 localStorage，下次直接读缓存，不用重新联网。
+           数据源同前面手动贴的一样：hanzi-writer-data（MIT，衍生自 Make Me a Hanzi），
+           这是这个游戏跑在用户自己浏览器里时发起的请求，不受这次对话里我这边工具沙盒的网络限制。
+           如果 jsdelivr 在某些网络环境下不通，会自动试 unpkg 兜底；两个都失败就报错、不影响其他字。 */
+        const HANZI_CACHE_KEY = 'traceGameHanziCache_v1';
+        let hanziCache = {};
+        try { hanziCache = JSON.parse(localStorage.getItem(HANZI_CACHE_KEY) || '{}'); } catch (e) { hanziCache = {}; }
+
+        function hanziDataUrls(ch) {
+            const enc = encodeURIComponent(ch);
+            return [
+                `https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/${enc}.json`,
+                `https://unpkg.com/hanzi-writer-data@latest/${enc}.json`
+            ];
+        }
+
+        async function fetchHanziMedians(ch) {
+            if (hanziCache[ch]) return hanziCache[ch];
+            let lastErr = null;
+            for (const url of hanziDataUrls(ch)) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const data = await res.json();
+                    if (!data || !data.medians) throw new Error('无 medians 字段');
+                    hanziCache[ch] = data.medians;
+                    try { localStorage.setItem(HANZI_CACHE_KEY, JSON.stringify(hanziCache)); } catch (e) { /* 存储满了就算了，不影响本次使用 */ }
+                    return data.medians;
+                } catch (e) {
+                    lastErr = e;
+                }
+            }
+            throw lastErr || new Error('加载失败');
+        }
+
+        // 分类的 items 数组里，每一项可能是普通字符串（用字符本身当 id），
+        // 也可能是 { id, icon }（主题分类用，给追逐动效配一个自定义"猎手"图标），
+        // 按钮上永远显示字符本身，icon 只影响追逐动效。
+        // 注：汉字类的追逐动效里，被追的那个图标（prey）固定显示"当前第几笔"的数字表情，
+        // 跟这里的字符是什么无关，所以每个字只需要配一个图标（icon），不需要一对。
+        function catItemId(entry) { return typeof entry === 'string' ? entry : entry.id; }
+        function catItemIcon(entry) { return typeof entry === 'string' ? null : (entry.icon || null); }
+
+        // 在所有分类里找 itemId 对应的自定义图标（如果有的话）
+        function findIconOverride(itemId) {
+            for (const cat of window.TRACE_DATA.categories) {
+                for (const entry of cat.items) {
+                    if (catItemId(entry) === itemId) {
+                        const icon = catItemIcon(entry);
+                        if (icon) return icon;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // 把 hanzi-data.js 里 window.HANZI_DATA 的字合并进 TRACE_DATA.items：
+        // 所有 id 以 'hanzi' 开头的分类（生肖/衣食/住行这类主题分类）
+        // 里出现的每个字，只要在 HANZI_DATA 里有数据就用本地数据；没有的字注册成
+        // { type:'hanzi' } 空壳，留给运行时的 CDN 懒加载(fetchHanziMedians)去补。
+        // 就算 hanzi-data.js 没引入/加载失败，这里也不会报错，只是全部退化成纯 CDN 加载。
+        function registerHanziData() {
+            const bundled = window.HANZI_DATA || {};
+            for (const cat of window.TRACE_DATA.categories) {
+                if (!cat.id.startsWith('hanzi')) continue;
+                for (const entry of cat.items) {
+                    const ch = catItemId(entry);
+                    if (window.TRACE_DATA.items[ch]) continue; // 已经手动定义过，不覆盖
+                    const data = bundled[ch];
+                    window.TRACE_DATA.items[ch] = data ? { type: 'hanzi', medians: data.medians } : { type: 'hanzi' };
+                }
+            }
+        }
+        registerHanziData();
+
+        // 批量预取：切到某个汉字主题分类时，把这一屏看得到的字都提前拉一遍（并发但不阻塞 UI），
+        // 这样用户点哪个字基本都是秒开，缓存过一次之后离线也能用。
+        function prefetchHanziForCategory(cat) {
+            if (!cat) return;
+            for (const entry of cat.items) {
+                const id = catItemId(entry);
+                const item = window.TRACE_DATA.items[id];
+                if (item && item.type === 'hanzi' && !item.medians) {
+                    fetchHanziMedians(id).then(medians => { item.medians = medians; }).catch(() => { /* 静默失败，真正点到那个字时会再报错提示 */ });
+                }
+            }
+        }
+
         // 把多个单字符 Hershey 字形横向拼成一个复合图形（比如两位数 "10"~"30"）。
         // 每个字符占用的"区域"就是它自己实际墨迹的宽度（而不是一个所有字符共用的固定宽度）——
         // 之前用统一的固定格子宽度时，"1"这种窄字符自己的墨迹远小于格子，两侧会留出比自身
@@ -743,6 +939,9 @@
             }
             if (item.type === 'hershey-compound') {
                 return rawStrokesToCanvas(cx, cy, size, composeDigitsRawStrokes(item.chars), item.heightRatio || 1.9);
+            }
+            if (item.type === 'hanzi') {
+                return generateHanziStrokes(cx, cy, size, item);
             }
             if (item.type === 'procedural') {
                 switch (item.generator) {
@@ -788,7 +987,33 @@
             return TEST_SIZE * scale;
         }
 
-        function startGame(itemId) {
+        // itemId 对应的数据没准备好时（汉字还没从 CDN 拉到），先异步把数据补齐，
+        // 再落到 runStartGame 走原来的同步流程。用一个自增的 token 防止"慢请求后到"
+        // 覆盖掉用户后面又点的新字符（比如手指划得快，连点了好几个字）。
+        let hanziLoadToken = 0;
+        const loadingEl = document.getElementById('hanziLoading');
+
+        async function startGame(itemId) {
+            const myToken = ++hanziLoadToken;
+            const item = window.TRACE_DATA.items[itemId];
+            if (item && item.type === 'hanzi' && !item.medians) {
+                loadingEl.style.display = 'block';
+                try {
+                    item.medians = await fetchHanziMedians(itemId);
+                } catch (err) {
+                    if (myToken === hanziLoadToken) {
+                        loadingEl.textContent = '「' + itemId + '」加载失败，检查下网络';
+                        setTimeout(() => { loadingEl.style.display = 'none'; loadingEl.textContent = '加载中…'; }, 1800);
+                    }
+                    return;
+                }
+                if (myToken !== hanziLoadToken) return; // 用户已经点了别的字，这次结果作废
+                loadingEl.style.display = 'none';
+            }
+            runStartGame(itemId);
+        }
+
+        function runStartGame(itemId) {
             currentShape = itemId;
             const cx = width / 2;
             // 上下留白：分类栏和选图案条各占一块，可用区域取正中间，这样才能真正"尽量占满"而不是拍脑袋往下挪40px
@@ -807,7 +1032,17 @@
 
             currentPath = allStrokes[0];
             pathColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-            currentPair = CHASE_PAIRS[Math.floor(Math.random() * CHASE_PAIRS.length)];
+            if (item && item.type === 'hanzi') {
+                // 汉字：猎手（主题/固定图标）保持不变，被追的那个换成"当前第几笔"，每笔画都会更新
+                const overrideIcon = findIconOverride(itemId);
+                const hunter = overrideIcon || CHASE_PAIRS[Math.floor(Math.random() * CHASE_PAIRS.length)].hunter;
+                currentPair = { hunter, prey: strokeNumberLabel(1) };
+            } else {
+                const overrideIcon = findIconOverride(itemId);
+                currentPair = overrideIcon
+                    ? { hunter: overrideIcon, prey: CHASE_PAIRS[Math.floor(Math.random() * CHASE_PAIRS.length)].prey }
+                    : CHASE_PAIRS[Math.floor(Math.random() * CHASE_PAIRS.length)];
+            }
 
             catIndex = 0;
             fishIndex = Math.min(FISH_LEAD_POINTS, currentPath.length - 1);
@@ -872,6 +1107,11 @@
                                 fishIndex = Math.min(FISH_LEAD_POINTS, currentPath.length - 1);
                                 isSuccess = false;
                                 strokeTransitionLock = false;
+                                // 汉字：猎物数字跟着笔画号往上走（第几笔就显示几）
+                                const curItem = window.TRACE_DATA.items[currentShape];
+                                if (curItem && curItem.type === 'hanzi') {
+                                    currentPair = { hunter: currentPair.hunter, prey: strokeNumberLabel(currentStrokeIndex + 1) };
+                                }
                             }, 500);
                         } else {
                             // 全部完成
@@ -925,16 +1165,34 @@
             ctx.clearRect(0, 0, width, height);
 
             if (allStrokes.length > 0 && currentPath.length > 0) {
-                // 1. 底色轨道点阵（所有笔画）
+                // 1. 底色轨道（汉字笔画多、拐弯多，用点阵会看不出形状，改成连成实线；
+                //    字母/数字/图形笔画简单，继续用点阵，不改原来的观感）
                 ctx.save();
                 ctx.globalAlpha = 1.0;
-                ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
-                for (let s = 0; s < allStrokes.length; s++) {
-                    const stroke = allStrokes[s];
-                    for (let i = 0; i < stroke.length; i += 10) {
+                const currentItemDef = window.TRACE_DATA.items[currentShape];
+                const isHanziBg = currentItemDef && currentItemDef.type === 'hanzi';
+                if (isHanziBg) {
+                    ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+                    ctx.lineWidth = 9;
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    for (let s = 0; s < allStrokes.length; s++) {
+                        const stroke = allStrokes[s];
+                        if (stroke.length < 2) continue;
                         ctx.beginPath();
-                        ctx.arc(stroke[i].x, stroke[i].y, 4.5, 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.moveTo(stroke[0].x, stroke[0].y);
+                        for (let i = 1; i < stroke.length; i++) ctx.lineTo(stroke[i].x, stroke[i].y);
+                        ctx.stroke();
+                    }
+                } else {
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+                    for (let s = 0; s < allStrokes.length; s++) {
+                        const stroke = allStrokes[s];
+                        for (let i = 0; i < stroke.length; i += 10) {
+                            ctx.beginPath();
+                            ctx.arc(stroke[i].x, stroke[i].y, 4.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
                     }
                 }
                 ctx.restore();
@@ -991,7 +1249,7 @@
                 effects.update(dt);
                 effects.render(ctx);
 
-                // 5. 小猫（拖动时微微放大：84px，正常78px；非拖动时轻微呼吸+上下浮动，暗示"想动、等着被拖走"）
+                // 5. 小猫（拖动时微微放大：67px，正常62px——即84/78px整体缩小20%左右；非拖动时轻微呼吸+上下浮动，暗示"想动、等着被拖走"）
                 const catPos = currentPath[catIndex];
                 const catBobY = isDragging ? 0 : Math.sin(catBobPhase) * CAT_BOB_AMOUNT;
                 ctx.save();
@@ -999,7 +1257,7 @@
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.translate(catPos.x, catPos.y + catBobY);
                 ctx.scale(1 / Math.sqrt(catBreath), catBreath);
-                ctx.font = isDragging ? "84px sans-serif" : "78px sans-serif";
+                ctx.font = isDragging ? "67px sans-serif" : "62px sans-serif";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.fillText(currentPair.hunter, 0, 0);
@@ -1034,7 +1292,8 @@
                     itemsEl.appendChild(tip);
                     return;
                 }
-                cat.items.forEach(id => {
+                cat.items.forEach(entry => {
+                    const id = catItemId(entry);
                     const def = window.TRACE_DATA.items[id];
                     const btn = document.createElement('button');
                     btn.className = 'item-btn';
@@ -1061,10 +1320,12 @@
                     btn.classList.add('active');
                     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); // 和底部条目条一样，点了自动居中
                     renderItems(cat.id);
+                    prefetchHanziForCategory(cat);
                     // 切换大类后，直接进入这一类的第一项，不用再多点一次
                     if (cat.items.length > 0) {
-                        setActiveItem(cat.items[0]);
-                        startGame(cat.items[0]);
+                        const firstId = catItemId(cat.items[0]);
+                        setActiveItem(firstId);
+                        startGame(firstId);
                     }
                 };
                 tabsEl.appendChild(btn);
@@ -1072,12 +1333,13 @@
 
             renderItems(activeCategoryId);
             const firstItems = window.TRACE_DATA.categories.find(c => c.id === activeCategoryId);
-            if (firstItems && firstItems.items.length > 0) setActiveItem(firstItems.items[0]);
+            if (firstItems && firstItems.items.length > 0) setActiveItem(catItemId(firstItems.items[0]));
+            prefetchHanziForCategory(firstItems);
         }
 
         buildCategoryUI();
         const firstCategoryWithItems = window.TRACE_DATA.categories.find(c => c.items.length > 0) || window.TRACE_DATA.categories[0];
-        startGame(firstCategoryWithItems.items[0] || 'circle');
+        startGame((firstCategoryWithItems.items[0] && catItemId(firstCategoryWithItems.items[0])) || 'circle');
         requestAnimationFrame(loop);
     </script>
 </body>
