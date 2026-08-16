@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉字笔画数据提取工具</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; }
+        input[type="text"] {
+            width: 100%; padding: 12px; font-size: 1rem;
+            border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box;
+        }
+        button {
+            background-color: #3b82f6; color: white; border: none;
+            padding: 10px 20px; font-size: 0.95rem; border-radius: 6px;
+            cursor: pointer; margin-right: 10px;
+        }
+        button:disabled { background-color: #94a3b8; cursor: not-allowed; }
+        textarea {
+            width: 100%; height: 300px; font-family: monospace; font-size: 0.88rem;
+            padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px;
+            background-color: #f8fafc; box-sizing: border-box;
+            white-space: pre; overflow: auto;
+        }
+        .status { margin-bottom: 15px; font-size: 0.9rem; line-height: 1.6; }
+        .status .ok { color: #16a34a; }
+        .status .fail { color: #dc2626; font-weight: 600; }
+        .hint { font-size: 0.82rem; color: #64748b; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>汉字笔画 JSON 数据提取工具</h2>
+
+    <div class="form-group">
+        <label for="hanziInput">输入汉字（例如：鼠牛虎兔），无需空格：</label>
+        <input type="text" id="hanziInput" value="" placeholder="把要新增的字粘贴/打在这里">
+    </div>
+
+    <div class="form-group">
+        <button id="fetchBtn" onclick="startFetch()">抓取并生成数据</button>
+    </div>
+
+    <div id="statusBox" class="status"></div>
+
+    <div class="form-group">
+        <label for="outputArea">提取结果（可以直接整段粘贴到 hanzi-data.js 里 window.HANZI_DATA = { ... } 的花括号内部）：</label>
+        <textarea id="outputArea" readonly></textarea>
+        <div class="hint">格式跟 hanzi-data.js 里已有的条目完全一致（'字': { medians: [...] }，4 空格缩进），
+            不带多余的 type 字段，粘贴后不用再手动改格式。</div>
+        <div style="margin-top: 10px; text-align: right;">
+            <button id="copyBtn" onclick="copyResult()" disabled>复制结果</button>
+            <button id="downloadBtn" onclick="downloadResult()" disabled>下载 txt 文件</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 跟 trace-3-3.html 里 fetchHanziMedians 用的是同一套数据源和 fallback 顺序，
+    // 保证这个小工具抓到的数据和游戏运行时懒加载抓到的数据是同一份，不会不一致。
+    function hanziDataUrls(ch) {
+        const enc = encodeURIComponent(ch);
+        return [
+            `https://cdn.jsdelivr.net/npm/hanzi-writer-data@latest/${enc}.json`,
+            `https://unpkg.com/hanzi-writer-data@latest/${enc}.json`
+        ];
+    }
+
+    async function fetchOneChar(ch) {
+        let lastErr = null;
+        for (const url of hanziDataUrls(ch)) {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                if (!data || !data.medians) throw new Error('返回数据里没有 medians 字段');
+                return data.medians;
+            } catch (e) {
+                lastErr = e;
+            }
+        }
+        throw lastErr || new Error('加载失败');
+    }
+
+    async function startFetch() {
+        const input = document.getElementById('hanziInput').value.trim();
+        const statusBox = document.getElementById('statusBox');
+        const outputArea = document.getElementById('outputArea');
+        const fetchBtn = document.getElementById('fetchBtn');
+        // 只保留汉字字符，自动去掉误粘进来的空格/标点/重复字
+        const chars = Array.from(new Set(Array.from(input).filter(c => /[\u4e00-\u9fff]/.test(c))));
+
+        if (!chars.length) {
+            statusBox.innerHTML = '<span class="fail">没有识别到汉字，检查一下输入。</span>';
+            return;
+        }
+
+        fetchBtn.disabled = true;
+        statusBox.textContent = `开始抓取，共 ${chars.length} 个字...`;
+        outputArea.value = '';
+
+        const succeeded = [];
+        const failed = [];
+        for (const ch of chars) {
+            try {
+                const medians = await fetchOneChar(ch);
+                succeeded.push(`    '${ch}': { medians: ${JSON.stringify(medians)} },`);
+            } catch (err) {
+                failed.push(ch);
+            }
+        }
+
+        outputArea.value = succeeded.join('\n');
+        let html = `<span class="ok">成功 ${succeeded.length} / ${chars.length} 个字。</span>`;
+        if (failed.length) {
+            html += `<br><span class="fail">以下 ${failed.length} 个字抓取失败，没有出现在结果里，需要单独确认：${failed.join('、')}</span>`;
+        }
+        statusBox.innerHTML = html;
+
+        fetchBtn.disabled = false;
+        document.getElementById('copyBtn').disabled = succeeded.length === 0;
+        document.getElementById('downloadBtn').disabled = succeeded.length === 0;
+    }
+
+    function copyResult() {
+        const area = document.getElementById('outputArea');
+        area.select();
+        document.execCommand('copy');
+        alert('已复制到剪贴板！直接粘贴到 hanzi-data.js 的 window.HANZI_DATA = { ... } 里面即可。');
+    }
+
+    function downloadResult() {
+        const content = document.getElementById('outputArea').value;
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'hanzi_data_snippet.txt';
+        a.click();
+    }
+</script>
+
+</body>
+</html>
