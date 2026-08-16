@@ -227,4 +227,44 @@ window.DEFAULT_WORDS = {
         { word: '雨伞', en: 'umbrella', en_chunks: ['um','brel','la'], emoji: '☂️' },
         { word: '卫生纸', en: 'toilet paper', en_chunks: ['toilet','paper'], emoji: '🧻' }
     ]
+    '节气': [
+        { word: '立春', en: 'Beginning of Spring', en_chunks: ['Beginning','of','Spring'], emoji: '🌱☀️' },
+        { word: '雨水', en: 'Rain Water', en_chunks: ['Rain','Water'], emoji: '🌧️💧' },
+        { word: '惊蛰', en: 'Awakening of Insects', en_chunks: ['Awakening','of','Insects'], emoji: '🌩️🐛' },
+        { word: '春分', en: 'Spring Equinox', en_chunks: ['Spring','Equinox'], emoji: '🌸🥚' },
+        { word: '清明', en: 'Clear and Bright', en_chunks: ['Clear','and','Bright'], emoji: '🌿🍡' },
+        { word: '谷雨', en: 'Grain Rain', en_chunks: ['Grain','Rain'], emoji: '🌾🌧️' },
+        { word: '立夏', en: 'Beginning of Summer', en_chunks: ['Beginning','of','Summer'], emoji: '☀️🌳' },
+        { word: '小满', en: 'Grain Buds', en_chunks: ['Grain','Buds'], emoji: '🌾💧' },
+        { word: '芒种', en: 'Grain in Ear', en_chunks: ['Grain','in','Ear'], emoji: '🌾🚜' },
+        { word: '夏至', en: 'Summer Solstice', en_chunks: ['Summer','Solstice'], emoji: '☀️☀️' },
+        { word: '小暑', en: 'Minor Heat', en_chunks: ['Minor','Heat'], emoji: '🔥🌡️' },
+        { word: '大暑', en: 'Great Heat', en_chunks: ['Great','Heat'], emoji: '🔥🥵' },
+        { word: '立秋', en: 'Beginning of Autumn', en_chunks: ['Beginning','of','Autumn'], emoji: '🍃🍉' },
+        { word: '处暑', en: 'End of Heat', en_chunks: ['End','of','Heat'], emoji: '🌤️' },
+        { word: '白露', en: 'White Dew', en_chunks: ['White','Dew'], emoji: '🌿💧' },
+        { word: '秋分', en: 'Autumn Equinox', en_chunks: ['Autumn','Equinox'], emoji: '🍁⚖️' },
+        { word: '寒露', en: 'Cold Dew', en_chunks: ['Cold','Dew'], emoji: '❄️💧' },
+        { word: '霜降', en: 'Frost Descent', en_chunks: ['Frost','Descent'], emoji: '❄️🍂' },
+        { word: '立冬', en: 'Beginning of Winter', en_chunks: ['Beginning','of','Winter'], emoji: '🌨️🌬️' },
+        { word: '小雪', en: 'Minor Snow', en_chunks: ['Minor','Snow'], emoji: '❄️🌨️' },
+        { word: '大雪', en: 'Major Snow', en_chunks: ['Major','Snow'], emoji: '❄️☃️' },
+        { word: '冬至', en: 'Winter Solstice', en_chunks: ['Winter','Solstice'], emoji: '🌙🥟' },
+        { word: '小寒', en: 'Minor Cold', en_chunks: ['Minor','Cold'], emoji: '🌨️🥶' },
+        { word: '大寒', en: 'Major Cold', en_chunks: ['Major','Cold'], emoji: '🧊🥶' }
+    ],
+    '生肖': [
+        { word: '子鼠', en: 'Rat', en_chunks: ['R','at'], emoji: '🐀' },
+        { word: '丑牛', en: 'Ox', en_chunks: ['O','x'], emoji: '🐂' },
+        { word: '寅虎', en: 'Tiger', en_chunks: ['Ti','ger'], emoji: '🐅' },
+        { word: '卯兔', en: 'Rabbit', en_chunks: ['Rab','bit'], emoji: '🐇' },
+        { word: '辰龙', en: 'Dragon', en_chunks: ['Dra','gon'], emoji: '🐉' },
+        { word: '巳蛇', en: 'Snake', en_chunks: ['Sn','ake'], emoji: '🐍' },
+        { word: '午马', en: 'Horse', en_chunks: ['H','orse'], emoji: '🐎' },
+        { word: '未羊', en: 'Goat', en_chunks: ['G','oat'], emoji: '🐐' },
+        { word: '申猴', en: 'Monkey', en_chunks: ['Mon','key'], emoji: '🐒' },
+        { word: '酉鸡', en: 'Rooster', en_chunks: ['Roo','ster'], emoji: '🐓' },
+        { word: '戌狗', en: 'Dog', en_chunks: ['D','og'], emoji: '🐕' },
+        { word: '亥猪', en: 'Pig', en_chunks: ['P','ig'], emoji: '🐖' }
+    ]
 };
