@@ -226,7 +226,7 @@ window.DEFAULT_WORDS = {
         { word: '肥皂', en: 'soap', en_chunks: ['s','oap'], emoji: '🧼' },
         { word: '雨伞', en: 'umbrella', en_chunks: ['um','brel','la'], emoji: '☂️' },
         { word: '卫生纸', en: 'toilet paper', en_chunks: ['toilet','paper'], emoji: '🧻' }
-    ]
+    ],
     '节气': [
         { word: '立春', en: 'Beginning of Spring', en_chunks: ['Beginning','of','Spring'], emoji: '🌱☀️' },
         { word: '雨水', en: 'Rain Water', en_chunks: ['Rain','Water'], emoji: '🌧️💧' },
