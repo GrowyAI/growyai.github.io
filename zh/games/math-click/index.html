@@ -66,6 +66,7 @@
         user-select: none;
     }
     /* 返回大厅：与右上角设置按钮同一枚圆形，只在开局的模式菜单出现（游戏中隐藏） */
+    /* ‹ 的墨迹比字体框中心低：统一 Arial 字形 + 3px 底留白做视觉居中 */
     .hall-toggle {
         position: fixed;
         top: 10px;
@@ -73,12 +74,13 @@
         z-index: 100;
         width: 36px;
         height: 36px;
-        padding: 0;
+        box-sizing: border-box;
+        padding: 0 0 3px;
         border: none;
         border-radius: 50%;
         background: rgba(43,88,118,0.15);
         color: #2b5876;
-        font-family: inherit;
+        font-family: Arial, sans-serif;
         font-size: 28px;
         font-weight: 700;
         line-height: 1;

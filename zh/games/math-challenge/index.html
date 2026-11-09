@@ -107,6 +107,7 @@
     transform: scale(0.97);
   }
   /* 返回大厅：与顶栏居中的 #uiModeBtn 同高、同圆角、同底色与阴影，常驻且层级高于弹窗遮罩 */
+  /* ‹ 的墨迹比字体框中心低：统一 Arial 字形 + 3px 底留白做视觉居中 */
   #hallBackBtn {
     position: fixed;
     top: 8px;
@@ -115,6 +116,7 @@
     width: 36px;
     height: 29px;
     box-sizing: border-box;
+    padding: 0 0 3px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -123,7 +125,7 @@
     border: none;
     border-radius: var(--r-sm);
     box-shadow: 0 2px 8px rgba(120,108,90,0.10);
-    font-family: inherit;
+    font-family: Arial, sans-serif;
     font-size: 22px;
     font-weight: 700;
     line-height: 1;

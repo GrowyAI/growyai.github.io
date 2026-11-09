@@ -81,9 +81,11 @@
         .settings-btn:active { transform: scale(var(--active-scale)); background: var(--btn-active); }
         /* 首页左上角返回大厅：与右上角设置按钮是同一枚胶囊，左右对称 */
         #homeSettingsBtn { position: absolute; top: 0; right: 0; }
+        /* ‹ 的墨迹比字体框中心低：统一 Arial 字形 + 3px 底留白做视觉居中 */
         #homeBackBtn {
             position: absolute; top: 0; left: 0;
-            width: 36px; height: 30px; padding: 0; justify-content: center;
+            width: 36px; height: 30px; padding: 0 0 3px; justify-content: center;
+            box-sizing: border-box; font-family: Arial, sans-serif;
             font-size: 26px; font-weight: 700; line-height: 1;
             text-decoration: none; color: var(--text-muted);
         }
@@ -141,8 +143,10 @@
         .learn-page { display: none; flex-direction: column; height: 100%; flex: 1; }
         .learn-page.active { display: flex; }
         .learn-top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        /* 学习页返回：与首页同一枚胶囊，同样做 ‹ 的视觉居中 */
         .back-btn {
-            width: 36px; height: 30px; padding: 0;
+            width: 36px; height: 30px; padding: 0 0 3px;
+            box-sizing: border-box; font-family: Arial, sans-serif;
             background: var(--btn-bg); border: none; border-radius: 20px;
             font-size: 26px; font-weight: 700; line-height: 1;
             color: var(--text-muted); cursor: pointer; touch-action: manipulation;
