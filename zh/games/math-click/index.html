@@ -3,15 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>幼儿认知小游戏</title>
-<style>
+<title>数字点点 - 边玩边学</title>
+    <style>
+    :root {
+        /* 共用 token（与 DESIGN.md 同名，本页自带，不依赖其他页面） */
+        --bg: #eaf7ff;
+        --bg-2: #f4f9fc;
+        --surface: #ffffff;
+        --text: #2b5876;
+        --muted: #6b7f8a;
+        --faint: #9aa9b1;
+        --accent: #8fb2c9;
+        --accent-soft: #eaf2f7;
+        --accent-ink: #3f6b85;
+        --line: rgba(120,108,90,.10);
+        --shadow: 0 6px 20px rgba(120,108,90,.07);
+        --r-sm: 12px;
+        --r-md: 20px;
+        --r-lg: 28px;
+        /* emoji 统一饱和度：1 = 原色，越小越淡。只改这一个数字即可调整全站幅度 */
+        --emoji-sat: .85;
+    }
     html,
     body {
         margin: 0;
         padding: 0;
         height: 100%;
         overflow: hidden;
-        background: #7fc8f0;
+        background: var(--bg);
         -webkit-user-select: none;
         user-select: none;
         touch-action: none;
@@ -20,9 +39,13 @@
     #gameCanvas {
         display: block;
         margin: 0 auto;
-        background: #eaf7ff;
+        background: var(--bg);
         touch-action: none;
+        /* 画布上的 8 种水果 emoji 统一轻微降饱和；浅蓝底与白盘子本就低饱和，几乎无感 */
+        filter: saturate(var(--emoji-sat));
     }
+    /* 设置面板里的 ⚙️ / 🔊 等功能图标同样处理 */
+    .settings-toggle, .option-btn { filter: saturate(var(--emoji-sat)); }
     /* 设置入口按钮：跟"返回菜单"按钮同一种浅色风格，避免视觉割裂 */
     .settings-toggle {
         position: fixed;
@@ -48,7 +71,7 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.35);
+        background: rgba(48, 40, 34, 0.38);
         z-index: 1000;
         align-items: center;
         justify-content: center;
@@ -59,12 +82,13 @@
 
     /* 弹窗卡片 */
     .settings-panel {
-        background: #fff;
-        border-radius: 28px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
         padding: 24px 22px 28px;
         width: 90%;
         max-width: 360px;
-        box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+        box-shadow: var(--shadow);
         display: flex;
         flex-direction: column;
         gap: 18px;
@@ -80,7 +104,7 @@
     .settings-title {
         font-size: 20px;
         font-weight: 700;
-        color: #2b5876;
+        color: var(--text);
     }
     .settings-close {
         background: #f0ebe4;
@@ -128,9 +152,9 @@
 
     /* 选中状态 */
     .option-btn.active {
-        border-color: #b8d4a8;
-        background: #f1f8ea;
-        color: #1a1a1a;
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: var(--text);
         font-weight: 700;
     }
 </style>
@@ -416,6 +440,21 @@
              draw(ctx, container)          -> 画容器本体 + 空位占位
              drawLabel(ctx, container)     -> 画容器下方的目标数字（通常直接调用 drawContainerLabel）
         ========================================================= */
+        /* 画布侧调色板：命名与 CSS :root token 对应，改色只改这里 */
+        const PALETTE = {
+            bg: '#eaf7ff',
+            text: '#2b5876',
+            muted: '#6b7f8a',
+            accent: '#8fb2c9',
+            accentSoft: 'rgba(143,178,201,0.18)',
+            accentInk: '#3f6b85',
+            ok: '#5c8f70',
+            radius: 20,
+            // 开局菜单：5 个模式各一种低饱和淡彩，只比画布底色略深
+            menuButtons: ['#dceaf1', '#e2ecdf', '#f1e8dd', '#efe2e5', '#e6e3ef']
+        };
+        const UI_FONT = '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+
         const Config = {
             itemRadius: 20,
 
@@ -442,7 +481,7 @@
                     // 1 个水果时正好在圆心
                     gridCols: 3,
                     // 填满后弹跳出现的活泼低饱和度颜色（红黄蓝绿橙棕紫）
-                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
 
                     // 根据画布宽度和盘子数量，算出统一的盘子直径（水果大小固定不变）
                     computeDims(cw, count) {
@@ -544,7 +583,7 @@
                     cellSize: 56,
                     cellGap: 10,
                     maxCols: 5,
-                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
 
                     // level.gridCols 可覆盖每行格子数；根据"预填充+互动"两部分的总格子数算出需要几行
                     computeDims(cw, count, level) {
@@ -645,7 +684,7 @@
                     cellSize: 56,
                     aZoneColor: '#dff0f7',     // 已经摆好的a：浅蓝底
                     bZoneColor: '#ffe9c7',     // 等着拖入的b：浅橙底
-                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
 
                     // 一整条连续的格子（不是c个分开的方块），一排放下 level.sum 个位置，会自动缩小以放得下
                     computeDims(cw, count, level) {
@@ -797,7 +836,7 @@
                     keepZoneColor: '#dff0f7',    // c：保留区，浅蓝底
                     removeZoneColor: '#ffe0b2',  // b：将被拿走区，浅橙底
                     targetZoneColor: '#ffe9c7',  // 底部承接格子，浅橙底（呼应上面要拿走的部分）
-                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
+                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
 
                     // 顶部行按 a 个格子算宽度（a 是这一排里最多的格子数），
                     // 底部行只有 b 个格子，居中摆在顶部行下方；两行格子大小/间距完全一致
@@ -1720,21 +1759,25 @@
 
             drawMenu(ctx, cw, ch) {
                 ctx.save();
-                ctx.fillStyle = '#eaf7ff';
+                ctx.fillStyle = PALETTE.bg;
                 ctx.fillRect(0, 0, cw, ch);
-                ctx.font = 'bold 22px sans-serif';
-                ctx.fillStyle = '#2b5876';
-                ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(t('selectMode'), cw / 2, this.menuButtons[0] ? this.menuButtons[0].y - 46 : ch / 2 - 100);
+                ctx.textAlign = 'center';
+                ctx.font = '600 18px ' + UI_FONT;
+                ctx.fillStyle = PALETTE.text;
+                ctx.fillText(t('selectMode'), cw / 2, this.menuButtons[0] ? this.menuButtons[0].y - 42 : ch / 2 - 100);
 
-                this.menuButtons.forEach(b => {
-                    ctx.fillStyle = '#6fae6a';
-                    roundRect(ctx, b.x, b.y, b.w, b.h, 18);
+                this.menuButtons.forEach((b, i) => {
+                    // 低饱和淡彩实心按钮：靠色相与明度区分，只比底色深一点。
+                    // 不要描边、阴影、编号或箭头；深蓝标题居中即可。
+                    ctx.fillStyle = PALETTE.menuButtons[i % PALETTE.menuButtons.length];
+                    roundRect(ctx, b.x, b.y, b.w, b.h, PALETTE.radius);
                     ctx.fill();
-                    ctx.font = 'bold 19px sans-serif';
-                    ctx.fillStyle = '#fff';
-                    ctx.fillText(b.title, b.x + b.w / 2, b.y + b.h / 2);
+
+                    ctx.textAlign = 'center';
+                    ctx.font = '600 17px ' + UI_FONT;
+                    ctx.fillStyle = PALETTE.text;
+                    ctx.fillText(b.title, b.x + b.w / 2, b.y + b.h / 2 + 0.5);
                 });
                 ctx.restore();
             },
@@ -1755,8 +1798,8 @@
                 ctx.fillStyle = 'rgba(43,88,118,0.15)';
                 roundRect(ctx, b.x, b.y, b.w, b.h, 10);
                 ctx.fill();
-                ctx.font = 'bold 15px sans-serif';
-                ctx.fillStyle = '#2b5876';
+                ctx.font = '600 15px ' + UI_FONT;
+                ctx.fillStyle = PALETTE.text;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(t('menu'), b.x + b.w / 2, b.y + b.h / 2 + 1);
@@ -1796,8 +1839,8 @@
             drawTitle(ctx, cw) {
                 const level = LevelManager.currentLevel();
                 ctx.save();
-                ctx.font = 'bold 22px sans-serif';
-                ctx.fillStyle = '#2b5876';
+                ctx.font = '600 20px ' + UI_FONT;
+                ctx.fillStyle = PALETTE.text;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 ctx.fillText(levelTitle(level), cw / 2, 10);
@@ -1858,12 +1901,12 @@
                 this.levelMenuItems.forEach((it, i) => {
                     const isCur = it.isCurrent;
                     if (isCur) {
-                        ctx.fillStyle = 'rgba(111,174,106,0.14)';
+                        ctx.fillStyle = PALETTE.accentSoft;
                         roundRect(ctx, it.x + 4, it.y + 3, it.w - 8, it.h - 6, 10);
                         ctx.fill();
                     }
-                    ctx.font = isCur ? 'bold 16px sans-serif' : '15px sans-serif';
-                    ctx.fillStyle = isCur ? '#6fae6a' : '#2b5876';
+                    ctx.font = (isCur ? '600 16px ' : '400 15px ') + UI_FONT;
+                    ctx.fillStyle = isCur ? PALETTE.accentInk : PALETTE.text;
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(it.title, it.x + 16, it.y + it.h / 2 + 1);
@@ -1904,10 +1947,10 @@
                 ctx.save();
                 ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
                 ctx.scale(this.celebrateScale, this.celebrateScale);
-                ctx.fillStyle = '#6fae6a';
+                ctx.fillStyle = PALETTE.ok;
                 roundRect(ctx, -b.w / 2, -b.h / 2, b.w, b.h, 26);
                 ctx.fill();
-                ctx.font = 'bold 21px sans-serif';
+                ctx.font = '600 21px ' + UI_FONT;
                 ctx.fillStyle = '#fff';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';

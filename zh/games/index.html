@@ -13,6 +13,23 @@
             --text-main: #2b2622;   /* 暖调深棕 */
             --text-muted: #85796e;  /* 暖灰 */
             --radius: 20px;
+
+            /* 共用 token 别名：本页是其余页面的取值参照，命名与 DESIGN.md 一致 */
+            --bg: #fdfbf7;
+            --bg-2: #f5f6f2;
+            --surface: #ffffff;
+            --text: #2b2622;
+            --muted: #85796e;
+            --faint: #a89e92;
+            --accent: #e0a87f;
+            --accent-soft: #faf0e7;
+            --accent-ink: #a2694a;
+            --line: rgba(120,108,90,.10);
+            --shadow: 0 6px 20px rgba(120,108,90,.07);
+            --r-sm: 12px;
+            --r-md: 20px;
+            --r-lg: 28px;
+            --emoji-sat: .85;  /* 与四个小游戏一致 */
         }
 
         * {
@@ -218,6 +235,16 @@
             font-size: 22px;
             line-height: 1;
             transform: rotate(90deg);
+        }
+
+        /* 卡片图标里的 emoji 与四个小游戏共用同一个饱和度；
+           只作用于 emoji 字符本身，卡片底色、渐变 Aa、数字 3 保持原样 */
+        .icon-grid span,
+        .icon-number .berry-row,
+        .icon-cat .cat-face,
+        .icon-cat .heart,
+        .icon-trace .badge-pencil {
+            filter: saturate(var(--emoji-sat));
         }
 
         .card-content {

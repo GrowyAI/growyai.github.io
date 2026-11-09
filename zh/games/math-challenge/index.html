@@ -3,8 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>儿童数学小游戏 - 小猫吃鱼</title>
+<title>数学挑战 - 边玩边学</title>
 <style>
+  :root {
+    /* 共用 token（与 DESIGN.md 同名，本页自带，不依赖其他页面） */
+    --bg: #7FD8FF;
+    --bg-2: #eaf4fa;
+    --surface: #fffef8;
+    --text: #4a4640;
+    --muted: #7a7168;
+    --faint: #a89e92;
+    --accent: #dfa87c;
+    --accent-soft: #faf0e7;
+    --accent-ink: #a2694a;
+    --line: rgba(120,108,90,.12);
+    --shadow: 0 12px 32px rgba(70,58,46,.18);
+    --r-sm: 12px;
+    --r-md: 20px;
+    --r-lg: 24px;
+    /* emoji 统一饱和度：1 = 原色，越小越淡。只改这一个数字即可调整全站幅度 */
+    --emoji-sat: .85;
+  }
+  /* 只处理标题 / 模式按钮 / 成功提示里的 emoji 图标；
+     canvas 上的鱼和猫是手绘图形，不是 emoji，保持原来的明快配色不动 */
+  .panel h1, .optionBtn, #successToast, #uiModeBtn {
+    filter: saturate(var(--emoji-sat));
+  }
   html, body {
     margin: 0;
     padding: 0;
@@ -13,7 +37,7 @@
     overflow: hidden;
     overscroll-behavior: none;
     background: #87CEEB;
-    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
@@ -39,12 +63,12 @@
     gap: 6px;
     padding: 8px 16px;
     box-sizing: border-box;
-    background: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.72);
     backdrop-filter: blur(6px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(70,58,46,0.08);
     font-size: 14px;
-    font-weight: bold;
-    color: #34495e;
+    font-weight: 600;
+    color: var(--text);
     z-index: 10;
     pointer-events: none;
   }
@@ -56,34 +80,34 @@
   #statsRow span {
     margin: 0 5px;
     white-space: nowrap;
-    background: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.55);
     padding: 4px 10px;
-    border-radius: 14px;
+    border-radius: var(--r-sm);
   }
-  #uiScore { color: #E67E22; }
-  #uiTime { color: #E74C3C; }
-  #uiTarget { color: #27AE60; }
+  /* 顶栏从四种饱和色收敛为「一个暖主色 + 暖灰」 */
+  #uiScore { color: var(--accent-ink); }
+  #uiTime { color: var(--muted); }
+  #uiTarget { color: var(--muted); }
   #uiModeBtn {
     pointer-events: auto;
     border: none;
-    background: rgba(255,255,255,0.55);
-    color: #8E44AD;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 600;
     font-family: inherit;
     white-space: nowrap;
     padding: 5px 16px;
-    border-radius: 14px;
-    box-shadow: 0 2px 0 rgba(142,68,173,0.25);
+    border-radius: var(--r-sm);
+    box-shadow: 0 2px 8px rgba(120,108,90,0.10);
   }
   #uiModeBtn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 0 rgba(142,68,173,0.25);
+    transform: scale(0.97);
   }
   .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(48,40,34,0.42);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -92,44 +116,45 @@
   .hidden {
     display: none !important;
   }
+  /* 外壳微调：4px 橙粗边 / 硬投影 → 1px 细边 + 柔和阴影；水下蓝与鱼猫配色保持不变 */
   .panel {
-    background: #fffef8;
-    border-radius: 24px;
+    background: var(--surface);
+    border-radius: var(--r-lg);
     padding: 32px 26px;
     text-align: center;
     width: 78%;
     max-width: 360px;
     max-height: 82vh;
     overflow-y: auto;
-    box-shadow: 0 14px 34px rgba(0,0,0,0.32);
-    border: 4px solid #FFE0B2;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
     box-sizing: border-box;
   }
   .panel h1 {
     margin: 0 0 10px 0;
     font-size: 27px;
-    color: #E67E22;
+    color: #E0914F;
     text-shadow: 1px 1px 0 #fff;
   }
   .panel p {
     margin: 6px 0 22px 0;
-    color: #666;
+    color: var(--muted);
     font-size: 15px;
     line-height: 1.6;
   }
   .panel button {
-    background: linear-gradient(180deg,#FFC15E,#FF8C42);
+    background: linear-gradient(180deg,#F5BD79,#E79A5C);
     border: none;
     color: #fff;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 700;
     padding: 13px 36px;
-    border-radius: 30px;
-    box-shadow: 0 5px 0 #E06B1A, 0 8px 14px rgba(255,140,66,0.4);
+    border-radius: var(--r-md);
+    box-shadow: 0 6px 16px rgba(224,140,80,0.24);
   }
   .panel button:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 #E06B1A, 0 4px 8px rgba(255,140,66,0.4);
+    transform: scale(0.97);
+    box-shadow: 0 3px 8px rgba(224,140,80,0.20);
   }
   .optionList {
     display: flex;
@@ -139,30 +164,28 @@
   }
   .optionBtn {
     width: 100%;
-    background: linear-gradient(180deg,#FFF3E0,#FFE0B2);
-    border: 2px solid #FFCC80;
+    background: linear-gradient(180deg,#FFF6EA,#FCEBD6);
+    border: 1px solid rgba(200,150,90,0.28);
     color: #A85D1F;
     font-size: 17px;
-    font-weight: bold;
+    font-weight: 600;
     padding: 13px 10px;
-    border-radius: 18px;
-    box-shadow: 0 3px 0 #E8A857;
+    border-radius: var(--r-md);
+    box-shadow: 0 2px 8px rgba(180,140,90,0.12);
     box-sizing: border-box;
   }
   .optionBtn:active {
-    transform: translateY(2px);
-    box-shadow: 0 1px 0 #E8A857;
+    transform: scale(0.98);
   }
   .secondaryBtn {
-    background: #EEE !important;
-    color: #888 !important;
-    box-shadow: 0 4px 0 #ccc, 0 6px 10px rgba(0,0,0,0.15) !important;
+    background: #F0EBE4 !important;
+    color: var(--muted) !important;
+    box-shadow: none !important;
     font-size: 15px !important;
     padding: 10px 28px !important;
   }
   .secondaryBtn:active {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 #ccc !important;
+    transform: scale(0.97);
   }
   .endBtnRow {
     display: flex;
@@ -174,26 +197,27 @@
     box-sizing: border-box;
   }
   #nextLevelBtn {
-    background: linear-gradient(180deg,#7EE0A8,#27AE60);
-    box-shadow: 0 5px 0 #1E8449, 0 8px 14px rgba(39,174,96,0.4);
+    background: linear-gradient(180deg,#9FD8B2,#5FAE7E);
+    box-shadow: 0 6px 16px rgba(95,174,126,0.26);
   }
   #nextLevelBtn:active {
-    box-shadow: 0 2px 0 #1E8449, 0 4px 8px rgba(39,174,96,0.4);
+    transform: scale(0.97);
+    box-shadow: 0 3px 8px rgba(95,174,126,0.20);
   }
   #successToast {
     position: fixed;
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(180deg, rgba(88, 214, 141, 0.95), rgba(39, 174, 96, 0.95));
+    background: linear-gradient(180deg, rgba(120, 200, 155, 0.95), rgba(78, 168, 116, 0.95));
     color: #fff;
     font-size: 30px;
-    font-weight: bold;
+    font-weight: 700;
     padding: 22px 44px;
-    border-radius: 24px;
+    border-radius: var(--r-lg);
     z-index: 30;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-    border: 3px solid rgba(255,255,255,0.6);
+    box-shadow: 0 10px 28px rgba(70,58,46,0.22);
+    border: 1px solid rgba(255,255,255,0.65);
     text-align: center;
   }
   #successToast .toastScore {

@@ -1,10 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cat Chases Fish - Letter Tracing</title>
+    <title>写写画画 - 边玩边学</title>
     <style>
+        :root {
+            /* 共用 token（与 DESIGN.md 同名，本页自带，不依赖其他页面） */
+            --bg: #e0f7fa;
+            --bg-2: #f2fafa;
+            --surface: #ffffff;
+            --text: #4a4640;
+            --muted: #7a7168;
+            --faint: #a89e92;
+            --accent: #8fc4c8;
+            --accent-soft: #eaf4f4;
+            --accent-ink: #3f7478;
+            --tab-color: var(--accent); /* 默认值；JS 会按分类覆盖到标签与底栏 */
+            --line: rgba(120,108,90,.10);
+            --shadow: 0 6px 20px rgba(120,108,90,.07);
+            --r-sm: 12px;
+            --r-md: 20px;
+            --r-lg: 28px;
+            /* emoji 统一饱和度：1 = 原色，越小越淡。只改这一个数字即可调整全站幅度 */
+            --emoji-sat: .85;
+        }
         html,
         body {
             margin: 0;
@@ -12,14 +32,14 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #E0F7FA;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
             -webkit-user-select: none;
             user-select: none;
             touch-action: none;
         }
 
-        /* ===== 顶部：分类标签（数字/大写/小写/形状），允许横向滑动，为后续新增分类留出空间 ===== */
+        /* ===== 顶部：分类标签 —— 与底部条目条共用同一套"选择器"规范 ===== */
         #categoryBar {
             position: fixed;
             top: 0;
@@ -28,7 +48,7 @@
             z-index: 10;
             display: flex;
             justify-content: center;
-            padding: 10px 10px 0;
+            padding: 10px 12px 0;
             box-sizing: border-box;
             pointer-events: none;
         }
@@ -36,13 +56,16 @@
             pointer-events: auto;
             display: flex;
             gap: 6px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 5px;
-            border-radius: 24px;
-            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.94);
+            padding: 6px;
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow);
             max-width: 100%;
             min-width: 0; /* flex子项默认min-width:auto，会拒绝收缩到比内容窄，导致max-width和overflow-x都不生效 */
             overflow-x: auto;
+            scroll-snap-type: x proximity;
+            scroll-padding-inline: 12px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             touch-action: pan-x; /* 覆盖 body 上的 touch-action: none，允许在这条带上横向滑动 */
@@ -51,26 +74,31 @@
             display: none;
         }
         .tab-btn {
-            border: none;
+            flex: 0 0 auto;
+            scroll-snap-align: center;
+            border: 1px solid transparent;
             background: transparent;
-            color: var(--tab-color, #888);
-            font-size: 21px;
-            font-weight: 800;
-            padding: 7px 14px;
-            border-radius: 20px;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1;
+            min-height: 44px;
+            padding: 0 16px;
+            border-radius: 22px;
             cursor: pointer;
             white-space: nowrap;
-            transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
+            transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
         }
         .tab-btn.active {
-            background: var(--tab-color, #4FC3F7);
+            background: var(--tab-color, var(--accent));
             color: #fff;
         }
         .tab-btn:active {
-            transform: scale(0.94);
+            transform: scale(0.97);
         }
 
-        /* ===== 底部：条目横向滑动带（一个分类下所有可选项，左右滑动挑选） ===== */
+        /* ===== 底部：条目滑动带 —— 与顶栏同一个"浮起白色胶囊"组件 ===== */
         #itemBar {
             position: fixed;
             bottom: 0;
@@ -78,15 +106,25 @@
             width: 100%;
             z-index: 10;
             box-sizing: border-box;
-            padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-            background: linear-gradient(to top, rgba(255, 255, 255, 0.97) 60%, rgba(255, 255, 255, 0));
+            padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+            display: flex;
+            justify-content: center;
+            pointer-events: none;
         }
         #itemStrip {
+            pointer-events: auto;
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding: 4px 16px;
+            padding: 6px 10px;
+            max-width: 100%;
+            min-width: 0; /* 同顶栏：允许收缩到比内容窄，overflow-x 才会生效 */
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--line);
+            border-radius: var(--r-lg);
+            box-shadow: var(--shadow);
             scroll-snap-type: x proximity;
+            scroll-padding-inline: 12px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             touch-action: pan-x; /* 覆盖 body 上的 touch-action: none，允许在这条带上横向滑动 */
@@ -97,33 +135,33 @@
         .item-btn {
             flex: 0 0 auto;
             scroll-snap-align: center;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            border: 2px solid #e5e5e5;
-            background: #fff;
-            color: #444;
-            font-size: 20px;
-            font-weight: 700;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
             cursor: pointer;
-            transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+            transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
         }
         .item-btn.active {
-            background: #FF8C42;
-            border-color: #FF8C42;
+            background: var(--tab-color, var(--accent));
+            border-color: var(--tab-color, var(--accent));
             color: #fff;
-            transform: scale(1.1);
         }
         .item-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.97);
         }
         .item-empty-tip {
-            color: #999;
-            font-size: 13px;
+            color: var(--muted);
+            font-size: 14px;
             padding: 8px;
         }
 
@@ -135,6 +173,8 @@
             top: 0;
             left: 0;
             z-index: 1;
+            /* 画布上的追逐 emoji（小鱼 / 小猫 / 生肖等）统一轻微降饱和 */
+            filter: saturate(var(--emoji-sat));
         }
         #hanziLoading {
             position: fixed;
@@ -142,11 +182,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5;
-            background: rgba(0, 0, 0, 0.72);
+            background: rgba(58, 50, 44, 0.78);
             color: #fff;
             font-size: 15px;
             padding: 10px 18px;
-            border-radius: 20px;
+            border-radius: var(--r-md);
             display: none;
             pointer-events: none;
         }
@@ -180,10 +220,10 @@
         // 以后要调整某个字符的比例/新增符号，直接改这里的数字/字符串就行，不用碰下面的引擎逻辑。
         window.TRACE_DATA = {
             categories: [
-                { id: 'numbers', label: '123', color: '#FF6B6B', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
-                { id: 'uppercase', label: 'ABC', color: '#4FC3F7', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
-                { id: 'lowercase', label: 'abc', color: '#66BB6A', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
-                { id: 'shapes', label: '▲◆', color: '#AB47BC', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] },
+                { id: 'numbers', label: '123', color: '#E07A7A', items: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] },
+                { id: 'uppercase', label: 'ABC', color: '#4E93B8', items: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'] },
+                { id: 'lowercase', label: 'abc', color: '#6FA97B', items: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'] },
+                { id: 'shapes', label: '▲◆', color: '#A267B0', items: ['circle', 'triangle', 'square', 'hexagon', 'pentagon', 'star', 'heart', 'ellipse', 'rectangle', 'rhombus'] },
                 // 汉字主题分类：items 里每一项是 { id: '字', icon }，icon 是这个字专属的追逐动效图标
                 // （追逐动效里被追的那个固定显示"当前第几笔"的数字，跟这个字是什么无关，
                 // 所以每个字只需要配一个 icon，不需要一对）。按钮本身永远显示汉字本身，不受影响。
@@ -191,7 +231,7 @@
                 // 不用改任何引擎代码；数据没有的字会在浏览器里自动从 CDN 现拉。
                 // 数字：icon 用带圈数字，跟"这个字表示几"对应得上。
                 {
-                    id: 'hanzi-numbers', label: '数字', color: '#42A5F5',
+                    id: 'hanzi-numbers', label: '数字', color: '#5B93C4',
                     items: [
                         { id: '一', icon: '①' },
                         { id: '二', icon: '②' },
@@ -207,7 +247,7 @@
                 },
                 // 十二生肖：icon 用用户指定的代表图标。
                 {
-                    id: 'hanzi-zodiac', label: '生肖', color: '#EF6C00',
+                    id: 'hanzi-zodiac', label: '生肖', color: '#C98649',
                     items: [
                         { id: '鼠', icon: '🐀' },
                         { id: '牛', icon: '🐃' },
@@ -225,7 +265,7 @@
                 },
                 // 衣食：日常吃穿用字。
                 {
-                    id: 'hanzi-food-clothing', label: '衣食', color: '#43A047',
+                    id: 'hanzi-food-clothing', label: '衣食', color: '#649A6B',
                     items: [
                         { id: '水', icon: '💧' },
                         { id: '饭', icon: '🍚' },
@@ -240,7 +280,7 @@
                 // 住行：桌/椅本来共用🪑会分不清，改成桌用🗄️、椅用🪑；
                 // 火/卡/机是"火车/卡车/飞机"里挑出来的单字，直接用对应交通工具的图标。
                 {
-                    id: 'hanzi-housing-transport', label: '住行', color: '#5C6BC0',
+                    id: 'hanzi-housing-transport', label: '住行', color: '#6B78B5',
                     items: [
                         { id: '房', icon: '🏠' },
                         { id: '床', icon: '🛏️' },
@@ -352,13 +392,18 @@
         canvas.width = width;
         canvas.height = height;
 
-        const COLORS = ['#FF5252', '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63'];
+        /* 画布侧调色板：命名与 CSS :root token 对应，笔迹色保持可辨识但降一点饱和 */
+        const PALETTE = {
+            guide: 'rgba(90,80,70,0.16)',
+            strokes: ['#E97B7B', '#7FB585', '#6FA9D8', '#E5AC6B', '#A982BE', '#D984A3']
+        };
+        const COLORS = PALETTE.strokes;
 
         let currentShape = 'circle';
         let allStrokes = [];
         let currentStrokeIndex = 0;
         let currentPath = [];
-        let pathColor = '#FF5252';
+        let pathColor = COLORS[0];
         let catIndex = 0;
         let fishIndex = 0;
         let isDragging = false;
@@ -1172,7 +1217,7 @@
                 const currentItemDef = window.TRACE_DATA.items[currentShape];
                 const isHanziBg = currentItemDef && currentItemDef.type === 'hanzi';
                 if (isHanziBg) {
-                    ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+                    ctx.strokeStyle = PALETTE.guide;
                     ctx.lineWidth = 9;
                     ctx.lineCap = "round";
                     ctx.lineJoin = "round";
@@ -1185,7 +1230,7 @@
                         ctx.stroke();
                     }
                 } else {
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+                    ctx.fillStyle = PALETTE.guide;
                     for (let s = 0; s < allStrokes.length; s++) {
                         const stroke = allStrokes[s];
                         for (let i = 0; i < stroke.length; i += 10) {
@@ -1285,6 +1330,8 @@
             function renderItems(catId) {
                 const cat = window.TRACE_DATA.categories.find(c => c.id === catId);
                 itemsEl.innerHTML = '';
+                // 底栏选中色跟随当前分类，和顶栏用同一个色值
+                itemsEl.style.setProperty('--tab-color', (cat && cat.color) || '#8fc4c8');
                 if (!cat || cat.items.length === 0) {
                     const tip = document.createElement('span');
                     tip.className = 'item-empty-tip';
