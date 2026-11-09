@@ -78,9 +78,10 @@
             scroll-snap-align: center;
             border: 1px solid transparent;
             background: transparent;
-            color: var(--muted);
+            /* 未选中：文字用本分类的颜色（也就是选中时的底色）；底部二级选项仍是深灰 */
+            color: var(--tab-color, var(--accent));
             font-family: inherit;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             line-height: 1;
             min-height: 44px;
@@ -458,9 +459,9 @@
             bottom: 130, // 底部选图案条（含安全区）
             side: 48     // 左右留白，防止圆滑鼓起/呼吸浮动贴边被裁切
         };
-        // 目标框长短边比上限（4:5 ~ 5:4）：不让它随屏幕变得过瘦长，
+        // 目标框长短边比上限（5:6 ~ 6:5）：不让它随屏幕变得过瘦长，
         // 否则窄字形（1 / l / i）会被"上下占满"拉得比 m / w 大很多
-        const FIT_BOX_MAX_RATIO = 5 / 4;
+        const FIT_BOX_MAX_RATIO = 6 / 5;
 
         // 追逐对配置：每次 startGame 随机选一对，避免孩子只看猫和鱼看腻
         const CHASE_PAIRS = [
@@ -1141,7 +1142,7 @@
             const budgetRight = (width - CANVAS_MARGIN.side) - cx;
             const budgetUp = cy - CANVAS_MARGIN.top;
             const budgetDown = (height - CANVAS_MARGIN.bottom) - cy;
-            // 屏幕本身偏瘦长时把目标框收进 4:5 ~ 5:4，宽屏/平板已在范围内则原样不动
+            // 屏幕本身偏瘦长时把目标框收进 5:6 ~ 6:5，宽屏/平板已在范围内则原样不动
             const boxW = Math.min(budgetLeft + budgetRight, (budgetUp + budgetDown) * FIT_BOX_MAX_RATIO);
             const boxH = Math.min(budgetUp + budgetDown, (budgetLeft + budgetRight) * FIT_BOX_MAX_RATIO);
             const fitSize = fitSizeToScreen(cx, cy, item, boxW / 2, boxW / 2, boxH / 2, boxH / 2);

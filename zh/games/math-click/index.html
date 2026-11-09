@@ -49,7 +49,7 @@
     /* 设置入口按钮：跟"返回菜单"按钮同一种浅色风格，避免视觉割裂 */
     .settings-toggle {
         position: fixed;
-        top: 10px;
+        top: 8px; /* 36px 圆钮中心 = 26px，与画布上的菜单/关卡标题同一条中心线 */
         right: 10px;
         z-index: 100;
         width: 36px;
@@ -69,7 +69,7 @@
     /* ‹ 的墨迹比字体框中心低：统一 Arial 字形 + 3px 底留白做视觉居中 */
     .hall-toggle {
         position: fixed;
-        top: 10px;
+        top: 8px;
         left: 10px;
         z-index: 100;
         width: 36px;
@@ -483,6 +483,9 @@
             menuButtons: ['#dceaf1', '#e2ecdf', '#f1e8dd', '#efe2e5', '#e6e3ef']
         };
         const UI_FONT = '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
+        // 顶部栏「菜单 / 关卡标题+下拉箭头 / 设置」共用同一条垂直中心线；
+        // CSS 里两枚 36px 圆钮的 top:8px 就是 26 - 36/2
+        const TOP_ROW_CENTER = 26;
 
         const Config = {
             itemRadius: 20,
@@ -1818,7 +1821,7 @@
 
             // ---- 游戏中左上角的"返回菜单"按钮 ----
             layoutBackButton() {
-                this.backBtn = { x: 12, y: 8, w: 64, h: 32 };
+                this.backBtn = { x: 12, y: TOP_ROW_CENTER - 16, w: 64, h: 32 };
             },
 
             drawBackButton(ctx) {
@@ -1871,14 +1874,15 @@
                 ctx.font = '600 20px ' + UI_FONT;
                 ctx.fillStyle = PALETTE.text;
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.fillText(levelTitle(level), cw / 2, 10);
+                ctx.textBaseline = 'middle';
+                // 中文字形墨迹比 em 中线略高，下移 3px 才和「菜单」「设置」视觉齐平
+                ctx.fillText(levelTitle(level), cw / 2, TOP_ROW_CENTER + 3);
 
                 // 标题右侧一个低调的小箭头，供家长展开"选关"菜单（触控区域比图形本身大一些）
                 const textW = ctx.measureText(levelTitle(level)).width;
                 const arrowCx = cw / 2 + textW / 2 + 18;
-                const arrowCy = 10 + 11;
-                this.titleArrowBtn = { x: arrowCx - 16, y: 2, w: 32, h: 28 };
+                const arrowCy = TOP_ROW_CENTER;
+                this.titleArrowBtn = { x: arrowCx - 16, y: TOP_ROW_CENTER - 14, w: 32, h: 28 };
                 ctx.fillStyle = this.levelMenuOpen ? '#2b5876' : 'rgba(43,88,118,0.45)';
                 ctx.beginPath();
                 if (this.levelMenuOpen) {
@@ -1934,7 +1938,7 @@
                         roundRect(ctx, it.x + 4, it.y + 3, it.w - 8, it.h - 6, 10);
                         ctx.fill();
                     }
-                    ctx.font = (isCur ? '600 16px ' : '400 15px ') + UI_FONT;
+                    ctx.font = (isCur ? '600 17px ' : '400 16px ') + UI_FONT;
                     ctx.fillStyle = isCur ? PALETTE.accentInk : PALETTE.text;
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
