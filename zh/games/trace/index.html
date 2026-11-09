@@ -458,6 +458,9 @@
             bottom: 130, // 底部选图案条（含安全区）
             side: 48     // 左右留白，防止圆滑鼓起/呼吸浮动贴边被裁切
         };
+        // 目标框长短边比上限（4:5 ~ 5:4）：不让它随屏幕变得过瘦长，
+        // 否则窄字形（1 / l / i）会被"上下占满"拉得比 m / w 大很多
+        const FIT_BOX_MAX_RATIO = 5 / 4;
 
         // 追逐对配置：每次 startGame 随机选一对，避免孩子只看猫和鱼看腻
         const CHASE_PAIRS = [
@@ -480,8 +483,8 @@
         let catBobPhase = 0;       // 猫上下浮动相位
         let catBreath = 1;         // 猫呼吸缩放（非拖动时生效；拖动时平滑归 1）
         let catGrab = 1;           // 抓取放大倍率，用缓动替代原来的字号硬跳
-        const FISH_WIGGLE_SPEED = 3.6;   // 摆动速度（调小，不那么抢眼）
-        const FISH_WIGGLE_AMOUNT = 0.10; // 摆动幅度（弧度，约6度）
+        const FISH_WIGGLE_SPEED = 2.5;   // 摆动速度，周期约 2.5s（原 3.6 → 1.75s）
+        const FISH_WIGGLE_AMOUNT = 0.07; // 摆动幅度（弧度，约4度，原 0.10 → 约6度）
         const CAT_BOB_SPEED = 2 * Math.PI / 3; // 周期 3s（呼吸与浮动共用同一相位）
         const CAT_BOB_AMOUNT = 1;        // 猫上下浮动幅度（像素）
         const CAT_BREATH_AMOUNT = 0.016; // 猫呼吸幅度（1.6%，能察觉但不抢眼）
@@ -1138,7 +1141,10 @@
             const budgetRight = (width - CANVAS_MARGIN.side) - cx;
             const budgetUp = cy - CANVAS_MARGIN.top;
             const budgetDown = (height - CANVAS_MARGIN.bottom) - cy;
-            const fitSize = fitSizeToScreen(cx, cy, item, budgetLeft, budgetRight, budgetUp, budgetDown);
+            // 屏幕本身偏瘦长时把目标框收进 4:5 ~ 5:4，宽屏/平板已在范围内则原样不动
+            const boxW = Math.min(budgetLeft + budgetRight, (budgetUp + budgetDown) * FIT_BOX_MAX_RATIO);
+            const boxH = Math.min(budgetUp + budgetDown, (budgetLeft + budgetRight) * FIT_BOX_MAX_RATIO);
+            const fitSize = fitSizeToScreen(cx, cy, item, boxW / 2, boxW / 2, boxH / 2, boxH / 2);
             allStrokes = generateStrokesForItem(cx, cy, fitSize, item);
 
             currentPath = allStrokes[0];

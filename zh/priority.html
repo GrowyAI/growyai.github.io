@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Growy 重要/不紧急时间管理（周计划）</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <style>
         :root {
             --primary: #1B5E20;
@@ -109,8 +109,20 @@
             max-width: 100%;
             max-height: 100%;
         }
+
+        /* 首屏静态占位：远程模块就绪前先显示，React 挂载后自动替换 */
+        #boot {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            background: #fff;
+            border-bottom: 1px solid #E0E7ED;
+        }
+        #boot h1 { margin: 0 0 .5rem; font-size: 1.5rem; font-weight: 700; color: #2D5A5A; }
+        #boot p { margin: 0; font-size: 1rem; color: #374151; }
+        #boot .boot-sub { margin-top: .25rem; font-size: .875rem; color: #4b5563; }
+        #boot .boot-hint { margin-top: 1.25rem; font-size: .8rem; color: #9ca3af; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
     <script type="importmap">
     {
       "imports": {
@@ -125,7 +137,21 @@
 </head>
 <body>
     <a href="index.html" class="back-link">← 返回首页</a>
-    <div id="root"></div>
+    <div id="root">
+        <div id="boot">
+            <h1>「重要/不紧急」周计划</h1>
+            <p>把真正重要但不紧急的事，先放进这一周</p>
+            <p class="boot-sub">不打卡 · 不监督 · 只是对自己的承诺</p>
+            <p class="boot-hint" id="boot-hint">正在加载…</p>
+        </div>
+    </div>
+    <script>
+        // 依赖全在 CDN：加载不出来时给一句提示，避免一直停在占位上
+        setTimeout(function () {
+            var hint = document.getElementById('boot-hint');
+            if (hint) hint.textContent = '内容加载失败或网络较慢，请检查网络后刷新页面';
+        }, 8000);
+    </script>
 
     <script type="module">
         import React, { useState, useMemo, useCallback } from 'react';
@@ -188,6 +214,7 @@
 
             // 生成二维码
             React.useEffect(() => {
+                if (typeof QRCode === 'undefined') return; // CDN 不可用时不影响页面其余部分
                 const container = document.createElement('div');
                 const qr = new QRCode(container, {
                     text: 'https://growy.pages.dev/',
