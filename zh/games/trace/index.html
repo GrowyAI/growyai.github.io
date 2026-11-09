@@ -7,8 +7,8 @@
     <style>
         :root {
             /* 共用 token（与 DESIGN.md 同名，本页自带，不依赖其他页面） */
-            --bg: #e0f7fa;
-            --bg-2: #f2fafa;
+            --bg: #f1fbf8;
+            --bg-2: #f8fcfa;
             --surface: #ffffff;
             --text: #4a4640;
             --muted: #7a7168;
@@ -97,6 +97,34 @@
         .tab-btn:active {
             transform: scale(0.97);
         }
+        /* 返回大厅：常驻在分类条左侧的半圆小胶囊，不另占一条栏、不挤压标签 */
+        #hallBackBtn {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            flex: 0 0 auto;
+            align-self: center;
+            width: 32px;
+            height: 40px;
+            margin-right: 4px;
+            padding: 0;
+            border: none;
+            border-radius: 20px 0 0 20px;
+            background: var(--surface);
+            opacity: .8;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        #hallBackBtn:active { transform: scale(0.94); }
 
         /* ===== 底部：条目滑动带 —— 与顶栏同一个"浮起白色胶囊"组件 ===== */
         #itemBar {
@@ -195,7 +223,7 @@
 <body>
 
     <div id="categoryBar">
-        <div id="categoryTabs"></div>
+        <div id="categoryTabs"><a id="hallBackBtn" href="../index.html" aria-label="返回游戏大厅">‹</a></div>
     </div>
 
     <div id="itemBar">
@@ -392,12 +420,17 @@
         canvas.width = width;
         canvas.height = height;
 
-        /* 画布侧调色板：命名与 CSS :root token 对应，笔迹色保持可辨识但降一点饱和 */
+        /* 画布侧调色板：命名与 CSS :root token 对应；笔迹色取原色与上一版的中点，保留焦点彩度 */
         const PALETTE = {
             guide: 'rgba(90,80,70,0.16)',
-            strokes: ['#E97B7B', '#7FB585', '#6FA9D8', '#E5AC6B', '#A982BE', '#D984A3']
+            strokes: ['#F36767', '#66B26B', '#4A9FE3', '#EFA039', '#A34CC0', '#DE5485']
         };
         const COLORS = PALETTE.strokes;
+
+        // 笔迹粗细：三种模式共用一组值，整体调细约 20%。汉字笔画密，细一点才不会糊成一团。
+        const GUIDE_WIDTH = 7;    // 汉字的实线引导（原 9）
+        const GUIDE_DOT_R = 3.6;  // 字母/数字的引导点半径（原 4.5）
+        const INK_WIDTH = 21;     // 彩笔轨迹（原 26）
 
         let currentShape = 'circle';
         let allStrokes = [];
@@ -437,16 +470,44 @@
             return String(n);
         }
 
-        // ===== 轻量idle动效（参考"小猫吃鱼"主游戏的wigglePhase/bobPhase/squash思路，做emoji版的简化实现）=====
+        // ===== 轻量idle动效（字形先烘焙成位图，每帧只做 drawImage 变换，避免彩色 emoji 反复栅格化掉帧）=====
         let fishWigglePhase = 0;   // 鱼身摆动相位
         let catBobPhase = 0;       // 猫上下浮动相位
-        let catBreath = 1;         // 猫呼吸缩放（仅在非拖动时生效，拖动时立即恢复为1，避免和抓取反馈打架）
+        let catBreath = 1;         // 猫呼吸缩放（非拖动时生效；拖动时平滑归 1）
+        let catGrab = 1;           // 抓取放大倍率，用缓动替代原来的字号硬跳
         const FISH_WIGGLE_SPEED = 3.6;   // 摆动速度（调小，不那么抢眼）
         const FISH_WIGGLE_AMOUNT = 0.10; // 摆动幅度（弧度，约6度）
-        const CAT_BOB_SPEED = 1.8;       // 猫浮动速度
-        const CAT_BOB_AMOUNT = 2;        // 猫上下浮动幅度（像素）
-        const CAT_BREATH_AMOUNT = 0.022; // 猫呼吸幅度（2.2%）
-        const PREY_FONT_SIZE = 36;       // 食物图标字号（45px×0.8，整体缩小20%左右），比猎手小一圈，方向感更明确
+        const CAT_BOB_SPEED = 2 * Math.PI / 3; // 周期 3s（呼吸与浮动共用同一相位）
+        const CAT_BOB_AMOUNT = 1;        // 猫上下浮动幅度（像素）
+        const CAT_BREATH_AMOUNT = 0.016; // 猫呼吸幅度（1.6%，能察觉但不抢眼）
+        const CAT_BREATH_PHASE = 0.7;    // 呼吸与浮动错开相位，避免同时变高又下移的"搏动"感
+        const CAT_EASE_TAU = 0.08;       // 呼吸与抓取共用的缓动时间常数（秒），帧率无关
+        const HUNTER_FONT_SIZE = 62;
+        const HUNTER_GRAB_SCALE = 67 / HUNTER_FONT_SIZE; // 抓取放大沿用原本 62→67px 的幅度
+        const PREY_FONT_SIZE = 36;       // 食物图标字号，比猎手小一圈，方向感更明确
+
+        // 字形只在字符变化时栅格化一次（切图案、汉字换笔画号），稳态每帧不再调用 fillText。
+        // 2× 超采样让缩放/旋转后的边缘仍然平滑；画布上的 CSS filter 照常作用于整块画布，降饱和不变。
+        const SPRITE_SS = 2;
+        const spriteCache = new Map();
+        function bakeSprite(text, fontSize) {
+            const key = text + '@' + fontSize;
+            let sprite = spriteCache.get(key);
+            if (sprite) return sprite;
+            const box = Math.ceil(fontSize * 1.6);
+            const off = document.createElement('canvas');
+            off.width = off.height = box * SPRITE_SS;
+            const c = off.getContext('2d');
+            c.scale(SPRITE_SS, SPRITE_SS);
+            c.font = fontSize + 'px sans-serif';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText(text, box / 2, box / 2);
+            sprite = { canvas: off, size: box };
+            if (spriteCache.size > 40) spriteCache.clear();
+            spriteCache.set(key, sprite);
+            return sprite;
+        }
 
         /* ========================= 特效管理 ========================= */
         class EffectsManager {
@@ -1203,9 +1264,16 @@
             // 更新idle动效相位
             fishWigglePhase += dt * FISH_WIGGLE_SPEED;
             catBobPhase += dt * CAT_BOB_SPEED;
-            // 猫呼吸：非拖动时跟随sin波轻微起伏；拖动时快速抚平为1，交给现有的78→84px抓取反馈，两者不打架
-            const catBreathTarget = isDragging ? 1 : (1 + Math.sin(catBobPhase) * CAT_BREATH_AMOUNT);
-            catBreath += (catBreathTarget - catBreath) * Math.min(1, dt * 10);
+            // 帧率无关的指数缓动：呼吸、抚平、抓取放大共用一套，掉帧时也不会"慢半拍"
+            const ease = 1 - Math.exp(-dt / CAT_EASE_TAU);
+            const catBreathTarget = isDragging ? 1 : (1 + Math.sin(catBobPhase + CAT_BREATH_PHASE) * CAT_BREATH_AMOUNT);
+            catBreath += (catBreathTarget - catBreath) * ease;
+            const catGrabTarget = isDragging ? HUNTER_GRAB_SCALE : 1;
+            catGrab += (catGrabTarget - catGrab) * ease;
+
+            // 字形只在字符变化时重新烘焙；命中缓存时这里只是两次查表
+            const hunterSprite = bakeSprite(currentPair.hunter, HUNTER_FONT_SIZE);
+            const preySprite = bakeSprite(currentPair.prey, PREY_FONT_SIZE);
 
             ctx.clearRect(0, 0, width, height);
 
@@ -1218,7 +1286,7 @@
                 const isHanziBg = currentItemDef && currentItemDef.type === 'hanzi';
                 if (isHanziBg) {
                     ctx.strokeStyle = PALETTE.guide;
-                    ctx.lineWidth = 9;
+                    ctx.lineWidth = GUIDE_WIDTH;
                     ctx.lineCap = "round";
                     ctx.lineJoin = "round";
                     for (let s = 0; s < allStrokes.length; s++) {
@@ -1235,7 +1303,7 @@
                         const stroke = allStrokes[s];
                         for (let i = 0; i < stroke.length; i += 10) {
                             ctx.beginPath();
-                            ctx.arc(stroke[i].x, stroke[i].y, 4.5, 0, Math.PI * 2);
+                            ctx.arc(stroke[i].x, stroke[i].y, GUIDE_DOT_R, 0, Math.PI * 2);
                             ctx.fill();
                         }
                     }
@@ -1246,7 +1314,7 @@
                 ctx.save();
                 ctx.globalAlpha = 1.0;
                 ctx.strokeStyle = pathColor;
-                ctx.lineWidth = 26;
+                ctx.lineWidth = INK_WIDTH;
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
 
@@ -1283,10 +1351,9 @@
                     ctx.globalCompositeOperation = 'source-over';
                     ctx.translate(fishPos.x, fishPos.y);
                     ctx.rotate(fishWiggle);
-                    ctx.font = PREY_FONT_SIZE + "px sans-serif";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(currentPair.prey, 0, 0);
+                    ctx.drawImage(preySprite.canvas,
+                        -preySprite.size / 2, -preySprite.size / 2,
+                        preySprite.size, preySprite.size);
                     ctx.restore();
                 }
 
@@ -1294,18 +1361,16 @@
                 effects.update(dt);
                 effects.render(ctx);
 
-                // 5. 小猫（拖动时微微放大：67px，正常62px——即84/78px整体缩小20%左右；非拖动时轻微呼吸+上下浮动，暗示"想动、等着被拖走"）
+                // 5. 小猫（抓取时平滑放大到原本 67px 的观感；非拖动时极轻微呼吸+浮动，暗示"可以拖"）
                 const catPos = currentPath[catIndex];
                 const catBobY = isDragging ? 0 : Math.sin(catBobPhase) * CAT_BOB_AMOUNT;
+                const size = hunterSprite.size * catGrab;
                 ctx.save();
                 ctx.globalAlpha = 1.0;
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.translate(catPos.x, catPos.y + catBobY);
                 ctx.scale(1 / Math.sqrt(catBreath), catBreath);
-                ctx.font = isDragging ? "67px sans-serif" : "62px sans-serif";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(currentPair.hunter, 0, 0);
+                ctx.drawImage(hunterSprite.canvas, -size / 2, -size / 2, size, size);
                 ctx.restore();
             }
 

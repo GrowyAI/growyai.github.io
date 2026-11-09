@@ -70,6 +70,7 @@
         .home-title-row {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             padding-bottom: 4px; border-bottom: 3px solid var(--border-soft); flex-wrap: wrap;
+            position: relative; min-height: 30px;
         }
         .home-title { font-size: 24px; font-weight: 600; color: var(--text); text-align: center; }
         .settings-btn {
@@ -78,6 +79,14 @@
             font-weight: 500; white-space: nowrap; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px;
         }
         .settings-btn:active { transform: scale(var(--active-scale)); background: var(--btn-active); }
+        /* 首页左上角返回大厅：与右上角设置按钮是同一枚胶囊，左右对称 */
+        #homeSettingsBtn { position: absolute; top: 0; right: 0; }
+        #homeBackBtn {
+            position: absolute; top: 0; left: 0;
+            width: 36px; height: 30px; padding: 0; justify-content: center;
+            font-size: 26px; font-weight: 700; line-height: 1;
+            text-decoration: none; color: var(--text-muted);
+        }
         .category-section { margin-bottom: 4px; }
         .category-label { font-size: 17px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
         .category-label span { background: var(--btn-bg); border-radius: 20px; padding: 0 10px; font-size: 13px; color: #888; }
@@ -132,7 +141,14 @@
         .learn-page { display: none; flex-direction: column; height: 100%; flex: 1; }
         .learn-page.active { display: flex; }
         .learn-top-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .back-btn { font-size: 28px; background: none; border: none; cursor: pointer; align-self: flex-start; padding: 4px 8px; color: #888; touch-action: manipulation; }
+        .back-btn {
+            width: 36px; height: 30px; padding: 0;
+            background: var(--btn-bg); border: none; border-radius: 20px;
+            font-size: 26px; font-weight: 700; line-height: 1;
+            color: var(--text-muted); cursor: pointer; touch-action: manipulation;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .back-btn:active { transform: scale(var(--active-scale)); background: var(--btn-active); }
         .learn-lang-toggle {
             background: var(--btn-bg); border: none; border-radius: 20px; padding: 5px 12px;
             font-size: 14px; cursor: pointer; touch-action: manipulation; font-weight: 500;
@@ -269,6 +285,7 @@
     <div class="container" id="app">
         <div id="homePage" class="home-page">
             <div class="home-title-row">
+                <a class="settings-btn" id="homeBackBtn" href="../index.html" aria-label="返回游戏大厅">‹</a>
                 <div class="home-title">📚 我的词汇卡</div>
                 <button class="settings-btn" id="homeSettingsBtn">⚙️ 设置</button>
             </div>
@@ -287,7 +304,7 @@
         </div>
         <div id="learnPage" class="learn-page">
             <div class="learn-top-bar">
-                <button class="back-btn" id="backBtn">‹ 返回</button>
+                <button class="back-btn" id="backBtn" aria-label="返回词汇卡首页">‹</button>
                 <button class="learn-lang-toggle" id="learnLangToggle"><span class="lang-zh">中</span>/<span class="lang-en">EN</span></button>
             </div>
             <div class="display-area">

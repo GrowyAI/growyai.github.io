@@ -7,8 +7,8 @@
     <style>
     :root {
         /* 共用 token（与 DESIGN.md 同名，本页自带，不依赖其他页面） */
-        --bg: #eaf7ff;
-        --bg-2: #f4f9fc;
+        --bg: #f2f9fd;
+        --bg-2: #f9fcfd;
         --surface: #ffffff;
         --text: #2b5876;
         --muted: #6b7f8a;
@@ -65,6 +65,32 @@
         -webkit-user-select: none;
         user-select: none;
     }
+    /* 返回大厅：与右上角设置按钮同一枚圆形，只在开局的模式菜单出现（游戏中隐藏） */
+    .hall-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 100;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: rgba(43,88,118,0.15);
+        color: #2b5876;
+        font-family: inherit;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    .hall-toggle:active { transform: scale(0.94); }
+    body.in-game .hall-toggle { display: none; }
 
     /* 遮罩层 */
     .settings-overlay {
@@ -161,6 +187,7 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+    <a id="hallBackBtn" class="hall-toggle" href="../index.html" aria-label="返回游戏大厅">‹</a>
     <button id="settingsToggle" class="settings-toggle" aria-label="设置">⚙️</button>
     <div id="settingsOverlay" class="settings-overlay">
         <div class="settings-panel">
@@ -442,13 +469,13 @@
         ========================================================= */
         /* 画布侧调色板：命名与 CSS :root token 对应，改色只改这里 */
         const PALETTE = {
-            bg: '#eaf7ff',
+            bg: '#f2f9fd',
             text: '#2b5876',
             muted: '#6b7f8a',
             accent: '#8fb2c9',
             accentSoft: 'rgba(143,178,201,0.18)',
             accentInk: '#3f6b85',
-            ok: '#5c8f70',
+            ok: '#7FBE80',
             radius: 20,
             // 开局菜单：5 个模式各一种低饱和淡彩，只比画布底色略深
             menuButtons: ['#dceaf1', '#e2ecdf', '#f1e8dd', '#efe2e5', '#e6e3ef']
@@ -481,7 +508,7 @@
                     // 1 个水果时正好在圆心
                     gridCols: 3,
                     // 填满后弹跳出现的活泼低饱和度颜色（红黄蓝绿橙棕紫）
-                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
 
                     // 根据画布宽度和盘子数量，算出统一的盘子直径（水果大小固定不变）
                     computeDims(cw, count) {
@@ -583,7 +610,7 @@
                     cellSize: 56,
                     cellGap: 10,
                     maxCols: 5,
-                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
 
                     // level.gridCols 可覆盖每行格子数；根据"预填充+互动"两部分的总格子数算出需要几行
                     computeDims(cw, count, level) {
@@ -684,7 +711,7 @@
                     cellSize: 56,
                     aZoneColor: '#dff0f7',     // 已经摆好的a：浅蓝底
                     bZoneColor: '#ffe9c7',     // 等着拖入的b：浅橙底
-                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
 
                     // 一整条连续的格子（不是c个分开的方块），一排放下 level.sum 个位置，会自动缩小以放得下
                     computeDims(cw, count, level) {
@@ -836,7 +863,7 @@
                     keepZoneColor: '#dff0f7',    // c：保留区，浅蓝底
                     removeZoneColor: '#ffe0b2',  // b：将被拿走区，浅橙底
                     targetZoneColor: '#ffe9c7',  // 底部承接格子，浅橙底（呼应上面要拿走的部分）
-                    completeColors: ['#e08a86', '#e8bb84', '#e6d38f', '#9cc9a2', '#94bedd', '#c0a3cc', '#bda79a'],
+                    completeColors: ['#e57373', '#ffb74d', '#fdd85d', '#81c784', '#64b5f6', '#ba68c8', '#a1887f'],
 
                     // 顶部行按 a 个格子算宽度（a 是这一排里最多的格子数），
                     // 底部行只有 b 个格子，居中摆在顶部行下方；两行格子大小/间距完全一致
@@ -1987,7 +2014,7 @@
                     return;
                 }
 
-                ctx.fillStyle = '#eaf7ff';
+                ctx.fillStyle = PALETTE.bg;
                 ctx.fillRect(0, 0, cw, ch);
 
                 UI.drawTitle(ctx, cw);
@@ -2040,6 +2067,7 @@
                         const groupId = UI.hitMenu(x, y);
                         if (groupId) {
                             Game.mode = 'playing';
+                            document.body.classList.add('in-game');
                             LevelManager.startGroup(cw, ch, groupId);
                         }
                         return;
@@ -2065,6 +2093,7 @@
                     if (UI.hitBack(x, y)) {
                         dragItem = null;
                         Game.mode = 'menu';
+                        document.body.classList.remove('in-game');
                         UI.reset();
                         return;
                     }

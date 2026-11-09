@@ -98,12 +98,41 @@
     font-family: inherit;
     white-space: nowrap;
     padding: 5px 16px;
+    height: 29px;
+    box-sizing: border-box;
     border-radius: var(--r-sm);
     box-shadow: 0 2px 8px rgba(120,108,90,0.10);
   }
   #uiModeBtn:active {
     transform: scale(0.97);
   }
+  /* 返回大厅：与顶栏居中的 #uiModeBtn 同高、同圆角、同底色与阴影，常驻且层级高于弹窗遮罩 */
+  #hallBackBtn {
+    position: fixed;
+    top: 8px;
+    left: 12px;
+    z-index: 25;
+    width: 36px;
+    height: 29px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    border: none;
+    border-radius: var(--r-sm);
+    box-shadow: 0 2px 8px rgba(120,108,90,0.10);
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  #hallBackBtn:active { transform: scale(0.97); }
   .modal {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -133,7 +162,7 @@
   .panel h1 {
     margin: 0 0 10px 0;
     font-size: 27px;
-    color: #E0914F;
+    color: #E38739;
     text-shadow: 1px 1px 0 #fff;
   }
   .panel p {
@@ -143,7 +172,7 @@
     line-height: 1.6;
   }
   .panel button {
-    background: linear-gradient(180deg,#F5BD79,#E79A5C);
+    background: linear-gradient(180deg,#FABE6C,#F3944F);
     border: none;
     color: #fff;
     font-size: 18px;
@@ -242,6 +271,7 @@
       <span id="uiTime">时间：30</span>
     </div>
   </div>
+  <a id="hallBackBtn" href="../index.html" aria-label="返回游戏大厅">‹</a>
 
   <div id="startModal" class="modal">
     <div class="panel">
