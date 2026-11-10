@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Important, Not Urgent — A Weekly Plan That Protects What Matters</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <style>
         :root {
             --primary: #1B5E20;
@@ -110,8 +110,20 @@
             max-width: 100%;
             max-height: 100%;
         }
+
+        /* Static first-paint placeholder; React replaces #root when it mounts */
+        #boot {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            background: #fff;
+            border-bottom: 1px solid #E0E7ED;
+        }
+        #boot h1 { margin: 0 0 .5rem; font-size: 1.5rem; font-weight: 700; color: #2D5A5A; }
+        #boot p { margin: 0; font-size: 1rem; color: #374151; }
+        #boot .boot-sub { margin-top: .25rem; font-size: .875rem; color: #4b5563; }
+        #boot .boot-hint { margin-top: 1.25rem; font-size: .8rem; color: #9ca3af; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
     <script type="importmap">
     {
       "imports": {
@@ -126,7 +138,21 @@
 </head>
 <body>
     <a href="index.html" class="back-link">← Back to Home</a>
-    <div id="root"></div>
+    <div id="root">
+        <div id="boot">
+            <h1>Important, Not Urgent — A Weekly Plan</h1>
+            <p>Make space for what truly matters, before it gets crowded out</p>
+            <p class="boot-sub">No tracking · No pressure · Just a promise to yourself</p>
+            <p class="boot-hint" id="boot-hint">Loading…</p>
+        </div>
+    </div>
+    <script>
+        // Everything is on a CDN: leave a hint if it never arrives
+        setTimeout(function () {
+            var hint = document.getElementById('boot-hint');
+            if (hint) hint.textContent = 'Content failed to load or the network is slow. Please check your connection and refresh.';
+        }, 8000);
+    </script>
 
     <script type="module">
         import React, { useState, useMemo, useCallback } from 'react';
@@ -189,6 +215,7 @@
 
             // Generate QR code
             React.useEffect(() => {
+                if (typeof QRCode === 'undefined') return; // CDN unavailable: keep the rest of the page working
                 const container = document.createElement('div');
                 const qr = new QRCode(container, {
                     text: 'https://growy.pages.dev/',
@@ -398,7 +425,7 @@
                         [
                             '1. What could you pause for a week without real harm?',
                             '2. If one thing must be imperfect, which would you choose?',
-                            '3. WWhat are you doing for yourself, and what are you doing because others expect it?'
+                            '3. What are you doing for yourself, and what are you doing because others expect it?'
                         ].map((q, i) => React.createElement('p', { key: i, className: 'text-base text-gray-700 leading-relaxed' }, q)),
                         React.createElement('button', { onClick: () => setIsReflectionOpen(false), className: 'w-full py-3 bg-[#2D5A5A] text-white rounded-xl text-lg font-bold mt-4' }, 'Got it')
                     )

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Game Hub - Play & Learn</title>
     <style>
         :root {
@@ -13,6 +13,23 @@
             --text-main: #2b2622;   /* Warm deep brown */
             --text-muted: #85796e;  /* Warm gray */
             --radius: 20px;
+
+            /* Shared token aliases, named after DESIGN.md; this page is self-contained */
+            --bg: #fdfbf7;
+            --bg-2: #f5f6f2;
+            --surface: #ffffff;
+            --text: #2b2622;
+            --muted: #85796e;
+            --faint: #a89e92;
+            --accent: #e0a87f;
+            --accent-soft: #faf0e7;
+            --accent-ink: #a2694a;
+            --line: rgba(120,108,90,.10);
+            --shadow: 0 6px 20px rgba(120,108,90,.07);
+            --r-sm: 12px;
+            --r-md: 20px;
+            --r-lg: 28px;
+            --emoji-sat: .85;  /* same value as the four games */
         }
 
         * {
@@ -125,11 +142,11 @@
             overflow: hidden;
         }
 
-        /* Card Colors */
-        .icon-words { background-color: #fdf1ed; }
-        .icon-write { background-color: #eaf3ec; }
-        .icon-click { background-color: #fbeef0; }
-        .icon-challenge { background-color: #eef2f6; }
+        /* Card icon backgrounds mirror each game's own theme color */
+        .icon-words { background-color: #fdf3e3; }      /* warm apricot */
+        .icon-write { background-color: #eaf3ec; }      /* soft mint */
+        .icon-click { background-color: #eef2f6; }      /* misty blue */
+        .icon-challenge { background-color: #fdf1ed; }  /* soft peach */
 
         /* Icon Grid */
         .icon-grid {
@@ -219,6 +236,15 @@
             transform: rotate(90deg);
         }
 
+        /* Desaturate only the emoji glyphs; card backgrounds, gradient Aa and the number 3 stay as they are */
+        .icon-grid span,
+        .icon-number .berry-row,
+        .icon-cat .cat-face,
+        .icon-cat .heart,
+        .icon-trace .badge-pencil {
+            filter: saturate(var(--emoji-sat));
+        }
+
         .card-content {
             flex: 1;
             min-width: 0;
@@ -246,10 +272,10 @@
             white-space: nowrap;
         }
 
-        .badge-words { background-color: #f6e3da; color: #a2694a; }
+        .badge-words { background-color: #f7e8d2; color: #a2694a; }
         .badge-write { background-color: #dcebe0; color: #4a7d5c; }
-        .badge-click { background-color: #f4dde1; color: #a25868; }
-        .badge-challenge { background-color: #dde5ee; color: #55688a; }
+        .badge-click { background-color: #dde5ee; color: #55688a; }
+        .badge-challenge { background-color: #f6e3da; color: #a2694a; }
 
         .card-desc {
             font-size: 14.5px;

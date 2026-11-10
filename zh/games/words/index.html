@@ -52,7 +52,9 @@
         }
         body {
             background: var(--bg);
+            /* svh tracks the visible area with the mobile toolbar shown; 100vh is the fallback */
             min-height: 100vh;
+            min-height: 100svh;
             font-family: -apple-system, "PingFang SC", "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
         }
         .container {
@@ -61,6 +63,7 @@
             margin: 0 auto;
             background: #fff;
             min-height: 100vh;
+            min-height: 100svh;
             padding: 14px 14px 22px;
             display: flex;
             flex-direction: column;
@@ -167,7 +170,7 @@
         .display-area { text-align: center; padding: 12px 0 8px; position: relative; display: flex; justify-content: center; align-items: center; }
         .display-emoji-wrapper { position: relative; display: inline-block; cursor: pointer; }
         .display-emoji {
-            font-size: 110px; line-height: 1.2; display: block;
+            font-size: clamp(72px, 15vh, 110px); line-height: 1.2; display: block;
             transition: opacity 0.4s, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
         }
@@ -190,7 +193,7 @@
             0% { transform: scale(1); } 40% { transform: scale(1.25); } 70% { transform: scale(0.95); } 100% { transform: scale(1); }
         }
         .speak-btn {
-            position: absolute; bottom: 0; right: -46px; background: var(--btn-bg);
+            position: absolute; bottom: -8px; right: -8px; background: var(--btn-bg);
             border: none; border-radius: 50%; width: 38px; height: 38px; font-size: 18px;
             cursor: pointer; touch-action: manipulation; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.15s; z-index: 5;
@@ -199,12 +202,12 @@
         .speak-btn:active { transform: scale(0.88); background: var(--btn-active); }
         .speak-btn.speaking { background: #d4c9b8; animation: speakPulse 0.5s ease infinite alternate; }
         @keyframes speakPulse { from { transform: scale(1); } to { transform: scale(1.12); } }
-        .puzzle-area { position: relative; flex: 1; min-height: 280px; display: flex; flex-direction: column; margin: 8px 0 10px; }
+        .puzzle-area { position: relative; flex: 1; min-height: 240px; display: flex; flex-direction: column; margin: 8px 0 10px; }
         .slots-row { flex: 0 0 auto; display: flex; justify-content: center; align-items: center; gap: 8px; padding-bottom: 10px; flex-wrap: wrap; min-height: 60px; }
         .slot-placeholder { border: 2px dashed var(--border-dashed); border-radius: var(--radius-md); background: var(--card-bg); box-sizing: border-box; }
-        .intact-word { font-size: 40px; font-weight: 700; color: var(--text); background: var(--card-bg); border-radius: 20px; padding: 12px 28px; border: 2px dashed var(--border-dashed); letter-spacing: 2px; }
-        .completed-word { font-size: 36px; font-weight: 700; color: var(--text); background: var(--accent-bg); border-radius: 20px; padding: 10px 28px; border: 2px solid var(--accent); letter-spacing: 2px; }
-        .scramble-container { flex: 1; min-height: 180px; background: var(--card-bg); border-radius: var(--radius-lg); border: 2px dashed var(--border-dashed); box-sizing: border-box; position: relative; overflow: hidden; touch-action: manipulation; }
+        .intact-word { font-size: clamp(24px, 5.5vh, 40px); font-weight: 700; color: var(--text); background: var(--card-bg); border-radius: 20px; padding: 12px 28px; border: 2px dashed var(--border-dashed); letter-spacing: 2px; }
+        .completed-word { font-size: clamp(22px, 5vh, 36px); font-weight: 700; color: var(--text); background: var(--accent-bg); border-radius: 20px; padding: 10px 28px; border: 2px solid var(--accent); letter-spacing: 2px; }
+        .scramble-container { flex: 1; min-height: 150px; background: var(--card-bg); border-radius: var(--radius-lg); border: 2px dashed var(--border-dashed); box-sizing: border-box; position: relative; overflow: hidden; touch-action: manipulation; }
         .tiles-layer { position: absolute; inset: 0; pointer-events: none; }
         .tile {
             position: absolute; pointer-events: auto; font-weight: 600; color: var(--text);
@@ -607,7 +610,11 @@
                     dom.wordStrip.appendChild(el);
                 });
                 const activeEl=dom.wordStrip.querySelector('.strip-item.active');
-                if(activeEl) activeEl.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+                // Scroll only the strip: scrollIntoView would also scroll the page and hide the top bar.
+                if(activeEl){
+                    const r = activeEl.getBoundingClientRect(), s = dom.wordStrip.getBoundingClientRect();
+                    dom.wordStrip.scrollLeft += (r.left - s.left) - (s.width - r.width) / 2;
+                }
             }
             function renderTiles(shuffled) {
                 if(!state.isShuffled && !state.isComplete){ dom.tilesLayer.innerHTML=''; dom.slotsRow.innerHTML=`<div class="intact-word">${getDisplayWord(state.currentWordObj)}</div>`; return; }
@@ -616,7 +623,8 @@
                 const gap=10; const availableW=(cw-gap*(count+1))/count; const tileW=Math.max(48,Math.min(96,availableW)); const tileH=Math.min(82,tileW*1.2);
                 state.tileLayoutCache={tileW,tileH,gap}; const totalWidth=count*tileW+(count-1)*gap; const startX=(cw-totalWidth)/2;
                 if(!shuffled){ state.tileStates.forEach((t,i)=>{t.left=startX+i*(tileW+gap);t.top=0;t.placed=false;}); state.expectedIndex=0; state.isShuffled=false; state.isComplete=false; dom.displayEmoji.classList.remove('dim','pop'); }
-                dom.slotsRow.innerHTML=''; for(let i=0;i<count;i++){ const ph=document.createElement('div'); ph.className='slot-placeholder'; ph.style.width=tileW+'px'; ph.style.height=tileH+'px'; dom.slotsRow.appendChild(ph); }
+                // Decoy tiles are distractors, not targets: only the word's own characters get a slot.
+                dom.slotsRow.innerHTML=''; for(let i=0;i<state.currentChars.length;i++){ const ph=document.createElement('div'); ph.className='slot-placeholder'; ph.style.width=tileW+'px'; ph.style.height=tileH+'px'; dom.slotsRow.appendChild(ph); }
                 if(dom.tilesLayer.children.length!==count){ dom.tilesLayer.innerHTML=''; state.tileStates.forEach((t,idx)=>{ const tile=document.createElement('div'); tile.className='tile'; tile.textContent=t.char; tile.onclick=()=>handleTileClick(idx); dom.tilesLayer.appendChild(tile); }); }
                 state.tileStates.forEach((t,idx)=>{ const tile=dom.tilesLayer.children[idx]; tile.className='tile'+(t.placed?' placed':''); tile.style.left=t.left+'px'; tile.style.top=t.top+'px'; tile.style.width=tileW+'px'; tile.style.height=tileH+'px'; tile.style.fontSize=Math.max(22,Math.min(36,tileW*0.55))+'px'; tile.style.zIndex = count-idx; });
                 dom.statusHint.textContent = state.isShuffled?`👆 按顺序点击，还剩 ${state.currentChars.length-state.expectedIndex} 个`:'点击"打乱"开始挑战';
@@ -624,7 +632,10 @@
             dom.actionBtn.onclick = () => { if(!state.isComplete) state.isShuffled?resetLearn():shuffleTiles(); };
             function shuffleTiles() {
                 clearAutoShuffleTimer();
-                const {tileW,tileH}=state.tileLayoutCache; const margin=16;
+                // loadWord returns before updating the layout cache; use the current word's tile size
+                const cw0=dom.puzzleArea.clientWidth||360, gap0=10, count0=state.tileStates.length;
+                const tileW=Math.max(48,Math.min(96,(cw0-gap0*(count0+1))/count0)), tileH=Math.min(82,tileW*1.2);
+                const margin=16;
                 const boxTop=dom.scrambleContainer.offsetTop, boxLeft=dom.scrambleContainer.offsetLeft;
                 const boxW=dom.scrambleContainer.clientWidth, boxH=dom.scrambleContainer.clientHeight;
                 const unplaced=state.tileStates.filter(t=>!t.placed); if(!unplaced.length) return;
@@ -632,7 +643,12 @@
                 unplaced.forEach((t,i)=>{t.left=positions[i].left; t.top=positions[i].top;});
                 if(!state.isShuffled){ state.isShuffled=true; dom.displayEmoji.classList.add('dim'); }
                 state.expectedIndex=state.tileStates.findIndex(t=>!t.placed); if(state.expectedIndex===-1) state.expectedIndex=state.tileStates.length;
-                renderTiles(true); dom.actionBtn.textContent='🔄 重置';
+                renderTiles(true);
+                // Slots shrink after the intact word is replaced; clamp unplaced tiles into the moved box.
+                const bTop=dom.scrambleContainer.offsetTop, bH=dom.scrambleContainer.clientHeight;
+                state.tileStates.forEach(t=>{ if(!t.placed) t.top=Math.max(bTop+margin, Math.min(t.top, bTop+bH-tileH-margin)); });
+                renderTiles(true);
+                dom.actionBtn.textContent='🔄 重置';
                 renderWordStrip();
             }
             function resetLearn() {
