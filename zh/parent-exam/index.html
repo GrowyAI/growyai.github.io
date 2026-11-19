@@ -137,6 +137,11 @@ button{font-family:inherit}
 .result-card .score small{font-size:22px;color:var(--muted);font-weight:500}
 .result-card .verdict{font-size:18px;font-weight:700;margin:8px 0 4px}
 .result-card .sub{font-size:13px;color:var(--muted)}
+.score-strip{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;
+  margin-top:10px;font-size:12px;color:var(--muted);
+}
+.score-strip b{color:var(--accent-ink);font-weight:700;font-variant-numeric:tabular-nums}
 .badge{
   display:inline-block;background:var(--accent-soft);color:var(--accent-ink);
   border-radius:999px;padding:5px 14px;font-size:12px;font-weight:700;margin-top:12px;
@@ -177,6 +182,7 @@ button{font-family:inherit}
 .sheet-head button{font-size:24px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:0 6px}
 .share-img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
 .share-hint{text-align:center;color:var(--muted);font-size:12px;margin:12px 0 2px}
+.sheet-copy{font-size:15px;line-height:1.75;color:var(--text);margin:0 0 14px}
 @media(max-width:420px){
   .hero{padding:24px 20px 20px}
   .hero h1{font-size:26px}
@@ -227,6 +233,7 @@ var HERO_TAGLINE = '0–18 岁育儿知识闯关，看看你能得多少分？';
 var SHARE_TAGLINE = '不只是考知识，更是考你怎么选';
 var KEY_PROGRESS = 'growy.parentExam.progress.v1';
 var KEY_ATTEMPT = 'growy.parentExam.attempt.v1';
+var KEY_HINT = 'growy.parentExam.shareHint.v1';
 
 var app = document.getElementById('app');
 var modal = document.getElementById('modal');
@@ -277,6 +284,8 @@ var progress = readStore(KEY_PROGRESS, null);
 if(!validProgress(progress)) progress = {best:[0,0,0,0,0], unlocked:1};
 var attempt = readStore(KEY_ATTEMPT, null);
 if(!validAttempt(attempt)) attempt = null;
+var shareHints = readStore(KEY_HINT, {});
+if(!shareHints || typeof shareHints !== 'object' || Array.isArray(shareHints)) shareHints = {};
 var view = attempt ? (attempt.submitted ? 'result' : 'quiz') : 'home';
 
 var questionMap = {};
@@ -361,7 +370,7 @@ function renderHome(){
   html += '<div class="tiny">仅供娱乐，不构成医疗建议。</div>';
   html += '</section>';
 
-  html += '<div class="rules"><b>规则：</b>每关知识题、场景题各抽 5 题，答对 <b>'+PASS+'</b> 题过关；交卷后看答案。</div>';
+  html += '<div class="rules"><b>规则：</b>每关 10 题，覆盖知识和场景决策；答对 <b>'+PASS+'</b> 题过关；交卷后看答案。</div>';
 
   if(resumed){
     html += '<div class="notice"><span>上次答题还没交卷</span><button class="btn primary" id="resumeBtn">继续答题</button></div>';
@@ -452,6 +461,15 @@ function renderQuiz(preserveScroll){
   });
 }
 
+function showMilestoneHint(level){
+  var inWechat = /MicroMessenger/i.test(navigator.userAgent || '');
+  var guide = inWechat ? '点右上角 ··· → 分享给朋友' : '用浏览器的分享按钮，把链接发给朋友';
+  sheetTitle.textContent = '干得漂亮！';
+  sheetBody.innerHTML = '<p class="sheet-copy">你已经完成'+esc(levelName(level))+'。'+guide+'，看看朋友能不能得比你高。</p>'+
+    '<p class="share-hint">不想分享的话，直接关闭就好。</p>';
+  modal.hidden = false;
+}
+
 function submitAttempt(){
   var flags = attempt.items.map(function(item){
     var q = questionMap[item.id];
@@ -470,6 +488,12 @@ function submitAttempt(){
   view = 'result';
   render();
   window.scrollTo(0,0);
+
+  if(score >= PASS && (attempt.level === 3 || attempt.level === 5) && !shareHints[attempt.level]){
+    shareHints[attempt.level] = true;
+    writeStore(KEY_HINT, shareHints);
+    showMilestoneHint(attempt.level);
+  }
 }
 
 function renderResult(){
@@ -483,7 +507,12 @@ function renderResult(){
   html += '<section class="result-card">';
   html += '<div class="score">'+score+'<small> / '+DRAW+'</small></div>';
   html += '<div class="verdict">'+esc(verdict)+'</div>';
-  html += '<div class="sub">'+esc(level.name)+' · 最好 '+progress.best[attempt.level-1]+'/'+DRAW+'</div>';
+  html += '<div class="sub">'+esc(level.name)+'</div>';
+  var strip = '';
+  for(var lv=1; lv<=attempt.level; lv++){
+    strip += '<span>第'+lv+'关 <b>'+progress.best[lv-1]+'/'+DRAW+'</b></span>';
+  }
+  html += '<div class="score-strip">'+strip+'</div>';
   html += '<div class="badge'+(passed?'':' fail')+'">'+esc(tier(totalScore()))+'</div>';
   html += '</section>';
 
@@ -664,7 +693,7 @@ async function makeScorePoster(){
     para(level.name, {size:26, color:'#8c8278', mt:0}),
     para(passed ? (attempt.level===5?'全部通关！':'过关，下一关已解锁') : '再答对 '+(PASS-score)+' 题就过关',
       {size:32, weight:700, color:passed?'#3f6b50':'#b97868', mt:14}),
-    para('每关知识题、场景题各抽 5 题 · 答对 '+PASS+' 题过关',
+    para('每关 10 题，覆盖知识和场景决策 · 答对 '+PASS+' 题过关',
       {size:23, color:'#8c8278', mt:12}),
     para('累计 '+totalScore()+' / 50 · '+tier(totalScore()),
       {size:25, color:'#2b2622', weight:600, mt:24})
@@ -736,7 +765,7 @@ async function makeTotalImage(){
       size:27, weight:600, color:s>=PASS?'#3f6b50':'#8c8278', lineH:44, mt:20
     }));
   });
-  paras.push(para('每关知识题、场景题各抽 5 题 · 答对 '+PASS+' 题过关',
+  paras.push(para('每关 10 题，覆盖知识和场景决策 · 答对 '+PASS+' 题过关',
     {size:21, color:'#8c8278', mt:30}));
   var bodyY = layoutParas(paras);
   var footer = footerMeasure(bodyY);
@@ -755,7 +784,9 @@ document.getElementById('resetBtn').addEventListener('click', function(){
   if(!window.confirm('确定重置全部进度和成绩吗？此操作不可撤销。')) return;
   dropStore(KEY_PROGRESS);
   dropStore(KEY_ATTEMPT);
+  dropStore(KEY_HINT);
   progress = {best:[0,0,0,0,0], unlocked:1};
+  shareHints = {};
   attempt = null;
   view = 'home';
   render();
