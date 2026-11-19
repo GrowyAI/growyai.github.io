@@ -653,19 +653,16 @@ function footerMeasure(bodyY){
     total: bodyY + 30 + 300 + 22 + disc.lines.length*28 + 34
   };
 }
-function drawFooter(ctx, footer, images){
+function drawFooter(ctx, footer, siteImg){
   var y = footer.qrY;
   roundRect(ctx, 40, y, W-80, 300, 20);
   ctx.fillStyle = '#ffffff';
   ctx.fill();
-  ctx.drawImage(images.site, 68, y+48, 180, 180);
-  ctx.drawImage(images.wechat, 418, y+48, 180, 180);
+  ctx.drawImage(siteImg, (W-180)/2, y+48, 180, 180);
   setFont(ctx, 22, 400);
   ctx.fillStyle = '#8c8278';
-  var left = '测一测';
-  var right = '关注公众号';
-  ctx.fillText(left, 158 - ctx.measureText(left).width/2, y+242);
-  ctx.fillText(right, 508 - ctx.measureText(right).width/2, y+242);
+  var label = '测一测';
+  ctx.fillText(label, W/2 - ctx.measureText(label).width/2, y+242);
   drawParas(ctx, [footer.disc], y+300);
 }
 function showImage(canvas, title, filename){
@@ -689,7 +686,7 @@ async function makeScorePoster(){
   var level = BANK.levels[attempt.level-1];
   var score = attempt.result.score;
   var passed = score >= PASS;
-  var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
+  var siteImg = await loadImage(QR.site);
 
   var bodyParas = [
     para('GROWY · 父母“资格考试”', {size:22, color:'#7fae8d', weight:700, mt:56}),
@@ -711,14 +708,14 @@ async function makeScorePoster(){
   out.ctx.fillStyle = '#7fae8d';
   out.ctx.fillRect(0,0,W,8);
   drawParas(out.ctx, bodyParas, 0);
-  drawFooter(out.ctx, footer, {site:imgs[0], wechat:imgs[1]});
+  drawFooter(out.ctx, footer, siteImg);
   showImage(out.canvas, '我的得分', 'parent-exam-score.png');
 }
 
 async function makeAnswerImage(){
   var level = BANK.levels[attempt.level-1];
   var score = attempt.result.score;
-  var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
+  var siteImg = await loadImage(QR.site);
 
   var paras = [
     para('GROWY · 父母“资格考试”', {size:22, color:'#7fae8d', weight:700, mt:56}),
@@ -750,13 +747,13 @@ async function makeAnswerImage(){
   out.ctx.fillStyle = '#7fae8d';
   out.ctx.fillRect(0,0,W,8);
   drawParas(out.ctx, paras, 0);
-  drawFooter(out.ctx, footer, {site:imgs[0], wechat:imgs[1]});
+  drawFooter(out.ctx, footer, siteImg);
   showImage(out.canvas, '答案解析', 'parent-exam-answers.png');
 }
 
 async function makeTotalImage(){
   var total = totalScore();
-  var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
+  var siteImg = await loadImage(QR.site);
   var paras = [
     para('GROWY · 父母“资格考试”', {size:22, color:'#7fae8d', weight:700, mt:56}),
     para(SHARE_TAGLINE, {size:38, weight:700, lineH:56, mt:16}),
@@ -780,7 +777,7 @@ async function makeTotalImage(){
   out.ctx.fillStyle = '#e8b98f';
   out.ctx.fillRect(0,0,W,8);
   drawParas(out.ctx, paras, 0);
-  drawFooter(out.ctx, footer, {site:imgs[0], wechat:imgs[1]});
+  drawFooter(out.ctx, footer, siteImg);
   showImage(out.canvas, '我的总成绩', 'parent-exam-total.png');
 }
 
