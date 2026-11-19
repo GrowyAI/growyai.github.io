@@ -209,7 +209,7 @@ button{font-family:inherit}
   <main id="app"></main>
 
   <footer class="site-foot">
-    仅供娱乐，不构成医疗建议。题目与依据不作为育儿、医疗或法律决策依据；遇到具体问题请咨询专业人士。
+    题目、答案、解析仅供参考，不构成专业建议
   </footer>
 </div>
 
@@ -235,7 +235,7 @@ var PASS = BANK.passScore;
 var DRAW = BANK.drawCount;
 var PER_SOURCE = BANK.drawPerSource || 5;
 var LETTERS = BANK.letters || 'ABC';
-var DISCLAIMER = '仅供娱乐，不构成医疗建议。题目与依据不作为育儿、医疗或法律决策依据；遇到具体问题请咨询专业人士。';
+var DISCLAIMER = '题目、答案、解析仅供参考，不构成专业建议';
 var BRAND_BYLINE = 'Growy陪伴与新生';
 var HERO_TAGLINE = '0–18 岁育儿知识闯关，看看你能得多少分？';
 var SHARE_TAGLINE = '不只是考知识，更是考你怎么选';
@@ -375,7 +375,7 @@ function renderHome(){
   html += '<div class="stat"><b>'+total+'<span style="font-size:14px"> / 50</span></b><span>累计最好成绩</span></div>';
   html += '<div class="stat"><b>'+progress.best.filter(function(v){return v>=PASS;}).length+'<span style="font-size:14px"> / 5</span></b><span>已通过关卡</span></div>';
   html += '</div>';
-  html += '<div class="tiny">仅供娱乐，不构成医疗建议。</div>';
+  html += '<div class="tiny">题目、答案、解析仅供参考，不构成专业建议</div>';
   html += '</section>';
 
   html += '<div class="rules"><b>规则：</b>每关 10 题，覆盖知识和场景决策；答对 <b>'+PASS+'</b> 题过关；交卷后看答案。</div>';
