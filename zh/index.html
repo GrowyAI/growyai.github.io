@@ -132,6 +132,7 @@
         .card.gray::before { background: linear-gradient(to right, #C5D3DC, var(--about)); }
         .card.purple::before { background: linear-gradient(to right, #9C7BB8, var(--priority)); }
         .card.orange::before { background: linear-gradient(to right, #FFA06B, var(--orange)); }
+        .card.rose::before { background: linear-gradient(to right, #E8A5B5, #D97F96); }
 
         .icon {
             width: 56px;
@@ -154,6 +155,8 @@
         .card.purple:hover .icon { background: var(--priority); color: white; }
         .card.orange .icon { background: rgba(226,112,58,0.12); color: var(--orange); }
         .card.orange:hover .icon { background: var(--orange); color: white; }
+        .card.rose .icon { background: rgba(217,127,150,0.12); color: #D97F96; }
+        .card.rose:hover .icon { background: #D97F96; color: white; }
 
         .card h3 {
             font-size: 1.25rem;
@@ -167,6 +170,7 @@
         .card.gray:hover h3 { color: var(--about); }
         .card.purple:hover h3 { color: var(--priority); }
         .card.orange:hover h3 { color: var(--orange); }
+        .card.rose:hover h3 { color: #D97F96; }
 
         .card p {
             font-size: 0.875rem;
@@ -188,6 +192,7 @@
         .card.gray .action { color: var(--about); }
         .card.purple .action { color: var(--priority); }
         .card.orange .action { color: var(--orange); }
+        .card.rose .action { color: #D97F96; }
 
         /* Footer */
         footer {
@@ -286,6 +291,19 @@
                 <h3>这一刻，我有些育儿纠结</h3>
                 <p>当真实的育儿纠结发生时，Growy 根据你的家庭情况和孩子特点，提供信息与思路，陪你一起把问题想清楚。</p>
                 <div class="action">和Growy聊聊 →</div>
+            </a>
+
+            <a href="parent-exam/index.html" class="card rose">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v4h4M9 12h6M9 16h4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.7 14.3l2-2a1.3 1.3 0 011.8 1.8l-2 2-2.5.7.7-2.5z" />
+                    </svg>
+                </div>
+                <h3>父母资格考试</h3>
+                <p>0–18 岁育儿知识闯关，看看你能得多少分？</p>
+                <div class="action">开始闯关 →</div>
             </a>
 
             <a href="priority.html" class="card purple">

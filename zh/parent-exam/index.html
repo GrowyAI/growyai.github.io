@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>父母资格考试 · Growy</title>
+<style>
+:root{
+  --bg:#fdfbf7;
+  --surface:#ffffff;
+  --text:#2b2622;
+  --muted:#8c8278;
+  --faint:#aaa096;
+  --accent:#7fae8d;
+  --accent-ink:#3f6b50;
+  --accent-soft:#eef6ef;
+  --warm:#e8b98f;
+  --danger:#b97868;
+  --line:rgba(90,80,70,.12);
+  --shadow:0 8px 24px rgba(90,80,70,.07);
+  --r:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:linear-gradient(180deg,#fdfbf7 0%,#f6f4ee 100%);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.wrap{max-width:720px;margin:0 auto;padding:0 18px 36px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 0 10px}
+.brand{font-size:17px;font-weight:700;letter-spacing:.02em}
+.brand span{color:var(--accent-ink)}
+.top .text-btn{font-size:13px}
+button{font-family:inherit}
+.text-btn{
+  background:none;border:0;color:var(--muted);font-size:14px;
+  cursor:pointer;padding:6px 2px;line-height:1.4;
+}
+.text-btn:active{opacity:.6}
+.hero{
+  background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  box-shadow:var(--shadow);padding:30px 26px 26px;margin:8px 0 20px;
+}
+.hero .eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent-ink);font-weight:700}
+.hero h1{font-size:30px;line-height:1.25;margin:10px 0 12px;font-weight:700}
+.hero p{margin:0;color:var(--muted);font-size:15px}
+.hero .tiny{margin-top:16px;font-size:12px;color:var(--faint)}
+.stats{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.stat{
+  flex:1;min-width:120px;background:#faf8f3;border-radius:14px;
+  padding:12px 14px;border:1px solid var(--line);
+}
+.stat b{display:block;font-size:24px;line-height:1.2;color:var(--accent-ink)}
+.stat span{font-size:12px;color:var(--muted)}
+.rules{
+  font-size:13px;color:var(--muted);background:rgba(127,174,141,.08);
+  border-radius:14px;padding:12px 16px;margin-bottom:22px;
+}
+.rules b{color:var(--accent-ink)}
+.notice{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--accent-soft);border:1px solid rgba(127,174,141,.25);
+  border-radius:14px;padding:12px 16px;margin-bottom:18px;font-size:14px;
+}
+.notice button{white-space:nowrap}
+.section-title{font-size:14px;color:var(--muted);margin:22px 2px 12px;font-weight:600}
+.levels{display:flex;flex-direction:column;gap:12px}
+.level{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:18px 20px;display:flex;align-items:center;
+  justify-content:space-between;gap:14px;
+}
+.level.locked{opacity:.55}
+.level .lv-no{
+  width:40px;height:40px;border-radius:12px;background:var(--accent-soft);
+  color:var(--accent-ink);font-weight:700;display:flex;align-items:center;
+  justify-content:center;flex:none;font-size:16px;
+}
+.level.locked .lv-no{background:#f1efea;color:var(--faint)}
+.level .lv-main{flex:1;min-width:0}
+.level h3{margin:0;font-size:16px;font-weight:700}
+.level p{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+.btn{
+  border:1px solid transparent;border-radius:12px;padding:11px 18px;
+  font-size:14px;font-weight:600;cursor:pointer;min-height:44px;
+  transition:transform .15s ease,opacity .15s ease;line-height:1.3;
+}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.ghost{background:#f7f5f0;color:var(--muted);border-color:var(--line)}
+.btn.wide{width:100%;display:block;text-align:center;margin-top:16px}
+.btn.warm{background:var(--warm);color:#fff}
+.quiz-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0 12px}
+.quiz-head .title{font-size:16px;font-weight:700}
+.quiz-head .count{font-size:13px;color:var(--muted)}
+.bar{height:5px;border-radius:5px;background:#ece8df;overflow:hidden;margin-bottom:20px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:5px;transition:width .2s ease}
+.qcard{
+  background:var(--surface);border:1px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow);padding:24px 22px;
+}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.qmeta .tag{
+  background:var(--accent-soft);color:var(--accent-ink);font-weight:700;
+  border-radius:7px;padding:2px 8px;
+}
+.qmeta .qid{margin-left:auto;color:var(--faint);font-variant-numeric:tabular-nums}
+.qcard h2{font-size:19px;line-height:1.55;margin:16px 0 22px;font-weight:600}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{
+  display:flex;align-items:flex-start;gap:12px;text-align:left;width:100%;
+  background:#fbf9f5;border:1px solid var(--line);border-radius:14px;
+  padding:13px 14px;min-height:56px;cursor:pointer;color:var(--text);
+  font-size:14.5px;line-height:1.5;transition:background .15s,border-color .15s,transform .15s;
+}
+.option:active{transform:scale(.99)}
+.option .letter{
+  flex:none;width:26px;height:26px;border-radius:8px;background:#eeece6;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+}
+.option.selected{background:var(--accent-soft);border-color:rgba(127,174,141,.5)}
+.option.selected .letter{background:var(--accent);color:#fff}
+.quiz-nav{display:flex;gap:10px;margin-top:16px}
+.quiz-nav .btn{flex:1}
+.hint{text-align:center;color:var(--faint);font-size:12px;margin:14px 0 0}
+.result-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow);padding:28px 24px;text-align:center;margin:8px 0 20px;
+}
+.result-card .score{font-size:56px;font-weight:700;line-height:1.1;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.result-card .score small{font-size:22px;color:var(--muted);font-weight:500}
+.result-card .verdict{font-size:18px;font-weight:700;margin:8px 0 4px}
+.result-card .sub{font-size:13px;color:var(--muted)}
+.badge{
+  display:inline-block;background:var(--accent-soft);color:var(--accent-ink);
+  border-radius:999px;padding:5px 14px;font-size:12px;font-weight:700;margin-top:12px;
+}
+.badge.fail{background:#f9efeb;color:var(--danger)}
+.answer-list{display:flex;flex-direction:column;gap:10px}
+.ans{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:16px 18px;
+}
+.ans .ans-head{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.ans .mark{font-weight:700;font-size:14px}
+.ans .ok .mark{color:var(--accent-ink)}
+.ans .no .mark{color:var(--danger)}
+.ans h4{margin:0 0 10px;font-size:15px;font-weight:600;line-height:1.55}
+.ans p{margin:4px 0;font-size:13px;line-height:1.6}
+.ans .wrong{color:var(--danger)}
+.ans .right{color:var(--accent-ink)}
+.ans .why{color:var(--muted);font-size:12.5px;border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.action-grid .btn{width:100%}
+.action-note{text-align:center;color:var(--faint);font-size:11.5px;line-height:1.6;margin:10px 2px 0}
+.site-foot{
+  text-align:center;color:var(--faint);font-size:11.5px;line-height:1.7;
+  padding:30px 10px 8px;border-top:1px solid var(--line);margin-top:30px;
+}
+.modal[hidden]{display:none}
+.modal{
+  position:fixed;inset:0;background:rgba(48,40,34,.46);z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+}
+.sheet{
+  background:#fdfbf7;width:100%;max-width:560px;max-height:92vh;overflow:auto;
+  border-radius:24px 24px 0 0;padding:18px 18px 26px;
+}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.sheet-head strong{font-size:16px}
+.sheet-head button{font-size:24px;line-height:1;background:none;border:0;color:var(--muted);cursor:pointer;padding:0 6px}
+.share-img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.share-hint{text-align:center;color:var(--muted);font-size:12px;margin:12px 0 2px}
+@media(max-width:420px){
+  .hero{padding:24px 20px 20px}
+  .hero h1{font-size:26px}
+  .qcard{padding:20px 16px}
+  .action-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <button class="text-btn" id="homeBtn">‹ 返回首页</button>
+    <div class="brand">🌱 <span>父母资格考试</span></div>
+    <button class="text-btn" id="resetBtn">重置进度</button>
+  </header>
+
+  <main id="app"></main>
+
+  <footer class="site-foot">
+    仅供娱乐，不构成医疗建议。题目与依据不作为育儿、医疗或法律决策依据；遇到具体问题请咨询专业人士。
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <div class="sheet-head">
+      <strong id="sheetTitle">图片已生成</strong>
+      <button id="closeModal" aria-label="关闭">×</button>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<script src="questions.js"></script>
+<script src="qr-data.js"></script>
+<script>
+(function(){
+'use strict';
+
+var BANK = window.QUESTION_BANK;
+var QR = window.QR_IMAGES;
+var PASS = BANK.passScore;
+var DRAW = BANK.drawCount;
+var PER_SOURCE = BANK.drawPerSource || 5;
+var LETTERS = BANK.letters || 'ABC';
+var DISCLAIMER = '仅供娱乐，不构成医疗建议。题目与依据不作为育儿、医疗或法律决策依据；遇到具体问题请咨询专业人士。';
+var HERO_TAGLINE = '0–18 岁育儿知识闯关，看看你能得多少分？';
+var SHARE_TAGLINE = '不只是考知识，更是考你怎么选';
+var KEY_PROGRESS = 'growy.parentExam.progress.v1';
+var KEY_ATTEMPT = 'growy.parentExam.attempt.v1';
+
+var app = document.getElementById('app');
+var modal = document.getElementById('modal');
+var sheetTitle = document.getElementById('sheetTitle');
+var sheetBody = document.getElementById('sheetBody');
+var currentObjectUrl = null;
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function readStore(key, fallback){
+  try{
+    var raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  }catch(e){ return fallback; }
+}
+function writeStore(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+}
+function dropStore(key){
+  try{ localStorage.removeItem(key); }catch(e){}
+}
+
+function validProgress(p){
+  return p && Array.isArray(p.best) && p.best.length === 5 &&
+    p.best.every(function(v){ return typeof v === 'number' && v >= 0 && v <= 10; }) &&
+    typeof p.unlocked === 'number' && p.unlocked >= 1 && p.unlocked <= 5;
+}
+function validAttempt(a){
+  if(!a || typeof a.level !== 'number' || a.level < 1 || a.level > 5) return false;
+  if(!Array.isArray(a.items) || a.items.length !== DRAW) return false;
+  var itemsOk = a.items.every(function(it){
+    return typeof it.id === 'string' && Array.isArray(it.order) && it.order.length === LETTERS.length &&
+      (it.answer === null || (typeof it.answer === 'number' && it.answer >= 0 && it.answer < LETTERS.length));
+  });
+  if(!itemsOk) return false;
+  if(a.submitted){
+    return a.result && typeof a.result.score === 'number' &&
+      Array.isArray(a.result.flags) && a.result.flags.length === DRAW;
+  }
+  return true;
+}
+
+var progress = readStore(KEY_PROGRESS, null);
+if(!validProgress(progress)) progress = {best:[0,0,0,0,0], unlocked:1};
+var attempt = readStore(KEY_ATTEMPT, null);
+if(!validAttempt(attempt)) attempt = null;
+var view = attempt ? (attempt.submitted ? 'result' : 'quiz') : 'home';
+
+var questionMap = {};
+BANK.questions.forEach(function(q){ questionMap[q.id] = q; });
+
+function levelName(id){ return BANK.levels[id-1].name; }
+function totalScore(){ return progress.best.reduce(function(a,b){ return a+b; },0); }
+function allDone(){ return progress.best.every(function(v){ return v>0; }); }
+function tier(score){
+  if(score>=46) return '满级父母';
+  if(score>=40) return '育儿达人';
+  if(score>=30) return '熟练玩家';
+  if(score>=17) return '进阶家长';
+  return '育儿实习生';
+}
+
+function rndInt(n){
+  if(window.crypto && window.crypto.getRandomValues){
+    var a = new Uint32Array(1);
+    window.crypto.getRandomValues(a);
+    return a[0] % n;
+  }
+  return Math.floor(Math.random()*n);
+}
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = rndInt(i+1);
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+function newAttempt(level){
+  // 两个题库各抽 5 题，再把 10 题整体洗牌，避免看出前后分段。
+  var picked = [];
+  ['knowledge','scenario'].forEach(function(source){
+    var pool = BANK.questions.filter(function(q){ return q.level===level && q.source===source; });
+    picked = picked.concat(shuffle(pool).slice(0, PER_SOURCE));
+  });
+  picked = shuffle(picked);
+  return {
+    level: level,
+    items: picked.map(function(q){
+      return {id:q.id, order:shuffle([0,1,2]), answer:null};
+    }),
+    idx: 0,
+    submitted: false,
+    result: null
+  };
+}
+function saveAttempt(){ writeStore(KEY_ATTEMPT, attempt); }
+function saveProgress(){ writeStore(KEY_PROGRESS, progress); }
+
+function goHome(){ view='home'; render(); }
+function startLevel(level){
+  if(level > progress.unlocked) return;
+  attempt = newAttempt(level);
+  view = 'quiz';
+  saveAttempt();
+  render();
+}
+
+function render(){
+  if(view==='quiz' && attempt && !attempt.submitted) renderQuiz();
+  else if(view==='result' && attempt && attempt.submitted) renderResult();
+  else renderHome();
+}
+
+function renderHome(){
+  var total = totalScore();
+  var resumed = attempt && !attempt.submitted;
+  var html = '';
+  html += '<section class="hero">';
+  html += '<div class="eyebrow">GROWY · 育儿知识闯关</div>';
+  html += '<h1>父母资格考试</h1>';
+  html += '<p>'+HERO_TAGLINE+'</p>';
+  html += '<div class="stats">';
+  html += '<div class="stat"><b>'+total+'<span style="font-size:14px"> / 50</span></b><span>累计最好成绩</span></div>';
+  html += '<div class="stat"><b>'+progress.best.filter(function(v){return v>=PASS;}).length+'<span style="font-size:14px"> / 5</span></b><span>已通过关卡</span></div>';
+  html += '</div>';
+  html += '<div class="tiny">仅供娱乐，不构成医疗建议。</div>';
+  html += '</section>';
+
+  html += '<div class="rules"><b>规则：</b>每关知识题、场景题各抽 5 题，答对 <b>'+PASS+'</b> 题过关；交卷后看答案。</div>';
+
+  if(resumed){
+    html += '<div class="notice"><span>上次答题还没交卷</span><button class="btn primary" id="resumeBtn">继续答题</button></div>';
+  }
+  if(attempt && attempt.submitted){
+    html += '<div class="notice"><span>上一关成绩已保存</span><button class="btn ghost" id="reviewBtn">查看成绩</button></div>';
+  }
+
+  html += '<div class="section-title">选择关卡</div><div class="levels">';
+  BANK.levels.forEach(function(l){
+    var locked = l.id > progress.unlocked;
+    var best = progress.best[l.id-1];
+    var passed = best >= PASS;
+    var desc = locked ? '未解锁' :
+      (best>0 ? (passed ? '已通过 · 最好 '+best+'/'+DRAW : '最好 '+best+'/'+DRAW) : '尚未挑战');
+    html += '<div class="level'+(locked?' locked':'')+'">';
+    html += '<div class="lv-no">'+(locked?'🔒':l.id)+'</div>';
+    html += '<div class="lv-main"><h3>'+esc(l.name)+'</h3><p>'+esc(desc)+'</p></div>';
+    if(!locked){
+      html += '<button class="btn '+(best>0?'ghost':'primary')+'" data-level="'+l.id+'">'+(best>0?'再考一次':'开始挑战')+'</button>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  if(allDone()){
+    html += '<button class="btn warm wide" id="totalBtn">查看总成绩</button>';
+  }
+  app.innerHTML = html;
+
+  app.querySelectorAll('[data-level]').forEach(function(btn){
+    btn.addEventListener('click', function(){ startLevel(Number(btn.dataset.level)); });
+  });
+  var resumeBtn = document.getElementById('resumeBtn');
+  if(resumeBtn) resumeBtn.addEventListener('click', function(){ view='quiz'; render(); });
+  var reviewBtn = document.getElementById('reviewBtn');
+  if(reviewBtn) reviewBtn.addEventListener('click', function(){ view='result'; render(); });
+  var totalBtn = document.getElementById('totalBtn');
+  if(totalBtn) totalBtn.addEventListener('click', makeTotalImage);
+}
+
+function renderQuiz(preserveScroll){
+  var y = preserveScroll ? window.scrollY : 0;
+  var item = attempt.items[attempt.idx];
+  var q = questionMap[item.id];
+  var html = '';
+  html += '<div class="quiz-head">';
+  html += '<button class="text-btn" id="quitBtn">‹ 退出</button>';
+  html += '<div class="title">'+esc(levelName(attempt.level))+'</div>';
+  html += '<div class="count">'+(attempt.idx+1)+' / '+DRAW+'</div>';
+  html += '</div>';
+  html += '<div class="bar"><i style="width:'+((attempt.idx+1)/DRAW*100)+'%"></i></div>';
+  html += '<div class="qcard">';
+  html += '<div class="qmeta"><span class="tag">'+esc(q.tag)+'</span><span>'+esc(q.topic)+'</span><span class="qid">'+esc(q.id)+'</span></div>';
+  html += '<h2>'+esc(q.stem)+'</h2>';
+  html += '<div class="options">';
+  item.order.forEach(function(orig, pos){
+    html += '<button class="option'+(item.answer===pos?' selected':'')+'" data-pos="'+pos+'">';
+    html += '<span class="letter">'+LETTERS[pos]+'</span><span>'+esc(q.options[orig])+'</span></button>';
+  });
+  html += '</div></div>';
+  html += '<div class="quiz-nav">';
+  html += '<button class="btn ghost" id="prevBtn"'+(attempt.idx===0?' disabled':'')+'>上一题</button>';
+  html += '<button class="btn primary" id="nextBtn">'+(attempt.idx===DRAW-1?'交卷':'下一题')+'</button>';
+  html += '</div>';
+  html += '<p class="hint">交卷后揭晓答案。</p>';
+  app.innerHTML = html;
+  window.scrollTo(0, y);
+
+  app.querySelectorAll('[data-pos]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      item.answer = Number(btn.dataset.pos);
+      saveAttempt();
+      renderQuiz(true);
+    });
+  });
+  document.getElementById('quitBtn').addEventListener('click', function(){ goHome(); });
+  document.getElementById('prevBtn').addEventListener('click', function(){
+    if(attempt.idx>0){ attempt.idx--; saveAttempt(); renderQuiz(); }
+  });
+  document.getElementById('nextBtn').addEventListener('click', function(){
+    if(item.answer===null){ alert('先选一个答案再继续。'); return; }
+    if(attempt.idx < DRAW-1){
+      attempt.idx++; saveAttempt(); renderQuiz();
+    }else{
+      submitAttempt();
+    }
+  });
+}
+
+function submitAttempt(){
+  var flags = attempt.items.map(function(item){
+    var q = questionMap[item.id];
+    return item.answer !== null && item.order[item.answer] === q.answer;
+  });
+  var score = flags.filter(function(v){ return v; }).length;
+  attempt.submitted = true;
+  attempt.result = {score:score, flags:flags};
+
+  if(score > progress.best[attempt.level-1]) progress.best[attempt.level-1] = score;
+  if(score >= PASS && progress.unlocked === attempt.level && attempt.level < 5){
+    progress.unlocked = attempt.level + 1;
+  }
+  saveAttempt();
+  saveProgress();
+  view = 'result';
+  render();
+  window.scrollTo(0,0);
+}
+
+function renderResult(){
+  var level = BANK.levels[attempt.level-1];
+  var score = attempt.result.score;
+  var flags = attempt.result.flags;
+  var passed = score >= PASS;
+  var verdict = passed ? (attempt.level===5 ? '全部通关！' : '过关，下一关已解锁') : '再答对 '+(PASS-score)+' 题就过关';
+
+  var html = '';
+  html += '<section class="result-card">';
+  html += '<div class="score">'+score+'<small> / '+DRAW+'</small></div>';
+  html += '<div class="verdict">'+esc(verdict)+'</div>';
+  html += '<div class="sub">'+esc(level.name)+' · 最好 '+progress.best[attempt.level-1]+'/'+DRAW+'</div>';
+  html += '<div class="badge'+(passed?'':' fail')+'">'+esc(tier(totalScore()))+'</div>';
+  html += '</section>';
+
+  html += '<div class="action-grid">';
+  html += '<button class="btn primary" id="posterBtn">分享我的得分</button>';
+  html += '<button class="btn ghost" id="answerImgBtn">下载答案解析</button>';
+  html += '<button class="btn ghost" id="retryBtn">再考一次</button>';
+  if(passed && attempt.level<5) html += '<button class="btn warm" id="nextLevelBtn">进入下一关</button>';
+  if(allDone()) html += '<button class="btn warm" id="totalBtn2">我的总成绩</button>';
+  html += '</div>';
+  html += '<p class="action-note">生成后可下载或分享。</p>';
+
+  html += '<div class="section-title">答案解析</div><div class="answer-list">';
+  attempt.items.forEach(function(item, i){
+    var q = questionMap[item.id];
+    var ok = flags[i];
+    var mine = item.answer===null ? '未作答' : LETTERS[item.answer]+'. '+q.options[item.order[item.answer]];
+    var rightPos = item.order.indexOf(q.answer);
+    var right = LETTERS[rightPos]+'. '+q.options[q.answer];
+    html += '<div class="ans '+(ok?'ok':'no')+'">';
+    html += '<div class="ans-head"><span class="mark">'+(ok?'✓':'✕')+'</span><span>'+esc(q.id)+' · '+esc(q.topic)+' · '+esc(q.tag)+'</span></div>';
+    html += '<h4>'+esc(q.stem)+'</h4>';
+    html += '<p class="'+(ok?'':'wrong')+'">你的答案：'+esc(mine)+'</p>';
+    html += '<p class="right">正确答案：'+esc(right)+'</p>';
+    html += '<p class="why">'+esc(q.rationale)+'</p>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  app.innerHTML = html;
+
+  document.getElementById('posterBtn').addEventListener('click', makeScorePoster);
+  document.getElementById('answerImgBtn').addEventListener('click', makeAnswerImage);
+  document.getElementById('retryBtn').addEventListener('click', function(){ startLevel(attempt.level); });
+  var nextBtn = document.getElementById('nextLevelBtn');
+  if(nextBtn) nextBtn.addEventListener('click', function(){ startLevel(attempt.level+1); });
+  var totalBtn2 = document.getElementById('totalBtn2');
+  if(totalBtn2) totalBtn2.addEventListener('click', makeTotalImage);
+}
+
+/* ---------- Canvas share images ---------- */
+
+var W = 750;
+var SCALE = 2;
+var measureCtx = document.createElement('canvas').getContext('2d');
+
+function setFont(ctx, size, weight){
+  ctx.font = (weight||400)+' '+size+'px -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
+}
+function wrapText(ctx, text, maxW, size, weight){
+  setFont(ctx, size, weight);
+  var lines = [], cur = '', i, ch, test;
+  for(i=0;i<String(text).length;i++){
+    ch = String(text)[i];
+    if(ch === '\n'){ lines.push(cur); cur=''; continue; }
+    test = cur + ch;
+    if(cur && ctx.measureText(test).width > maxW){ lines.push(cur); cur = ch; }
+    else cur = test;
+  }
+  if(cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
+function para(text, opt){
+  var p = {text:text, size:26, weight:400, color:'#2b2622', x:54, maxW:642, lineH:38, mt:0, rule:false};
+  if(opt) Object.keys(opt).forEach(function(k){ p[k]=opt[k]; });
+  return p;
+}
+function layoutParas(paras){
+  var y = 0;
+  paras.forEach(function(p){
+    p.lines = p.rule ? [] : wrapText(measureCtx, p.text, p.maxW, p.size, p.weight);
+    y += p.mt + (p.rule ? 1 : p.lines.length*p.lineH);
+  });
+  return y;
+}
+function drawParas(ctx, paras, y){
+  paras.forEach(function(p){
+    y += p.mt;
+    if(p.rule){
+      ctx.fillStyle = 'rgba(90,80,70,.12)';
+      ctx.fillRect(p.x, y, p.maxW, 1);
+      y += 1;
+      return;
+    }
+    setFont(ctx, p.size, p.weight);
+    ctx.fillStyle = p.color;
+    p.lines.forEach(function(line, i){ ctx.fillText(line, p.x, y+i*p.lineH); });
+    y += p.lines.length*p.lineH;
+  });
+  return y;
+}
+function roundRect(ctx,x,y,w,h,r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function makeCanvas(height){
+  var c = document.createElement('canvas');
+  c.width = W*SCALE;
+  c.height = height*SCALE;
+  var ctx = c.getContext('2d');
+  ctx.scale(SCALE,SCALE);
+  ctx.textBaseline = 'top';
+  return {canvas:c, ctx:ctx};
+}
+function paintBg(ctx, height){
+  var g = ctx.createLinearGradient(0,0,0,height);
+  g.addColorStop(0,'#fdfbf7');
+  g.addColorStop(1,'#f4f1e9');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,height);
+}
+function loadImage(src){
+  return new Promise(function(resolve, reject){
+    var img = new Image();
+    img.onload = function(){ resolve(img); };
+    img.onerror = function(){ reject(new Error('image load failed')); };
+    img.src = src;
+  });
+}
+function footerMeasure(bodyY){
+  var disc = para(DISCLAIMER, {size:19, color:'#9a9188', lineH:28, mt:22});
+  disc.lines = wrapText(measureCtx, disc.text, disc.maxW, disc.size, disc.weight);
+  return {
+    qrY: bodyY + 30,
+    disc: disc,
+    total: bodyY + 30 + 300 + 22 + disc.lines.length*28 + 34
+  };
+}
+function drawFooter(ctx, footer, images){
+  var y = footer.qrY;
+  roundRect(ctx, 40, y, W-80, 300, 20);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  ctx.drawImage(images.site, 68, y+48, 180, 180);
+  ctx.drawImage(images.wechat, 418, y+48, 180, 180);
+  setFont(ctx, 22, 400);
+  ctx.fillStyle = '#8c8278';
+  var left = '测一测';
+  var right = '关注公众号';
+  ctx.fillText(left, 158 - ctx.measureText(left).width/2, y+242);
+  ctx.fillText(right, 508 - ctx.measureText(right).width/2, y+242);
+  drawParas(ctx, [footer.disc], y+300);
+}
+function showImage(canvas, title, filename){
+  canvas.toBlob(function(blob){
+    if(!blob){ alert('图片生成失败，请重试。'); return; }
+    if(currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(blob);
+    sheetTitle.textContent = title;
+    sheetBody.innerHTML = '<img class="share-img" src="'+currentObjectUrl+'" alt="分享图片">'+
+      '<p class="share-hint">长按图片保存到相册，或点击下载。</p>'+
+      '<a class="btn primary wide" href="'+currentObjectUrl+'" download="'+filename+'">下载图片</a>';
+    modal.hidden = false;
+  }, 'image/png');
+}
+function closeModal(){
+  modal.hidden = true;
+  if(currentObjectUrl){ URL.revokeObjectURL(currentObjectUrl); currentObjectUrl = null; }
+}
+
+async function makeScorePoster(){
+  var level = BANK.levels[attempt.level-1];
+  var score = attempt.result.score;
+  var passed = score >= PASS;
+  var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
+
+  var bodyParas = [
+    para('GROWY · 父母资格考试', {size:22, color:'#7fae8d', weight:700, mt:56}),
+    para(SHARE_TAGLINE, {size:38, weight:700, lineH:56, mt:16}),
+    para('我的得分', {size:24, color:'#8c8278', mt:40}),
+    para(score+' / '+DRAW, {size:112, weight:700, color:'#3f6b50', lineH:130, mt:8}),
+    para(level.name, {size:26, color:'#8c8278', mt:0}),
+    para(passed ? (attempt.level===5?'全部通关！':'过关，下一关已解锁') : '再答对 '+(PASS-score)+' 题就过关',
+      {size:32, weight:700, color:passed?'#3f6b50':'#b97868', mt:14}),
+    para('每关知识题、场景题各抽 5 题 · 答对 '+PASS+' 题过关',
+      {size:23, color:'#8c8278', mt:12}),
+    para('累计 '+totalScore()+' / 50 · '+tier(totalScore()),
+      {size:25, color:'#2b2622', weight:600, mt:24})
+  ];
+  var bodyY = layoutParas(bodyParas);
+  var footer = footerMeasure(bodyY);
+  var out = makeCanvas(footer.total);
+  paintBg(out.ctx, footer.total);
+  out.ctx.fillStyle = '#7fae8d';
+  out.ctx.fillRect(0,0,W,8);
+  drawParas(out.ctx, bodyParas, 0);
+  drawFooter(out.ctx, footer, {site:imgs[0], wechat:imgs[1]});
+  showImage(out.canvas, '我的得分', 'parent-exam-score.png');
+}
+
+async function makeAnswerImage(){
+  var level = BANK.levels[attempt.level-1];
+  var score = attempt.result.score;
+  var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
+
+  var paras = [
+    para('GROWY · 父母资格考试', {size:22, color:'#7fae8d', weight:700, mt:56}),
+    para('答案解析', {size:44, weight:700, color:'#3f6b50', mt:12}),
+    para(level.name+'　'+score+' / '+DRAW, {size:26, color:'#8c8278', mt:10}),
+    para('', {rule:true, mt:28})
+  ];
+  attempt.items.forEach(function(item,i){
+    var q = questionMap[item.id];
+    var ok = attempt.result.flags[i];
+    var rightPos = item.order.indexOf(q.answer);
+    var right = LETTERS[rightPos]+'. '+q.options[q.answer];
+    paras.push(para('第 '+(i+1)+' 题 · '+q.topic+'　'+(ok?'✓ 答对':'✕ 答错'), {
+      size:20, color:ok?'#3f6b50':'#b97868', mt:34
+    }));
+    paras.push(para(q.stem, {size:30, weight:600, lineH:44, mt:10}));
+    if(!ok){
+      var mine = item.answer===null ? '未作答' : LETTERS[item.answer]+'. '+q.options[item.order[item.answer]];
+      paras.push(para('你的答案：'+mine, {size:25, color:'#b97868', lineH:38, mt:14}));
+    }
+    paras.push(para('正确答案：'+right, {size:25, color:'#3f6b50', lineH:38, mt:6}));
+    paras.push(para('为什么：'+q.rationale, {size:23, color:'#8c8278', lineH:36, mt:10}));
+    paras.push(para('', {rule:true, mt:26}));
+  });
+  var bodyY = layoutParas(paras);
+  var footer = footerMeasure(bodyY);
+  var out = makeCanvas(footer.total);
+  paintBg(out.ctx, footer.total);
+  out.ctx.fillStyle = '#7fae8d';
+  out.ctx.fillRect(0,0,W,8);
+  drawParas(out.ctx, paras, 0);
+  drawFooter(out.ctx, footer, {site:imgs[0], wechat:imgs[1]});
+  showImage(out.canvas, '答案解析', 'parent-exam-answers.png');
+}
+
+async function makeTotalImage(){
+  var total = totalScore();
+  var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
+  var paras = [
+    para('GROWY · 父母资格考试', {size:22, color:'#7fae8d', weight:700, mt:56}),
+    para(SHARE_TAGLINE, {size:38, weight:700, lineH:56, mt:16}),
+    para('我的总成绩', {size:25, color:'#8c8278', mt:32}),
+    para(total+' / 50', {size:104, weight:700, color:'#3f6b50', lineH:124, mt:8}),
+    para(tier(total), {size:32, weight:700, mt:6}),
+    para('', {rule:true, mt:34})
+  ];
+  BANK.levels.forEach(function(l){
+    var s = progress.best[l.id-1];
+    paras.push(para(l.name+'　'+s+' / '+DRAW+(s>=PASS?'　✓':'　—'), {
+      size:27, weight:600, color:s>=PASS?'#3f6b50':'#8c8278', lineH:44, mt:20
+    }));
+  });
+  paras.push(para('每关知识题、场景题各抽 5 题 · 答对 '+PASS+' 题过关',
+    {size:21, color:'#8c8278', mt:30}));
+  var bodyY = layoutParas(paras);
+  var footer = footerMeasure(bodyY);
+  var out = makeCanvas(footer.total);
+  paintBg(out.ctx, footer.total);
+  out.ctx.fillStyle = '#e8b98f';
+  out.ctx.fillRect(0,0,W,8);
+  drawParas(out.ctx, paras, 0);
+  drawFooter(out.ctx, footer, {site:imgs[0], wechat:imgs[1]});
+  showImage(out.canvas, '我的总成绩', 'parent-exam-total.png');
+}
+
+/* ---------- global controls ---------- */
+document.getElementById('homeBtn').addEventListener('click', goHome);
+document.getElementById('resetBtn').addEventListener('click', function(){
+  if(!window.confirm('确定重置全部进度和成绩吗？此操作不可撤销。')) return;
+  dropStore(KEY_PROGRESS);
+  dropStore(KEY_ATTEMPT);
+  progress = {best:[0,0,0,0,0], unlocked:1};
+  attempt = null;
+  view = 'home';
+  render();
+});
+document.getElementById('closeModal').addEventListener('click', closeModal);
+modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !modal.hidden) closeModal(); });
+
+render();
+})();
+</script>
+</body>
+</html>
