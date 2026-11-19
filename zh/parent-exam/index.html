@@ -236,6 +236,7 @@ var DRAW = BANK.drawCount;
 var PER_SOURCE = BANK.drawPerSource || 5;
 var LETTERS = BANK.letters || 'ABC';
 var DISCLAIMER = '仅供娱乐，不构成医疗建议。题目与依据不作为育儿、医疗或法律决策依据；遇到具体问题请咨询专业人士。';
+var BRAND_BYLINE = 'Growy陪伴与新生';
 var HERO_TAGLINE = '0–18 岁育儿知识闯关，看看你能得多少分？';
 var SHARE_TAGLINE = '不只是考知识，更是考你怎么选';
 var KEY_PROGRESS = 'growy.parentExam.progress.v1';
@@ -663,7 +664,10 @@ function drawFooter(ctx, footer, siteImg){
   ctx.fillStyle = '#8c8278';
   var label = '测一测';
   ctx.fillText(label, W/2 - ctx.measureText(label).width/2, y+242);
-  drawParas(ctx, [footer.disc], y+300);
+  var discEnd = drawParas(ctx, [footer.disc], y+300);
+  setFont(ctx, 16, 400);
+  ctx.fillStyle = '#aaa096';
+  ctx.fillText(BRAND_BYLINE, W/2 - ctx.measureText(BRAND_BYLINE).width/2, discEnd + 10);
 }
 function showImage(canvas, title, filename){
   canvas.toBlob(function(blob){
