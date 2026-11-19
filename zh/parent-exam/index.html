@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>父母资格考试 · Growy</title>
+<title>父母“资格考试” · Growy</title>
 <style>
 :root{
   --bg:#fdfbf7;
@@ -48,6 +48,7 @@ button{font-family:inherit}
 .hero .eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent-ink);font-weight:700}
 .hero h1{font-size:30px;line-height:1.25;margin:10px 0 12px;font-weight:700}
 .hero p{margin:0;color:var(--muted);font-size:15px}
+.hero .note{margin-top:8px;font-size:13px;color:var(--muted)}
 .hero .tiny{margin-top:16px;font-size:12px;color:var(--faint)}
 .stats{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
 .stat{
@@ -188,7 +189,7 @@ button{font-family:inherit}
 <div class="wrap">
   <header class="top">
     <button class="text-btn" id="homeBtn">‹ 返回首页</button>
-    <div class="brand">🌱 <span>父母资格考试</span></div>
+    <div class="brand">🌱 <span>父母“资格考试”</span></div>
     <button class="text-btn" id="resetBtn">重置进度</button>
   </header>
 
@@ -350,8 +351,9 @@ function renderHome(){
   var html = '';
   html += '<section class="hero">';
   html += '<div class="eyebrow">GROWY · 育儿知识闯关</div>';
-  html += '<h1>父母资格考试</h1>';
+  html += '<h1>父母“资格考试”</h1>';
   html += '<p>'+HERO_TAGLINE+'</p>';
+  html += '<p class="note">做父母不需要通过考试，这套题只是帮你想得更清楚。</p>';
   html += '<div class="stats">';
   html += '<div class="stat"><b>'+total+'<span style="font-size:14px"> / 50</span></b><span>累计最好成绩</span></div>';
   html += '<div class="stat"><b>'+progress.best.filter(function(v){return v>=PASS;}).length+'<span style="font-size:14px"> / 5</span></b><span>已通过关卡</span></div>';
@@ -655,7 +657,7 @@ async function makeScorePoster(){
   var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
 
   var bodyParas = [
-    para('GROWY · 父母资格考试', {size:22, color:'#7fae8d', weight:700, mt:56}),
+    para('GROWY · 父母“资格考试”', {size:22, color:'#7fae8d', weight:700, mt:56}),
     para(SHARE_TAGLINE, {size:38, weight:700, lineH:56, mt:16}),
     para('我的得分', {size:24, color:'#8c8278', mt:40}),
     para(score+' / '+DRAW, {size:112, weight:700, color:'#3f6b50', lineH:130, mt:8}),
@@ -684,7 +686,7 @@ async function makeAnswerImage(){
   var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
 
   var paras = [
-    para('GROWY · 父母资格考试', {size:22, color:'#7fae8d', weight:700, mt:56}),
+    para('GROWY · 父母“资格考试”', {size:22, color:'#7fae8d', weight:700, mt:56}),
     para('答案解析', {size:44, weight:700, color:'#3f6b50', mt:12}),
     para(level.name+'　'+score+' / '+DRAW, {size:26, color:'#8c8278', mt:10}),
     para('', {rule:true, mt:28})
@@ -721,7 +723,7 @@ async function makeTotalImage(){
   var total = totalScore();
   var imgs = await Promise.all([loadImage(QR.site), loadImage(QR.wechat)]);
   var paras = [
-    para('GROWY · 父母资格考试', {size:22, color:'#7fae8d', weight:700, mt:56}),
+    para('GROWY · 父母“资格考试”', {size:22, color:'#7fae8d', weight:700, mt:56}),
     para(SHARE_TAGLINE, {size:38, weight:700, lineH:56, mt:16}),
     para('我的总成绩', {size:25, color:'#8c8278', mt:32}),
     para(total+' / 50', {size:104, weight:700, color:'#3f6b50', lineH:124, mt:8}),
