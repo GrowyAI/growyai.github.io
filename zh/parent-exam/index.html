@@ -16,6 +16,7 @@
   --accent-soft:#eef6ef;
   --warm:#e8b98f;
   --danger:#b97868;
+  --link:#2f6fb0;
   --line:rgba(90,80,70,.12);
   --shadow:0 8px 24px rgba(90,80,70,.07);
   --r:18px;
@@ -69,6 +70,12 @@ button{font-family:inherit}
 }
 .notice button{white-space:nowrap}
 .section-title{font-size:14px;color:var(--muted);margin:22px 2px 12px;font-weight:600}
+.inline-link{
+  background:none;border:0;padding:0;margin-left:8px;vertical-align:middle;
+  color:var(--link);font-size:13px;font-weight:600;cursor:pointer;
+  text-decoration:underline;text-underline-offset:2px;
+}
+.inline-link:active{opacity:.6}
 .levels{display:flex;flex-direction:column;gap:12px}
 .level{
   background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
@@ -161,7 +168,7 @@ button{font-family:inherit}
 .ans .wrong{color:var(--danger)}
 .ans .right{color:var(--accent-ink)}
 .ans .why{color:var(--muted);font-size:12.5px;border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
-.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px}
 .action-grid .btn{width:100%}
 .action-note{text-align:center;color:var(--faint);font-size:11.5px;line-height:1.6;margin:10px 2px 0}
 .site-foot{
@@ -518,14 +525,13 @@ function renderResult(){
 
   html += '<div class="action-grid">';
   html += '<button class="btn primary" id="posterBtn">分享我的得分</button>';
-  html += '<button class="btn ghost" id="answerImgBtn">下载答案解析</button>';
   html += '<button class="btn ghost" id="retryBtn">再考一次</button>';
   if(passed && attempt.level<5) html += '<button class="btn warm" id="nextLevelBtn">进入下一关</button>';
   if(allDone()) html += '<button class="btn warm" id="totalBtn2">我的总成绩</button>';
   html += '</div>';
   html += '<p class="action-note">生成后可下载或分享。</p>';
 
-  html += '<div class="section-title">答案解析</div><div class="answer-list">';
+  html += '<div class="section-title">答案解析<button type="button" class="inline-link" id="answerImgBtn">保存解析</button></div><div class="answer-list">';
   attempt.items.forEach(function(item, i){
     var q = questionMap[item.id];
     var ok = flags[i];
