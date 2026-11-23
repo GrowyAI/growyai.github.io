@@ -1,0 +1,38 @@
+Content License — CC BY-NC-SA 4.0
+
+Scope
+-----
+This license applies to the knowledge-point data, Chinese translations,
+derived CSV/XLSX tables, and related textual content in this directory
+(including the data/ folder). It does not replace the repository-root
+license for the surrounding Growy site code.
+
+Source
+------
+Based on an original work of the Core Knowledge® Foundation, made available
+through the Core Knowledge Sequence (2023), Preschool and K–8 editions:
+https://www.coreknowledge.org/free-resource/core-knowledge-sequence/
+
+Required attribution
+--------------------
+This work is based on an original work of the Core Knowledge® Foundation made
+available through licensing under a Creative Commons Attribution-
+NonCommercial-ShareAlike 4.0 International License. This does not in any way
+imply that the Core Knowledge Foundation endorses this work.
+
+License
+-------
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Changes made
+------------
+The source PDFs were parsed and restructured into bilingual JSON/CSV/XLSX
+data; Chinese translations, source-page references, filtering, search,
+favorites, an outline, a roadmap, and Unicode emoji hints were added.
+No images extracted from the source PDFs are distributed in this directory.
+
+ShareAlike / NonCommercial
+--------------------------
+Adaptations must be shared under the same or a compatible license.
+Commercial use, sublicensing, and removal of attribution are not permitted.

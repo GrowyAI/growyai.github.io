@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Knowledge 路线图</title>
+<style>
+  :root {
+    --bg: #f6f8fb; --surface: #fff; --border: #e2e8f0; --text: #0f172a;
+    --muted: #64748b; --accent: #2563eb; --accent-soft: #eff6ff;
+    --amber: #b45309; --amber-soft: #fffbeb; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 16px 14px; }
+  .top { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 { margin: 0; font-size: 20px; }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .link-btn, .ghost-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--accent); font-size: 13px;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 18px 16px 40px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--muted); }
+  .stat b { display: block; font-size: 17px; color: var(--text); }
+  h2 { font-size: 15px; margin: 22px 0 10px; }
+  .matrix-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; }
+  th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; }
+  th { background: #fafbfc; font-size: 12px; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+  th:first-child, td:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; font-weight: 600; font-size: 13px; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .cell {
+    display: block; width: 100%; min-width: 108px; text-align: left;
+    border: 1px solid var(--border); border-radius: 10px; background: #fff;
+    padding: 9px 10px; cursor: pointer; color: var(--text);
+  }
+  .cell:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .cell.core { border-color: #bfdbfe; background: #f8fbff; }
+  .cell-name { font-size: 13px; font-weight: 600; }
+  .cell-name .star { color: var(--accent); }
+  .cell-en { font-size: 10px; color: var(--muted); margin: 2px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-counts { font-size: 11px; color: var(--muted); display: flex; gap: 8px; }
+  .bar { height: 3px; border-radius: 2px; background: #dbeafe; margin-top: 7px; }
+  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+  .preschool { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+  .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 20; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 94vw);
+    background: var(--surface); z-index: 21; overflow-y: auto;
+    box-shadow: -12px 0 32px rgba(15,23,42,.12); padding: 18px;
+  }
+  .drawer-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .drawer h3 { margin: 0; font-size: 18px; }
+  .drawer .crumb { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .drawer .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .close { border: none; background: #f1f5f9; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; color: var(--muted); }
+  .topic { border: 1px solid var(--border); border-radius: 10px; margin-top: 8px; background: #fff; }
+  .topic summary { cursor: pointer; padding: 10px 12px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; }
+  .topic summary .n { color: var(--muted); font-weight: 400; font-size: 11px; white-space: nowrap; }
+  .topic-body { border-top: 1px solid var(--border); padding: 8px 12px 12px; }
+  .preview { margin: 0 0 8px; padding-left: 16px; font-size: 12px; color: var(--muted); }
+  .preview li { margin: 4px 0; }
+  .preview .p-en { color: var(--text); }
+  .view-all { display: inline-block; font-size: 12px; color: var(--accent); text-decoration: none; }
+  .all-link { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--accent); }
+  .empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
+  @media (max-width: 640px) {
+    header { padding: 14px 12px 12px; }
+    main { padding: 14px 12px 32px; }
+    h1 { font-size: 18px; }
+    .top { align-items: flex-start; }
+    .drawer { padding: 14px; }
+  }
+  .site-foot {
+    max-width: 980px; margin: 0 auto; padding: 18px 16px 32px;
+    font-size: 12px; color: #94a3b8; text-align: center;
+  }
+  .site-foot a { color: var(--accent); }
+  .nav-links { display: flex; flex-wrap: wrap; gap: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1>Core Knowledge 学习路线图</h1>
+      <div class="sub">先选年级和学科，再看这一格的核心知识点；点击主题可预览，也可进入速查器。</div>
+    </div>
+    <div class="nav-links">
+      <a class="link-btn" href="../index.html">Growy 首页</a>
+      <a class="link-btn" href="index.html">进入速查器 →</a>
+      <a class="link-btn" href="attribution.html">版权</a>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="stats" id="stats"></div>
+
+  <h2>学前 · 发展领域</h2>
+  <div class="preschool" id="preschool"></div>
+
+  <h2>K–8 · 年级 × 学科</h2>
+  <div class="matrix-wrap">
+    <table id="matrix">
+      <thead><tr><th>年级</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<footer class="site-foot">
+  来源：Core Knowledge Sequence 2023 · 非官方整理，未经 Core Knowledge Foundation 认可或背书 ·
+  <a href="attribution.html">版权与署名</a>
+</footer>
+
+<div class="overlay" id="overlay" hidden></div>
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-head">
+    <div>
+      <div class="crumb" id="drawerCrumb"></div>
+      <h3 id="drawerTitle"></h3>
+      <div class="meta" id="drawerMeta"></div>
+    </div>
+    <button class="close" id="drawerClose" title="关闭">×</button>
+  </div>
+  <div id="drawerBody"></div>
+</aside>
+
+<script src="data/knowledge-inline.js"></script>
+<script>
+(function () {
+  var DATA = window.KNOWLEDGE;
+  var items = DATA.items;
+  var GRADES = ["K", "1", "2", "3", "4", "5", "6", "7", "8"];
+  var SUBJECTS = DATA.taxonomy.k8_subjects;
+  var CORE = {
+    "English Language Arts": 1, "Mathematics": 1, "Science": 1, "History and Geography": 1,
+    "Language and Literacy": 1, "Mathematical Reasoning and Number Sense": 1
+  };
+  var ZH = {
+    "English Language Arts": "英语语言艺术", "Mathematics": "数学", "Science": "科学",
+    "History and Geography": "历史与地理", "Visual Arts": "视觉艺术", "Music": "音乐",
+    "Movement and Coordination": "动作与协调", "Social and Emotional Development": "社会情感发展",
+    "Language and Literacy": "语言与读写", "Mathematics and Numerical Reasoning": "数学与数感",
+    "History and Geography: Orientation in Time": "历史与地理：时间概念",
+    "History and Geography: Orientation in Space": "历史与地理：空间概念",
+    "Scientific Reasoning and the Physical World": "科学推理与物质世界",
+    "Mathematical Reasoning and Number Sense": "数学推理与数感",
+    "Emerging Literacy Skills in Reading and Writing": "读写萌芽技能",
+    "Nursery Rhymes, Poems, Fingerplays and Songs": "童谣、诗歌、手指游戏与歌曲",
+    "Storybook Reading and Storytelling": "绘本阅读与讲故事"
+  };
+  function zh(s) { return ZH[s] || ""; }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function gradeLabel(g) { return g === "K" ? "K" : "G" + g; }
+  function gradeItems(g) { return items.filter(function (i) { return i.grade === g; }); }
+  function subjectItems(g, s) {
+    return items.filter(function (i) { return i.grade === g && i.subject === s; });
+  }
+  function topicList(g, s) {
+    var seen = {}, out = [];
+    subjectItems(g, s).forEach(function (i) {
+      if (!seen[i.topic]) {
+        seen[i.topic] = { title: i.topic, items: [], subtopics: {} };
+        out.push(seen[i.topic]);
+      }
+      seen[i.topic].items.push(i);
+      if (i.subtopic) seen[i.topic].subtopics[i.subtopic] = 1;
+    });
+    return out;
+  }
+  function viewerUrl(g, s, topic) {
+    var q = "index.html?grade=" + encodeURIComponent(g) + "&subject=" + encodeURIComponent(s);
+    if (topic) q += "&topic=" + encodeURIComponent(topic);
+    return q;
+  }
+
+  function buildStats() {
+    var grades = GRADES.length + 1;
+    var subjects = new Set(items.map(function (i) { return i.grade + "|" + i.subject; })).size;
+    var topics = new Set(items.map(function (i) { return i.grade + "|" + i.subject + "|" + i.topic; })).size;
+    document.getElementById("stats").innerHTML = [
+      ["年级", grades], ["年级学科组合", subjects], ["主题", topics], ["知识点", items.length]
+    ].map(function (p) {
+      return '<div class="stat"><b>' + p[1] + "</b>" + p[0] + "</div>";
+    }).join("");
+  }
+
+  function buildPreschool() {
+    var counts = {};
+    gradeItems("Preschool").forEach(function (i) { counts[i.subject] = (counts[i.subject] || 0) + 1; });
+    var names = Object.keys(counts).sort(function (a, b) {
+      return (CORE[b] ? 1 : 0) - (CORE[a] ? 1 : 0);
+    });
+    document.getElementById("preschool").innerHTML = names.map(function (s) {
+      return '<a class="cell' + (CORE[s] ? " core" : "") + '" href="' + esc(viewerUrl("Preschool", s)) + '">' +
+        '<div class="cell-name">' + (CORE[s] ? '<span class="star">★ </span>' : "") + esc(zh(s) || s) + "</div>" +
+        '<div class="cell-en">' + esc(s) + "</div>" +
+        '<div class="cell-counts"><span>' + counts[s] + " 条</span></div></a>";
+    }).join("");
+  }
+
+  function buildMatrix() {
+    var table = document.getElementById("matrix");
+    var head = table.querySelector("thead tr");
+    SUBJECTS.forEach(function (s) {
+      var th = document.createElement("th");
+      th.textContent = (CORE[s] ? "★ " : "") + (zh(s) || s);
+      head.appendChild(th);
+    });
+    var max = 0;
+    var cells = {};
+    GRADES.forEach(function (g) {
+      SUBJECTS.forEach(function (s) {
+        cells[g + "|" + s] = subjectItems(g, s);
+        max = Math.max(max, cells[g + "|" + s].length);
+      });
+    });
+    var body = table.querySelector("tbody");
+    body.innerHTML = GRADES.map(function (g) {
+      var tds = SUBJECTS.map(function (s) {
+        var arr = cells[g + "|" + s];
+        var ts = topicList(g, s).length;
+        var pct = max ? Math.max(6, Math.round(arr.length / max * 100)) : 0;
+        return "<td><button class=\"cell" + (CORE[s] ? " core" : "") + "\" data-grade=\"" + esc(g) + "\" data-subject=\"" + esc(s) + "\">" +
+          '<div class="cell-name">' + (CORE[s] ? '<span class="star">★ </span>' : "") + esc(zh(s) || s) + "</div>" +
+          '<div class="cell-en">' + esc(s) + "</div>" +
+          '<div class="cell-counts"><span>' + ts + " 主题</span><span>" + arr.length + " 条</span></div>" +
+          '<div class="bar"><span style="width:' + pct + '%"></span></div></button></td>';
+      }).join("");
+      return "<tr><td>" + gradeLabel(g) + "</td>" + tds + "</tr>";
+    }).join("");
+    Array.prototype.forEach.call(body.querySelectorAll(".cell"), function (btn) {
+      btn.addEventListener("click", function () { openDrawer(btn.dataset.grade, btn.dataset.subject); });
+    });
+  }
+
+  function openDrawer(g, s) {
+    var arr = subjectItems(g, s);
+    var topics = topicList(g, s);
+    document.getElementById("drawerCrumb").textContent = "路线图 / " + (g === "K" ? "K" : "G" + g);
+    document.getElementById("drawerTitle").textContent = (CORE[s] ? "★ " : "") + (zh(s) || s);
+    document.getElementById("drawerMeta").textContent = s + " · " + topics.length + " 个主题 · " + arr.length + " 条知识点";
+    document.getElementById("drawerBody").innerHTML = topics.length ? topics.map(function (t, idx) {
+      var preview = t.items.slice(0, 3).map(function (i) {
+        return "<li><span class=\"p-en\">" + esc(i.en) + "</span>" +
+          (i.zh ? "<br>" + esc(i.zh) : "") + "</li>";
+      }).join("");
+      return '<details class="topic"' + (idx < 3 ? " open" : "") + ">" +
+        "<summary><span>" + esc(t.title) + "</span><span class=\"n\">" +
+        Object.keys(t.subtopics).length + " 子主题 · " + t.items.length + " 条</span></summary>" +
+        '<div class="topic-body"><ul class="preview">' + preview + "</ul>" +
+        '<a class="view-all" href="' + esc(viewerUrl(g, s, t.title)) + '">在速查器中查看全部 ' + t.items.length + " 条 →</a>" +
+        "</div></details>";
+    }).join("") + '<a class="all-link" href="' + esc(viewerUrl(g, s)) + '">打开 ' + gradeLabel(g) + " · " + esc(zh(s) || s) + " 全部内容 →</a>"
+      : '<div class="empty">这个格子暂时没有内容。</div>';
+    document.getElementById("overlay").hidden = false;
+    document.getElementById("drawer").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDrawer() {
+    document.getElementById("overlay").hidden = true;
+    document.getElementById("drawer").hidden = true;
+    document.body.style.overflow = "";
+  }
+  document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+  document.getElementById("overlay").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+
+  buildStats();
+  buildPreschool();
+  buildMatrix();
+})();
+</script>
+</body>
+</html>

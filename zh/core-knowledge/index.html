@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Core Knowledge 知识点速查</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #f1f4f8;
+    --border: #dfe4ea;
+    --text: #1f2933;
+    --muted: #64748b;
+    --accent: #2563eb;
+    --accent-soft: #e8f0fe;
+    --amber: #b45309;
+    --amber-soft: #fef3c7;
+    --green: #15803d;
+    --green-soft: #dcfce7;
+    --purple: #7e22ce;
+    --purple-soft: #f3e8ff;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px calc(10px + env(safe-area-inset-top));
+  }
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 17px; margin: 0; font-weight: 650; }
+  .count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .controls { display: grid; gap: 8px; }
+  .search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .search:focus { outline: 2px solid var(--accent); background: var(--surface); }
+  .grade-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .grade-row::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  select {
+    flex: 1 1 130px;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+  }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+  main { padding: 12px 14px 80px; max-width: 900px; margin: 0 auto; }
+  details.subject {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  details.subject > summary {
+    padding: 12px 14px;
+    font-weight: 620;
+    font-size: 15px;
+    cursor: pointer;
+    background: var(--surface-2);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  details.subject > summary::-webkit-details-marker { display: none; }
+  details.subject > summary::after { content: "+"; color: var(--muted); font-size: 18px; }
+  details.subject[open] > summary::after { content: "−"; }
+  .topic-group { border-top: 1px solid var(--border); }
+  .topic-title {
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 14px;
+    background: #fafbfc;
+    color: #334155;
+  }
+  .subtopic-title {
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .section-title {
+    list-style: none; margin: 8px 12px 2px; padding: 4px 8px;
+    border-left: 3px solid var(--accent); background: #f8fafc;
+    font-size: 12px; font-weight: 600; color: #475569;
+  }
+  .section-zh { font-weight: 400; color: var(--muted); margin-left: 6px; }
+  ul.items { list-style: none; margin: 0; padding: 0; }
+  li.item {
+    padding: 10px 14px;
+    border-top: 1px solid #eef1f5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .item-body { flex: 1; min-width: 0; }
+  .badges { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-bottom: 4px; }
+  .badge {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .type-question { background: var(--amber-soft); color: var(--amber); }
+  .type-work { background: var(--purple-soft); color: var(--purple); }
+  .type-skill, .type-objective { background: var(--green-soft); color: var(--green); }
+  .type-note { background: #f1f5f9; color: #475569; }
+  .en { font-size: 15px; color: var(--text); line-height: 1.2; }
+  .zh { font-size: 13px; color: var(--muted); line-height: 1.3; }
+  .en + .zh { margin-top: 1px; }
+  .en.dialogue-text, .zh.dialogue-text { white-space: pre-line; }
+  .subject-cn { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+  .subject-core { color: var(--accent); }
+  .meta { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .emoji-row {
+    display: inline-flex;
+    align-items: center;
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: 1px;
+    margin-left: 1px;
+  }
+  .details { margin: 5px 0 0; padding-left: 16px; color: var(--muted); font-size: 13px; }
+  .details li { margin: 2px 0; }
+  .fav {
+    flex: 0 0 auto;
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+  }
+  .fav.on { color: #f59e0b; }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 48px 16px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+  .more {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .footer-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 24px; }
+  .footer-note a { color: var(--accent); }
+  .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .nav-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px 11px; border: 1px solid var(--border); border-radius: 999px;
+    background: var(--surface); color: var(--accent); font-size: 13px;
+    text-decoration: none; cursor: pointer;
+  }
+  .topic-bar {
+    margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent); font-size: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .topic-bar button { border: none; background: transparent; color: var(--accent); font-size: 12px; cursor: pointer; }
+  .outline-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 30; }
+  .outline-panel {
+    position: fixed; top: 0; left: 0; bottom: 0; width: min(340px, 88vw);
+    background: var(--surface); z-index: 31; overflow-y: auto; padding: 14px;
+    box-shadow: 12px 0 32px rgba(15,23,42,.12);
+  }
+  .outline-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .outline-head b { font-size: 15px; }
+  .outline-head button { border: none; background: #f1f5f9; color: var(--muted); border-radius: 50%; width: 28px; height: 28px; font-size: 17px; cursor: pointer; }
+  .outline-band { font-size: 11px; color: var(--muted); margin: 14px 0 4px; letter-spacing: .08em; }
+  .ol-node summary, .ol-leaf {
+    display: flex; justify-content: space-between; gap: 8px; align-items: center;
+    padding: 6px 7px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text);
+  }
+  .ol-node summary:hover, .ol-leaf:hover { background: #f8fafc; }
+  .ol-leaf { width: 100%; border: none; background: transparent; text-align: left; }
+  .ol-count { color: var(--muted); font-size: 11px; white-space: nowrap; }
+  .ol-children { margin-left: 9px; padding-left: 6px; border-left: 1px solid var(--border); }
+  .ol-node.active > summary, .ol-leaf.active { background: var(--accent-soft); color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div class="title-row">
+    <h1>Core Knowledge 知识点速查</h1>
+    <div class="header-actions">
+      <a class="nav-btn" href="../index.html">Growy 首页</a>
+      <a class="nav-btn" href="roadmap.html">路线图</a>
+      <a class="nav-btn" href="attribution.html">版权</a>
+      <button class="nav-btn" id="outlineToggle">大纲</button>
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+  <div class="topic-bar" id="topicBar" hidden></div>
+  <div class="controls">
+    <input id="search" class="search" type="search" placeholder="搜索英文或中文知识点…" autocomplete="off">
+    <div class="grade-row" id="grades"></div>
+    <div class="filter-row">
+      <select id="subject" aria-label="学科"></select>
+      <select id="topic" aria-label="主题"></select>
+      <select id="type" aria-label="类型"></select>
+      <label class="toggle"><input type="checkbox" id="questionsOnly">只看问题</label>
+      <label class="toggle"><input type="checkbox" id="favOnly">收藏</label>
+      <label class="toggle"><input type="checkbox" id="langZh" checked>显示中文</label>
+    </div>
+  </div>
+</header>
+<main>
+  <div id="content"></div>
+  <button class="more" id="more" hidden>显示更多</button>
+  <p class="footer-note" id="footer"></p>
+</main>
+
+<div class="outline-overlay" id="outlineOverlay" hidden></div>
+<aside class="outline-panel" id="outlinePanel" hidden></aside>
+
+<script src="data/knowledge-inline.js"></script>
+<script src="data/topic-zh-inline.js"></script>
+<script>
+(function () {
+  var DATA = window.KNOWLEDGE;
+  var items = DATA.items;
+  var favs = {};
+  try { favs = JSON.parse(localStorage.getItem("ck-favs") || "{}"); } catch (e) { favs = {}; }
+  var state = { grade: "K", subject: "", topic: "", subtopic: "", type: "", q: "", questionsOnly: false, favOnly: false, limit: 600 };
+  var SUBJECT_ORDER = DATA.taxonomy.k8_subjects.concat(DATA.taxonomy.preschool_subjects);
+  var GRADES = ["Preschool", "K", "1", "2", "3", "4", "5", "6", "7", "8"];
+  var TYPE_ORDER = ["objective", "skill", "question", "work", "vocabulary", "dialogue", "note"];
+  var SUBJECT_ZH = {
+    "English Language Arts": "英语语言艺术",
+    "Mathematics": "数学",
+    "Science": "科学",
+    "History and Geography": "历史与地理",
+    "Visual Arts": "视觉艺术",
+    "Music": "音乐",
+    "Movement and Coordination": "动作与协调",
+    "Social and Emotional Development": "社会情感发展",
+    "Language and Literacy": "语言与读写",
+    "History and Geography: Orientation in Time": "历史与地理：时间概念",
+    "History and Geography: Orientation in Space": "历史与地理：空间概念",
+    "Scientific Reasoning and the Physical World": "科学推理与物质世界",
+    "Mathematical Reasoning and Number Sense": "数学推理与数感",
+    "Emerging Literacy Skills in Reading and Writing": "读写萌芽技能",
+    "Nursery Rhymes, Poems, Fingerplays and Songs": "童谣、诗歌、手指游戏与歌曲",
+    "Storybook Reading and Storytelling": "绘本阅读与讲故事"
+  };
+  var CORE_SUBJECTS = {
+    "English Language Arts": 1, "Mathematics": 1, "Science": 1, "History and Geography": 1,
+    "Language and Literacy": 1, "Mathematical Reasoning and Number Sense": 1
+  };
+  function isCore(subject) { return !!CORE_SUBJECTS[subject]; }
+  function subjectZh(subject) { return SUBJECT_ZH[subject] || ""; }
+  function topicZh(topic) { return (window.TOPIC_ZH && window.TOPIC_ZH[topic]) || ""; }
+  function topicLabel(topic) {
+    topic = topic || "(General)";
+    var en = topic.length > 44 ? topic.slice(0, 41) + "…" : topic;
+    var zh = topicZh(topic);
+    return en + (zh ? " · " + zh : "");
+  }
+
+  function readParams() {
+    var p = new URLSearchParams(location.search);
+    var g = p.get("grade");
+    if (g && GRADES.indexOf(g) >= 0) state.grade = g;
+    state.subject = p.get("subject") || "";
+    state.topic = p.get("topic") || "";
+    state.subtopic = p.get("subtopic") || "";
+    if (state.subject && !items.some(function (i) { return i.grade === state.grade && i.subject === state.subject; })) state.subject = "";
+    if (state.topic && !items.some(function (i) {
+      return i.grade === state.grade && i.subject === state.subject && i.topic === state.topic;
+    })) state.topic = "";
+    if (state.subtopic && !items.some(function (i) {
+      return i.grade === state.grade && i.subject === state.subject &&
+        i.topic === state.topic && i.subtopic === state.subtopic;
+    })) state.subtopic = "";
+  }
+
+  function syncUrl() {
+    try {
+      var p = new URLSearchParams();
+      p.set("grade", state.grade);
+      if (state.subject) p.set("subject", state.subject);
+      if (state.topic) p.set("topic", state.topic);
+      if (state.subtopic) p.set("subtopic", state.subtopic);
+      history.replaceState(null, "", location.href.split("?")[0] + "?" + p.toString());
+    } catch (e) {}
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function gradeLabel(g) {
+    if (g === "Preschool") return "学前";
+    if (g === "K") return "K";
+    return "G" + g;
+  }
+
+  function typeLabel(t) {
+    return {
+      objective: "知识点", skill: "技能", question: "问题", work: "作品",
+      vocabulary: "词汇", dialogue: "对话", note: "提示"
+    }[t] || t;
+  }
+
+  var outline = null;
+
+  function buildOutline() {
+    outline = {};
+    GRADES.forEach(function (g) { outline[g] = { count: 0, subjects: [], subjIndex: {} }; });
+    items.forEach(function (i) {
+      var g = outline[i.grade];
+      if (!g) return;
+      g.count += 1;
+      var sk = i.grade + "|" + i.subject;
+      var s = g.subjIndex[sk];
+      if (!s) {
+        s = { name: i.subject, count: 0, topics: [], index: {} };
+        g.subjIndex[sk] = s;
+        g.subjects.push(s);
+      }
+      s.count += 1;
+      var tk = sk + "|" + i.topic;
+      var t = s.index[tk];
+      if (!t) {
+        t = { name: i.topic, count: 0, subtopics: [], subIndex: {} };
+        s.index[tk] = t;
+        s.topics.push(t);
+      }
+      t.count += 1;
+      if (i.subtopic) {
+        var stk = tk + "|" + i.subtopic;
+        var st = t.subIndex[stk];
+        if (!st) {
+          st = { name: i.subtopic, count: 0 };
+          t.subIndex[stk] = st;
+          t.subtopics.push(st);
+        }
+        st.count += 1;
+      }
+    });
+  }
+
+  function renderOutline() {
+    if (!outline) buildOutline();
+    var bands = [
+      { label: "学前", grades: ["Preschool"] },
+      { label: "K–2", grades: ["K", "1", "2"] },
+      { label: "3–5", grades: ["3", "4", "5"] },
+      { label: "6–8", grades: ["6", "7", "8"] }
+    ];
+    var html = '<div class="outline-head"><b>知识点大纲</b><button id="outlineClose" title="关闭">×</button></div>';
+    bands.forEach(function (band) {
+      html += '<div class="outline-band">' + esc(band.label) + "</div>";
+      band.grades.forEach(function (g) {
+        var node = outline[g];
+        if (!node) return;
+        var gActive = g === state.grade;
+        html += '<details class="ol-node' + (gActive ? " active" : "") + '"' + (gActive ? " open" : "") + ">" +
+          '<summary data-nav="grade" data-grade="' + esc(g) + '"><span>' + gradeLabel(g) +
+          '</span><span class="ol-count">' + node.count + "</span></summary><div class=\"ol-children\">";
+        node.subjects.slice().sort(function (a, b) {
+          var ai = SUBJECT_ORDER.indexOf(a.name), bi = SUBJECT_ORDER.indexOf(b.name);
+          return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+        }).forEach(function (s) {
+          var sActive = gActive && s.name === state.subject;
+          html += '<details class="ol-node' + (sActive ? " active" : "") + '"' + (sActive ? " open" : "") + ">" +
+            '<summary data-nav="subject" data-grade="' + esc(g) + '" data-subject="' + esc(s.name) + '"><span>' +
+            (isCore(s.name) ? "★ " : "") + esc(subjectZh(s.name) || s.name) +
+            '</span><span class="ol-count">' + s.count + "</span></summary><div class=\"ol-children\">";
+          s.topics.forEach(function (t) {
+            var tActive = sActive && t.name === state.topic;
+            html += '<button class="ol-leaf' + (tActive ? " active" : "") +
+              '" data-nav="topic" data-grade="' + esc(g) + '" data-subject="' + esc(s.name) +
+              '" data-topic="' + esc(t.name) + '"><span>' + esc(topicLabel(t.name)) +
+              '</span><span class="ol-count">' + t.count + "</span></button>";
+            t.subtopics.forEach(function (st) {
+              var stActive = tActive && st.name === state.subtopic;
+              html += '<button class="ol-leaf' + (stActive ? " active" : "") +
+                '" data-nav="subtopic" data-grade="' + esc(g) + '" data-subject="' + esc(s.name) +
+                '" data-topic="' + esc(t.name) + '" data-subtopic="' + esc(st.name) +
+                '"><span>↳ ' + esc(st.name) + '</span><span class="ol-count">' + st.count + "</span></button>";
+            });
+          });
+          html += "</div></details>";
+        });
+        html += "</div></details>";
+      });
+    });
+    document.getElementById("outlinePanel").innerHTML = html;
+  }
+
+  function openOutline() {
+    renderOutline();
+    document.getElementById("outlineOverlay").hidden = false;
+    document.getElementById("outlinePanel").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOutline() {
+    document.getElementById("outlineOverlay").hidden = true;
+    document.getElementById("outlinePanel").hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function applyNav(nav) {
+    nav = nav || {};
+    if (nav.grade) state.grade = nav.grade;
+    state.subject = nav.subject || "";
+    state.topic = nav.topic || "";
+    state.subtopic = nav.subtopic || "";
+    state.type = "";
+    state.q = "";
+    state.questionsOnly = false;
+    state.favOnly = false;
+    state.limit = 600;
+    document.getElementById("search").value = "";
+    document.getElementById("questionsOnly").checked = false;
+    document.getElementById("favOnly").checked = false;
+    buildGradeChips();
+    refreshFilters();
+    renderOutline();
+    closeOutline();
+  }
+
+  function renderTopicBar() {
+    var bar = document.getElementById("topicBar");
+    if (!state.topic) { bar.hidden = true; bar.innerHTML = ""; return; }
+    var label = gradeLabel(state.grade) + " · " + (subjectZh(state.subject) || state.subject) +
+      " · " + topicLabel(state.topic) + (state.subtopic ? " · " + state.subtopic : "");
+    bar.hidden = false;
+    bar.innerHTML = "<span>当前主题：<b>" + esc(label) + "</b></span><button id=\"clearTopic\">清除主题</button>";
+    document.getElementById("clearTopic").addEventListener("click", function () {
+      state.topic = "";
+      state.subtopic = "";
+      refreshFilters();
+      renderOutline();
+    });
+  }
+
+  function buildGradeChips() {
+    var box = document.getElementById("grades");
+    box.innerHTML = GRADES.map(function (g) {
+      return '<button class="chip' + (g === state.grade ? ' active' : '') + '" data-grade="' + g + '">' + gradeLabel(g) + "</button>";
+    }).join("");
+    Array.prototype.forEach.call(box.querySelectorAll(".chip"), function (chip) {
+      chip.addEventListener("click", function () {
+        applyNav({ grade: chip.dataset.grade });
+      });
+    });
+  }
+
+  function commonFiltered(skip) {
+    skip = skip || {};
+    var q = state.q.trim().toLowerCase();
+    return items.filter(function (i) {
+      if (!skip.grade && i.grade !== state.grade) return false;
+      if (!skip.subject && state.subject && i.subject !== state.subject) return false;
+      if (!skip.topic && state.topic && i.topic !== state.topic) return false;
+      if (!skip.subtopic && state.subtopic && i.subtopic !== state.subtopic) return false;
+      if (!skip.type && state.type && i.type !== state.type) return false;
+      if (!skip.questionsOnly && state.questionsOnly && i.type !== "question" && i.type !== "dialogue") return false;
+      if (!skip.favOnly && state.favOnly && !favs[i.id]) return false;
+      if (!skip.q && q) {
+        var hay = (i.en + " " + i.zh + " " + i.topic + " " + i.subtopic +
+          " " + (i.section || "") + " " + (i.section_zh || "")).toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function filteredItems() { return commonFiltered({}); }
+
+  function buildSubjects() {
+    var counts = {};
+    commonFiltered({subject: true, topic: true, subtopic: true}).forEach(function (i) {
+      counts[i.subject] = (counts[i.subject] || 0) + 1;
+    });
+    if (state.subject && !counts[state.subject]) {
+      state.subject = "";
+      state.topic = "";
+      state.subtopic = "";
+    }
+    var list = Object.keys(counts);
+    list.sort(function (a, b) {
+      var ac = isCore(a) ? 0 : 1, bc = isCore(b) ? 0 : 1;
+      if (ac !== bc) return ac - bc;
+      var ai = SUBJECT_ORDER.indexOf(a), bi = SUBJECT_ORDER.indexOf(b);
+      return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+    var sel = document.getElementById("subject");
+    sel.innerHTML = '<option value="">全部学科 (' + list.length + ')</option>' + list.map(function (s) {
+      var zh = subjectZh(s);
+      var label = (isCore(s) ? "★ " : "") + esc(s) + (zh ? " · " + esc(zh) : "") + " (" + counts[s] + ")";
+      return '<option value="' + esc(s) + '">' + label + "</option>";
+    }).join("");
+    sel.value = state.subject;
+  }
+
+  function buildTopics() {
+    var counts = {};
+    var order = [];
+    commonFiltered({topic: true, subtopic: true}).forEach(function (i) {
+      var t = i.topic || "(General)";
+      if (!counts[t]) order.push(t);
+      counts[t] = (counts[t] || 0) + 1;
+    });
+    if (state.topic && !counts[state.topic]) {
+      state.topic = "";
+      state.subtopic = "";
+    }
+    if (!state.topic) state.subtopic = "";
+    var sel = document.getElementById("topic");
+    sel.innerHTML = '<option value="">全部主题 (' + order.length + ')</option>' + order.map(function (t) {
+      return '<option value="' + esc(t) + '">' + esc(topicLabel(t)) + " (" + counts[t] + ")</option>";
+    }).join("");
+    sel.value = state.topic;
+  }
+
+  function buildTypes() {
+    var counts = {};
+    commonFiltered({type: true}).forEach(function (i) {
+      counts[i.type] = (counts[i.type] || 0) + 1;
+    });
+    if (state.type && !counts[state.type]) state.type = "";
+    var sel = document.getElementById("type");
+    var total = 0;
+    Object.keys(counts).forEach(function (t) { total += counts[t]; });
+    var html = '<option value="">全部类型 (' + total + ')</option>';
+    TYPE_ORDER.forEach(function (t) {
+      if (counts[t]) html += '<option value="' + t + '">' + esc(typeLabel(t)) + " (" + counts[t] + ")</option>";
+    });
+    Object.keys(counts).forEach(function (t) {
+      if (TYPE_ORDER.indexOf(t) < 0) {
+        html += '<option value="' + esc(t) + '">' + esc(typeLabel(t)) + " (" + counts[t] + ")</option>";
+      }
+    });
+    sel.innerHTML = html;
+    sel.value = state.type;
+  }
+
+  function itemHtml(i) {
+    var showZh = document.getElementById("langZh").checked;
+    var dialogClass = i.type === "dialogue" ? " dialogue-text" : "";
+    var enHtml = '<div class="en' + dialogClass + '">' + esc(i.en) + "</div>";
+    var zhHtml = showZh && i.zh ? '<div class="zh' + dialogClass + '">' + esc(i.zh) + "</div>" : "";
+    var details = (i.details || []).map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("");
+    var meta = [];
+    if (i.subtopic) meta.push(esc(i.subtopic));
+    if (i.level) meta.push(esc(i.level));
+    meta.push("p." + i.source.page);
+    var emoji = (i.emojis || []).slice(0, 2).join("");
+    var emojiHtml = emoji ? '<span class="emoji-row">' + emoji + "</span>" : "";
+    return '<li class="item" data-id="' + i.id + '">' +
+      '<button class="fav' + (favs[i.id] ? " on" : "") + '" title="收藏">' + (favs[i.id] ? "★" : "☆") + "</button>" +
+      '<div class="item-body">' +
+      '<div class="badges"><span class="badge type-' + i.type + '">' + typeLabel(i.type) + "</span>" + emojiHtml +
+      (i.subtopic ? '<span class="badge">' + esc(i.subtopic) + "</span>" : "") + "</div>" +
+      enHtml + zhHtml +
+      (details ? '<ul class="details">' + details + "</ul>" : "") +
+      '<div class="meta">' + meta.join(" · ") + "</div></div></li>";
+  }
+
+  function render() {
+    var list = filteredItems();
+    var shown = list.slice(0, state.limit);
+    var box = document.getElementById("content");
+    document.getElementById("count").textContent = list.length + " 条 / 共 " + items.length + " 条";
+    document.getElementById("more").hidden = list.length <= shown.length;
+    if (!shown.length) {
+      box.innerHTML = '<div class="empty">没有匹配的内容，换个筛选条件试试。</div>';
+      return;
+    }
+    var bySubject = {};
+    shown.forEach(function (i) {
+      bySubject[i.subject] = bySubject[i.subject] || {};
+      bySubject[i.subject][i.topic || "(General)"] = bySubject[i.subject][i.topic || "(General)"] || [];
+      bySubject[i.subject][i.topic || "(General)"].push(i);
+    });
+    var html = "";
+    Object.keys(bySubject).forEach(function (subject) {
+      var topicHtml = "";
+      Object.keys(bySubject[subject]).forEach(function (topic) {
+        var arr = bySubject[subject][topic];
+        var subGroups = {};
+        arr.forEach(function (i) {
+          var key = i.subtopic || "";
+          subGroups[key] = subGroups[key] || [];
+          subGroups[key].push(i);
+        });
+        var inner = "";
+        Object.keys(subGroups).forEach(function (sub) {
+          if (sub) inner += '<div class="subtopic-title">' + esc(sub) + "</div>";
+          var groupHtml = "";
+          var prevSection = "";
+          subGroups[sub].forEach(function (entry) {
+            var sec = entry.section || "";
+            if (sec && sec !== prevSection) {
+              var secZh = entry.section_zh
+                ? '<span class="section-zh">' + esc(entry.section_zh) + "</span>" : "";
+              groupHtml += '<li class="section-title">' + esc(sec) + secZh + "</li>";
+            }
+            prevSection = sec;
+            groupHtml += itemHtml(entry);
+          });
+          inner += '<ul class="items">' + groupHtml + "</ul>";
+        });
+        topicHtml += '<div class="topic-group"><div class="topic-title">' + esc(topicLabel(topic)) +
+          ' <span style="color:#94a3b8;font-weight:400">(' + arr.length + ")</span></div>" + inner + "</div>";
+      });
+      var zh = subjectZh(subject);
+      var summaryLabel = (isCore(subject) ? '<span class="subject-core">★ </span>' : "") +
+        esc(subject) + (zh ? '<span class="subject-cn">' + esc(zh) + "</span>" : "");
+      html += '<details class="subject" open><summary>' + summaryLabel + "</summary>" + topicHtml + "</details>";
+    });
+    box.innerHTML = html;
+    Array.prototype.forEach.call(box.querySelectorAll(".fav"), function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.closest("li").dataset.id;
+        if (favs[id]) { delete favs[id]; btn.classList.remove("on"); btn.textContent = "☆"; }
+        else { favs[id] = 1; btn.classList.add("on"); btn.textContent = "★"; }
+        localStorage.setItem("ck-favs", JSON.stringify(favs));
+        if (state.favOnly) refreshFilters();
+      });
+    });
+    document.getElementById("footer").innerHTML =
+      "来源：Core Knowledge Sequence 2023 · " + DATA.meta.item_count + " 条知识点 · 具体名词/动作配 emoji，抽象条目不配 · 收藏保存在本机浏览器 · " +
+      '<a href="attribution.html">版权与署名</a>';
+  }
+
+  function refreshFilters() {
+    state.limit = 600;
+    buildSubjects();
+    buildTopics();
+    buildTypes();
+    render();
+    renderTopicBar();
+    syncUrl();
+  }
+
+  var timer;
+  document.getElementById("search").addEventListener("input", function (e) {
+    clearTimeout(timer);
+    timer = setTimeout(function () { state.q = e.target.value; refreshFilters(); }, 180);
+  });
+  document.getElementById("subject").addEventListener("change", function (e) {
+    state.subject = e.target.value;
+    state.topic = "";
+    state.subtopic = "";
+    refreshFilters();
+    renderOutline();
+  });
+  document.getElementById("topic").addEventListener("change", function (e) {
+    state.topic = e.target.value;
+    state.subtopic = "";
+    refreshFilters();
+    renderOutline();
+  });
+  document.getElementById("type").addEventListener("change", function (e) {
+    state.type = e.target.value; refreshFilters();
+  });
+  document.getElementById("questionsOnly").addEventListener("change", function (e) {
+    state.questionsOnly = e.target.checked; refreshFilters();
+  });
+  document.getElementById("favOnly").addEventListener("change", function (e) {
+    state.favOnly = e.target.checked; refreshFilters();
+  });
+  document.getElementById("langZh").addEventListener("change", render);
+  document.getElementById("more").addEventListener("click", function () {
+    state.limit += 600; render();
+  });
+
+  document.getElementById("outlineToggle").addEventListener("click", openOutline);
+  document.getElementById("outlineOverlay").addEventListener("click", closeOutline);
+  document.getElementById("outlinePanel").addEventListener("click", function (e) {
+    if (e.target.id === "outlineClose") { closeOutline(); return; }
+    var el = e.target.closest("[data-nav]");
+    if (!el) return;
+    applyNav({
+      grade: el.dataset.grade,
+      subject: el.dataset.subject,
+      topic: el.dataset.topic,
+      subtopic: el.dataset.subtopic
+    });
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOutline(); });
+
+  readParams();
+  buildGradeChips();
+  refreshFilters();
+  renderOutline();
+})();
+</script>
+</body>
+</html>

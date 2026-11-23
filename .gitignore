@@ -10,3 +10,16 @@ Thumbs.db
 *.log
 temp/
 tmp/
+
+# Core Knowledge 工具：本地重建材料（含版权内容，不提交）
+zh/core-knowledge/source/
+zh/core-knowledge/data/raw/
+zh/core-knowledge/assets/images/
+zh/core-knowledge/data/images.json
+zh/core-knowledge/data/images-inline.js
+zh/core-knowledge/data/item-images.json
+zh/core-knowledge/data/item-images-inline.js
+zh/core-knowledge/translations/
+zh/core-knowledge/data/knowledge-before-*.json
+zh/core-knowledge/scripts/__pycache__/
+*.pyc
