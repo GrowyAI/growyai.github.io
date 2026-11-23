@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Core Knowledge 路线图</title>
+<title>Core Knowledge 学习大纲</title>
 <style>
   :root {
     --bg: #f6f8fb; --surface: #fff; --border: #e2e8f0; --text: #0f172a;
@@ -15,6 +15,7 @@
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 16px 14px; }
   .top { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   h1 { margin: 0; font-size: 20px; }
+  h1 a { color: inherit; text-decoration: none; }
   .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
   .link-btn, .ghost-btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -39,13 +40,13 @@
     padding: 9px 10px; cursor: pointer; color: var(--text);
   }
   .cell:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .cell.core { border-color: #bfdbfe; background: #f8fbff; }
-  .cell-name { font-size: 13px; font-weight: 600; }
-  .cell-name .star { color: var(--accent); }
+  .cell.core { border-color: var(--sc, #bfdbfe); background: #f8fbff; }
+  .cell-name { font-size: 13px; font-weight: 600; color: var(--sc, var(--text)); }
+  .cell-name .star { color: var(--sc, var(--accent)); }
   .cell-en { font-size: 10px; color: var(--muted); margin: 2px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cell-counts { font-size: 11px; color: var(--muted); display: flex; gap: 8px; }
   .bar { height: 3px; border-radius: 2px; background: #dbeafe; margin-top: 7px; }
-  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+  .bar span { display: block; height: 100%; background: var(--sc, var(--accent)); border-radius: 2px; }
   .preschool { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
   .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 20; }
   .drawer {
@@ -65,6 +66,9 @@
   .preview { margin: 0 0 8px; padding-left: 16px; font-size: 12px; color: var(--muted); }
   .preview li { margin: 4px 0; }
   .preview .p-en { color: var(--text); }
+  .sub-links { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 0 0 8px; }
+  .sub-links a { font-size: 12px; color: var(--accent); text-decoration: none; }
+  .sub-links a:hover { text-decoration: underline; }
   .view-all { display: inline-block; font-size: 12px; color: var(--accent); text-decoration: none; }
   .all-link { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--accent); }
   .empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
@@ -87,7 +91,7 @@
 <header>
   <div class="top">
     <div>
-      <h1>Core Knowledge 学习路线图</h1>
+      <h1><a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge</a> 学习大纲</h1>
       <div class="sub">先选年级和学科，再看这一格的核心知识点；点击主题可预览，也可进入速查器。</div>
     </div>
     <div class="nav-links">
@@ -113,8 +117,10 @@
 </main>
 
 <footer class="site-foot">
-  来源：Core Knowledge Sequence 2023 · 非官方整理，未经 Core Knowledge Foundation 认可或背书 ·
-  <a href="attribution.html">版权与署名</a>
+  来源：<a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge Sequence 2023</a> · 非官方整理，未经 Core Knowledge Foundation 认可或背书 ·
+  <a href="attribution.html">版权与署名</a> · 原版 PDF：
+  <a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_PreSchool_W2.pdf" target="_blank" rel="noopener noreferrer">Preschool</a> /
+  <a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_GK8_W3.pdf" target="_blank" rel="noopener noreferrer">K–8</a>
 </footer>
 
 <div class="overlay" id="overlay" hidden></div>
@@ -136,7 +142,18 @@
   var DATA = window.KNOWLEDGE;
   var items = DATA.items;
   var GRADES = ["K", "1", "2", "3", "4", "5", "6", "7", "8"];
-  var SUBJECTS = DATA.taxonomy.k8_subjects;
+  var SUBJECT_ORDER = [
+    "Language and Literacy", "English Language Arts", "Mathematics",
+    "History and Geography", "Science", "Movement and Coordination",
+    "Social and Emotional Development", "Music", "Visual Arts"
+  ];
+  function subjectRank(s) {
+    var i = SUBJECT_ORDER.indexOf(s);
+    return i === -1 ? SUBJECT_ORDER.length : i;
+  }
+  var SUBJECTS = DATA.taxonomy.k8_subjects.slice().sort(function (a, b) {
+    return subjectRank(a) - subjectRank(b);
+  });
   var CORE = {
     "English Language Arts": 1, "Mathematics": 1, "Science": 1, "History and Geography": 1,
     "Language and Literacy": 1, "Mathematical Reasoning and Number Sense": 1
@@ -154,6 +171,26 @@
     "Nursery Rhymes, Poems, Fingerplays and Songs": "童谣、诗歌、手指游戏与歌曲",
     "Storybook Reading and Storytelling": "绘本阅读与讲故事"
   };
+  var SUBJECT_COLORS = {
+    "History and Geography": "#9A6B3F",
+    "English Language Arts": "#4F6FA8",
+    "Science": "#2F7D6E",
+    "Mathematics": "#6B5CA5",
+    "Visual Arts": "#B0556B",
+    "Music": "#8A5AA8",
+    "Language and Literacy": "#3F7E96",
+    "Social and Emotional Development": "#B06A3B",
+    "Movement and Coordination": "#5C8A4A"
+  };
+  function subjectColor(s) {
+    s = s || "";
+    if (SUBJECT_COLORS[s]) return SUBJECT_COLORS[s];
+    var keys = Object.keys(SUBJECT_COLORS);
+    for (var k = 0; k < keys.length; k++) {
+      if (s.indexOf(keys[k]) === 0) return SUBJECT_COLORS[keys[k]];
+    }
+    return "#2563eb";
+  }
   function zh(s) { return ZH[s] || ""; }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -177,9 +214,10 @@
     });
     return out;
   }
-  function viewerUrl(g, s, topic) {
+  function viewerUrl(g, s, topic, subtopic) {
     var q = "index.html?grade=" + encodeURIComponent(g) + "&subject=" + encodeURIComponent(s);
     if (topic) q += "&topic=" + encodeURIComponent(topic);
+    if (subtopic) q += "&subtopic=" + encodeURIComponent(subtopic);
     return q;
   }
 
@@ -197,11 +235,9 @@
   function buildPreschool() {
     var counts = {};
     gradeItems("Preschool").forEach(function (i) { counts[i.subject] = (counts[i.subject] || 0) + 1; });
-    var names = Object.keys(counts).sort(function (a, b) {
-      return (CORE[b] ? 1 : 0) - (CORE[a] ? 1 : 0);
-    });
+    var names = Object.keys(counts).sort(function (a, b) { return subjectRank(a) - subjectRank(b); });
     document.getElementById("preschool").innerHTML = names.map(function (s) {
-      return '<a class="cell' + (CORE[s] ? " core" : "") + '" href="' + esc(viewerUrl("Preschool", s)) + '">' +
+      return '<a class="cell' + (CORE[s] ? " core" : "") + '" style="--sc:' + subjectColor(s) + '" href="' + esc(viewerUrl("Preschool", s)) + '">' +
         '<div class="cell-name">' + (CORE[s] ? '<span class="star">★ </span>' : "") + esc(zh(s) || s) + "</div>" +
         '<div class="cell-en">' + esc(s) + "</div>" +
         '<div class="cell-counts"><span>' + counts[s] + " 条</span></div></a>";
@@ -230,7 +266,7 @@
         var arr = cells[g + "|" + s];
         var ts = topicList(g, s).length;
         var pct = max ? Math.max(6, Math.round(arr.length / max * 100)) : 0;
-        return "<td><button class=\"cell" + (CORE[s] ? " core" : "") + "\" data-grade=\"" + esc(g) + "\" data-subject=\"" + esc(s) + "\">" +
+        return "<td><button class=\"cell" + (CORE[s] ? " core" : "") + "\" style=\"--sc:" + subjectColor(s) + "\" data-grade=\"" + esc(g) + "\" data-subject=\"" + esc(s) + "\">" +
           '<div class="cell-name">' + (CORE[s] ? '<span class="star">★ </span>' : "") + esc(zh(s) || s) + "</div>" +
           '<div class="cell-en">' + esc(s) + "</div>" +
           '<div class="cell-counts"><span>' + ts + " 主题</span><span>" + arr.length + " 条</span></div>" +
@@ -246,18 +282,26 @@
   function openDrawer(g, s) {
     var arr = subjectItems(g, s);
     var topics = topicList(g, s);
-    document.getElementById("drawerCrumb").textContent = "路线图 / " + (g === "K" ? "K" : "G" + g);
-    document.getElementById("drawerTitle").textContent = (CORE[s] ? "★ " : "") + (zh(s) || s);
+    document.getElementById("drawerCrumb").textContent = "大纲 / " + (g === "K" ? "K" : "G" + g);
+    var drawerTitle = document.getElementById("drawerTitle");
+    drawerTitle.textContent = (CORE[s] ? "★ " : "") + (zh(s) || s);
+    drawerTitle.style.color = subjectColor(s);
     document.getElementById("drawerMeta").textContent = s + " · " + topics.length + " 个主题 · " + arr.length + " 条知识点";
     document.getElementById("drawerBody").innerHTML = topics.length ? topics.map(function (t, idx) {
       var preview = t.items.slice(0, 3).map(function (i) {
         return "<li><span class=\"p-en\">" + esc(i.en) + "</span>" +
           (i.zh ? "<br>" + esc(i.zh) : "") + "</li>";
       }).join("");
+      var subNames = Object.keys(t.subtopics);
+      var subHtml = subNames.length
+        ? '<div class="sub-links">' + subNames.map(function (sub) {
+            return '<a href="' + esc(viewerUrl(g, s, t.title, sub)) + '">↳ ' + esc(sub) + "</a>";
+          }).join("") + "</div>"
+        : "";
       return '<details class="topic"' + (idx < 3 ? " open" : "") + ">" +
         "<summary><span>" + esc(t.title) + "</span><span class=\"n\">" +
-        Object.keys(t.subtopics).length + " 子主题 · " + t.items.length + " 条</span></summary>" +
-        '<div class="topic-body"><ul class="preview">' + preview + "</ul>" +
+        subNames.length + " 子主题 · " + t.items.length + " 条</span></summary>" +
+        '<div class="topic-body">' + subHtml + '<ul class="preview">' + preview + "</ul>" +
         '<a class="view-all" href="' + esc(viewerUrl(g, s, t.title)) + '">在速查器中查看全部 ' + t.items.length + " 条 →</a>" +
         "</div></details>";
     }).join("") + '<a class="all-link" href="' + esc(viewerUrl(g, s)) + '">打开 ' + gradeLabel(g) + " · " + esc(zh(s) || s) + " 全部内容 →</a>"

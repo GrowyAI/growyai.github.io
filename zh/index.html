@@ -11,6 +11,7 @@
             --about: #546E7A;
             --priority: #6B5B95;
             --orange: #E2703A;
+            --knowledge: #5B7C99;
             --bg: #F5F7FA;
             --text: #2C3E50;
             --gray: #6b7280;
@@ -100,10 +101,10 @@
         .card {
             background: white;
             border-radius: 16px;
-            padding: 2rem;
+            padding: 1.25rem 1.5rem;
             border: 1px solid #f0f0f0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            text-align: center;
+            text-align: left;
             position: relative;
             overflow: hidden;
             transition: all 0.3s;
@@ -111,6 +112,12 @@
             color: inherit;
             display: flex;
             flex-direction: column;
+        }
+        .card-head {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            margin-bottom: 0.55rem;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -133,12 +140,14 @@
         .card.purple::before { background: linear-gradient(to right, #9C7BB8, var(--priority)); }
         .card.orange::before { background: linear-gradient(to right, #FFA06B, var(--orange)); }
         .card.rose::before { background: linear-gradient(to right, #E8A5B5, #D97F96); }
+        .card.knowledge::before { background: linear-gradient(to right, #8CA9BF, var(--knowledge)); }
 
         .icon {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            margin: 0 auto 1.25rem;
+            margin: 0;
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,11 +166,14 @@
         .card.orange:hover .icon { background: var(--orange); color: white; }
         .card.rose .icon { background: rgba(217,127,150,0.12); color: #D97F96; }
         .card.rose:hover .icon { background: #D97F96; color: white; }
+        .card.knowledge .icon { background: rgba(91,124,153,0.12); color: var(--knowledge); }
+        .card.knowledge:hover .icon { background: var(--knowledge); color: white; }
 
         .card h3 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0;
+            line-height: 1.35;
             color: #1f2937;
             transition: color 0.3s;
         }
@@ -171,6 +183,7 @@
         .card.purple:hover h3 { color: var(--priority); }
         .card.orange:hover h3 { color: var(--orange); }
         .card.rose:hover h3 { color: #D97F96; }
+        .card.knowledge:hover h3 { color: var(--knowledge); }
 
         .card p {
             font-size: 0.875rem;
@@ -181,11 +194,13 @@
         }
 
         .action {
+            display: inline;
             font-weight: 600;
             font-size: 0.875rem;
             opacity: 1;
             transform: translateY(0);
-            margin-top: 1.0rem;
+            margin-left: 0.4rem;
+            white-space: nowrap;
         }
         .card.green .action { color: var(--primary); }
         .card.blue .action { color: var(--consult); }
@@ -193,6 +208,7 @@
         .card.purple .action { color: var(--priority); }
         .card.orange .action { color: var(--orange); }
         .card.rose .action { color: #D97F96; }
+        .card.knowledge .action { color: var(--knowledge); }
 
         /* Footer */
         footer {
@@ -237,7 +253,7 @@
             h1 { font-size: 2.25rem; }
             .tagline { font-size: 1.125rem; }
             .tagline span { font-size: 1rem; }
-            .cards { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+            .cards { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
         }
     </style>
 </head>
@@ -261,82 +277,89 @@
         <div class="cards">
             
             <a href="timeline.html" class="card green">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3>这个年龄，对孩子最重要的是？</h3>
                 </div>
-                <h3>这个年龄，对孩子最重要的是？</h3>
-                <p>直观呈现 0–18 岁不同阶段真正值得投入精力的 3–5 个重点，帮你在信息不过载的情况下，把时间用在“这个年龄最重要的事”上。</p>
-                <div class="action">开始探索 →</div>
+                <p>直观呈现 0–18 岁不同阶段真正值得投入精力的 3–5 个重点，帮你在信息不过载的情况下，把时间用在“这个年龄最重要的事”上。<span class="action">开始探索 →</span></p>
             </a>
 
             <a href="games/index.html" class="card orange">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-6.857 2.143L12 21l-2.143-6.857L3 12l6.857-2.143L12 3z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-6.857 2.143L12 21l-2.143-6.857L3 12l6.857-2.143L12 3z" />
+                        </svg>
+                    </div>
+                    <h3>想让孩子边玩边学？</h3>
                 </div>
-                <h3>想让孩子边玩边学？</h3>
-                <p>安静、轻松的小游戏，帮孩子在玩耍中练习单词、数字、计算……</p>
-                <div class="action">去玩一下 →</div>
+                <p>安静、轻松的小游戏，帮孩子在玩耍中练习单词、数字、计算……<span class="action">去玩一下 →</span></p>
             </a>
 
             <a href="https://growyai.lovable.app" target="_blank" class="card blue">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                    </div>
+                    <h3>这一刻，我有些育儿纠结</h3>
                 </div>
-                <h3>这一刻，我有些育儿纠结</h3>
-                <p>当真实的育儿纠结发生时，Growy 根据你的家庭情况和孩子特点，提供信息与思路，陪你一起把问题想清楚。</p>
-                <div class="action">和Growy聊聊 →</div>
+                <p>当真实的育儿纠结发生时，Growy 根据你的家庭情况和孩子特点，提供信息与思路，陪你一起把问题想清楚。<span class="action">和Growy聊聊 →</span></p>
             </a>
 
             <a href="parent-exam/index.html" class="card rose">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v4h4M9 12h6M9 16h4" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.7 14.3l2-2a1.3 1.3 0 011.8 1.8l-2 2-2.5.7.7-2.5z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 3h7l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 3v4h4M9 12h6M9 16h4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.7 14.3l2-2a1.3 1.3 0 011.8 1.8l-2 2-2.5.7.7-2.5z" />
+                        </svg>
+                    </div>
+                    <h3>父母“资格考试”</h3>
                 </div>
-                <h3>父母“资格考试”</h3>
-                <p>0–18 岁育儿知识闯关，看看你能得多少分？</p>
-                <div class="action">开始闯关 →</div>
+                <p>0–18 岁育儿知识闯关，看看你能得多少分？<span class="action">开始闯关 →</span></p>
             </a>
 
-            <a href="core-knowledge/index.html" class="card rose">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+            <a href="core-knowledge/index.html" class="card knowledge">
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3>美国核心知识点速查</h3>
                 </div>
-                <h3>美国核心知识点速查</h3>
-                <p>按学前 / K–8、年级、学科和主题查找 Core Knowledge 核心知识点，中英对照、筛选搜索，还有路线图。</p>
-                <div class="action">开始查找 →</div>
+                <p>按学前 / K–8、年级、学科和主题查找 Core Knowledge 核心知识点，中英对照、筛选搜索，还有大纲。<span class="action">开始查找 →</span></p>
             </a>
 
             <a href="priority.html" class="card purple">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
+                    <h3>重要的事，总被紧急的事挤掉</h3>
                 </div>
-                <h3>重要的事，总被紧急的事挤掉</h3>
-                <p>帮忙碌的你把那些容易被挤掉、却真正重要的事，先放进这一周的时间里。不打卡，不监督，只是一份对自己的承诺。</p>
-                <div class="action">开始规划 →</div>
+                <p>帮忙碌的你把那些容易被挤掉、却真正重要的事，先放进这一周的时间里。不打卡，不监督，只是一份对自己的承诺。<span class="action">开始规划 →</span></p>
             </a>
 
             <a href="about.html" class="card gray">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3>Growy如何帮你</h3>
                 </div>
-                <h3>Growy如何帮你</h3>
-                <p>了解 Growy "辅助而不替代"的理念、Growy 如何帮你缓解迷茫和焦虑，以及 Growy 背后一位家长的个人故事。</p>
-                <div class="action">了解更多 →</div>
+                <p>了解 Growy "辅助而不替代"的理念、Growy 如何帮你缓解迷茫和焦虑，以及 Growy 背后一位家长的个人故事。<span class="action">了解更多 →</span></p>
             </a>
 
         </div>

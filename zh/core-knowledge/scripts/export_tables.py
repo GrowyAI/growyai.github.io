@@ -23,8 +23,8 @@ GRADE_LABELS = {
 }
 COLUMNS = [
     "id", "uid", "grade", "grade_label", "subject", "topic", "subtopic",
-    "section", "section_zh", "type", "level", "en", "zh", "emojis", "details",
-    "source_doc", "source_page", "tags",
+    "section", "section_zh", "type", "level", "en", "zh", "emojis",
+    "work", "link", "details", "source_doc", "source_page", "tags",
 ]
 
 
@@ -44,6 +44,8 @@ def row_for(item):
         item.get("en", ""),
         item.get("zh", ""),
         " ".join(item.get("emojis", [])),
+        item.get("work", ""),
+        item.get("link", ""),
         " | ".join(item.get("details", [])),
         item.get("source", {}).get("doc", ""),
         item.get("source", {}).get("page", ""),
@@ -72,7 +74,8 @@ def write_xlsx(path, rows):
         "id": 20, "uid": 10, "grade": 10, "grade_label": 14, "subject": 26,
         "topic": 32, "subtopic": 20, "section": 28, "section_zh": 22,
         "type": 12, "level": 10, "en": 70, "zh": 40, "emojis": 10,
-        "details": 50, "source_doc": 12, "source_page": 12, "tags": 20,
+        "work": 28, "link": 60, "details": 50, "source_doc": 12,
+        "source_page": 12, "tags": 20,
     }
     for idx, col in enumerate(COLUMNS, 1):
         ws.column_dimensions[get_column_letter(idx)].width = widths.get(col, 20)

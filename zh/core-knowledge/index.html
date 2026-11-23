@@ -48,6 +48,7 @@
     margin-bottom: 8px;
   }
   h1 { font-size: 17px; margin: 0; font-weight: 650; }
+  h1 a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--accent); }
   .count { font-size: 12px; color: var(--muted); white-space: nowrap; }
   .controls { display: grid; gap: 8px; }
   .search {
@@ -119,7 +120,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-left: 4px solid var(--subject-color, var(--accent));
   }
+  .subject-core { color: var(--subject-color, var(--accent)); }
   details.subject > summary::-webkit-details-marker { display: none; }
   details.subject > summary::after { content: "+"; color: var(--muted); font-size: 18px; }
   details.subject[open] > summary::after { content: "−"; }
@@ -129,17 +132,17 @@
     font-weight: 600;
     font-size: 14px;
     background: #fafbfc;
-    color: #334155;
+    color: var(--subject-color, #334155);
   }
   .subtopic-title {
     padding: 7px 14px;
     font-size: 13px;
-    color: var(--accent);
+    color: var(--subject-color, var(--accent));
     background: var(--accent-soft);
   }
   .section-title {
     list-style: none; margin: 8px 12px 2px; padding: 4px 8px;
-    border-left: 3px solid var(--accent); background: #f8fafc;
+    border-left: 3px solid var(--subject-color, var(--accent)); background: #f8fafc;
     font-size: 12px; font-weight: 600; color: #475569;
   }
   .section-zh { font-weight: 400; color: var(--muted); margin-left: 6px; }
@@ -166,12 +169,16 @@
   .type-skill, .type-objective { background: var(--green-soft); color: var(--green); }
   .type-note { background: #f1f5f9; color: #475569; }
   .en { font-size: 15px; color: var(--text); line-height: 1.2; }
+  .en a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); }
+  .en a:hover { background: var(--accent-soft); }
   .zh { font-size: 13px; color: var(--muted); line-height: 1.3; }
   .en + .zh { margin-top: 1px; }
   .en.dialogue-text, .zh.dialogue-text { white-space: pre-line; }
   .subject-cn { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
-  .subject-core { color: var(--accent); }
+  .subject-core { color: var(--subject-color, var(--accent)); }
   .meta { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .meta a { color: var(--accent); text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
   .emoji-row {
     display: inline-flex;
     align-items: center;
@@ -182,6 +189,12 @@
   }
   .details { margin: 5px 0 0; padding-left: 16px; color: var(--muted); font-size: 13px; }
   .details li { margin: 2px 0; }
+  .item.collapsed .full-only { display: none; }
+  .item:not(.collapsed) .preview-only { display: none; }
+  .expand-btn {
+    border: none; background: transparent; color: var(--accent);
+    font-size: 12px; padding: 3px 0 0; cursor: pointer;
+  }
   .fav {
     flex: 0 0 auto;
     border: none;
@@ -228,36 +241,16 @@
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
   }
   .topic-bar button { border: none; background: transparent; color: var(--accent); font-size: 12px; cursor: pointer; }
-  .outline-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 30; }
-  .outline-panel {
-    position: fixed; top: 0; left: 0; bottom: 0; width: min(340px, 88vw);
-    background: var(--surface); z-index: 31; overflow-y: auto; padding: 14px;
-    box-shadow: 12px 0 32px rgba(15,23,42,.12);
-  }
-  .outline-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .outline-head b { font-size: 15px; }
-  .outline-head button { border: none; background: #f1f5f9; color: var(--muted); border-radius: 50%; width: 28px; height: 28px; font-size: 17px; cursor: pointer; }
-  .outline-band { font-size: 11px; color: var(--muted); margin: 14px 0 4px; letter-spacing: .08em; }
-  .ol-node summary, .ol-leaf {
-    display: flex; justify-content: space-between; gap: 8px; align-items: center;
-    padding: 6px 7px; border-radius: 6px; cursor: pointer; font-size: 12px; color: var(--text);
-  }
-  .ol-node summary:hover, .ol-leaf:hover { background: #f8fafc; }
-  .ol-leaf { width: 100%; border: none; background: transparent; text-align: left; }
-  .ol-count { color: var(--muted); font-size: 11px; white-space: nowrap; }
-  .ol-children { margin-left: 9px; padding-left: 6px; border-left: 1px solid var(--border); }
-  .ol-node.active > summary, .ol-leaf.active { background: var(--accent-soft); color: var(--accent); }
 </style>
 </head>
 <body>
 <header>
   <div class="title-row">
-    <h1>Core Knowledge 知识点速查</h1>
+    <h1><a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge</a> 知识点速查</h1>
     <div class="header-actions">
       <a class="nav-btn" href="../index.html">Growy 首页</a>
-      <a class="nav-btn" href="roadmap.html">路线图</a>
+      <a class="nav-btn" href="roadmap.html">大纲</a>
       <a class="nav-btn" href="attribution.html">版权</a>
-      <button class="nav-btn" id="outlineToggle">大纲</button>
       <span class="count" id="count"></span>
     </div>
   </div>
@@ -281,9 +274,6 @@
   <p class="footer-note" id="footer"></p>
 </main>
 
-<div class="outline-overlay" id="outlineOverlay" hidden></div>
-<aside class="outline-panel" id="outlinePanel" hidden></aside>
-
 <script src="data/knowledge-inline.js"></script>
 <script src="data/topic-zh-inline.js"></script>
 <script>
@@ -293,6 +283,10 @@
   var favs = {};
   try { favs = JSON.parse(localStorage.getItem("ck-favs") || "{}"); } catch (e) { favs = {}; }
   var state = { grade: "K", subject: "", topic: "", subtopic: "", type: "", q: "", questionsOnly: false, favOnly: false, limit: 600 };
+  var COLLAPSE_EN = 300;
+  var COLLAPSE_ZH = 200;
+  var PREVIEW_EN = 200;
+  var PREVIEW_ZH = 100;
   var SUBJECT_ORDER = DATA.taxonomy.k8_subjects.concat(DATA.taxonomy.preschool_subjects);
   var GRADES = ["Preschool", "K", "1", "2", "3", "4", "5", "6", "7", "8"];
   var TYPE_ORDER = ["objective", "skill", "question", "work", "vocabulary", "dialogue", "note"];
@@ -318,8 +312,28 @@
     "English Language Arts": 1, "Mathematics": 1, "Science": 1, "History and Geography": 1,
     "Language and Literacy": 1, "Mathematical Reasoning and Number Sense": 1
   };
+  var SUBJECT_COLORS = {
+    "History and Geography": "#9A6B3F",
+    "English Language Arts": "#4F6FA8",
+    "Science": "#2F7D6E",
+    "Mathematics": "#6B5CA5",
+    "Visual Arts": "#B0556B",
+    "Music": "#8A5AA8",
+    "Language and Literacy": "#3F7E96",
+    "Social and Emotional Development": "#B06A3B",
+    "Movement and Coordination": "#5C8A4A"
+  };
   function isCore(subject) { return !!CORE_SUBJECTS[subject]; }
   function subjectZh(subject) { return SUBJECT_ZH[subject] || ""; }
+  function subjectColor(subject) {
+    subject = subject || "";
+    if (SUBJECT_COLORS[subject]) return SUBJECT_COLORS[subject];
+    var keys = Object.keys(SUBJECT_COLORS);
+    for (var k = 0; k < keys.length; k++) {
+      if (subject.indexOf(keys[k]) === 0) return SUBJECT_COLORS[keys[k]];
+    }
+    return "#2563eb";
+  }
   function topicZh(topic) { return (window.TOPIC_ZH && window.TOPIC_ZH[topic]) || ""; }
   function topicLabel(topic) {
     topic = topic || "(General)";
@@ -375,104 +389,18 @@
     }[t] || t;
   }
 
-  var outline = null;
-
-  function buildOutline() {
-    outline = {};
-    GRADES.forEach(function (g) { outline[g] = { count: 0, subjects: [], subjIndex: {} }; });
-    items.forEach(function (i) {
-      var g = outline[i.grade];
-      if (!g) return;
-      g.count += 1;
-      var sk = i.grade + "|" + i.subject;
-      var s = g.subjIndex[sk];
-      if (!s) {
-        s = { name: i.subject, count: 0, topics: [], index: {} };
-        g.subjIndex[sk] = s;
-        g.subjects.push(s);
-      }
-      s.count += 1;
-      var tk = sk + "|" + i.topic;
-      var t = s.index[tk];
-      if (!t) {
-        t = { name: i.topic, count: 0, subtopics: [], subIndex: {} };
-        s.index[tk] = t;
-        s.topics.push(t);
-      }
-      t.count += 1;
-      if (i.subtopic) {
-        var stk = tk + "|" + i.subtopic;
-        var st = t.subIndex[stk];
-        if (!st) {
-          st = { name: i.subtopic, count: 0 };
-          t.subIndex[stk] = st;
-          t.subtopics.push(st);
-        }
-        st.count += 1;
-      }
+  function renderTopicBar() {
+    var bar = document.getElementById("topicBar");
+    if (!state.topic) { bar.hidden = true; bar.innerHTML = ""; return; }
+    var label = gradeLabel(state.grade) + " · " + (subjectZh(state.subject) || state.subject) +
+      " · " + topicLabel(state.topic) + (state.subtopic ? " · " + state.subtopic : "");
+    bar.hidden = false;
+    bar.innerHTML = "<span>当前主题：<b>" + esc(label) + "</b></span><button id=\"clearTopic\">清除主题</button>";
+    document.getElementById("clearTopic").addEventListener("click", function () {
+      state.topic = "";
+      state.subtopic = "";
+      refreshFilters();
     });
-  }
-
-  function renderOutline() {
-    if (!outline) buildOutline();
-    var bands = [
-      { label: "学前", grades: ["Preschool"] },
-      { label: "K–2", grades: ["K", "1", "2"] },
-      { label: "3–5", grades: ["3", "4", "5"] },
-      { label: "6–8", grades: ["6", "7", "8"] }
-    ];
-    var html = '<div class="outline-head"><b>知识点大纲</b><button id="outlineClose" title="关闭">×</button></div>';
-    bands.forEach(function (band) {
-      html += '<div class="outline-band">' + esc(band.label) + "</div>";
-      band.grades.forEach(function (g) {
-        var node = outline[g];
-        if (!node) return;
-        var gActive = g === state.grade;
-        html += '<details class="ol-node' + (gActive ? " active" : "") + '"' + (gActive ? " open" : "") + ">" +
-          '<summary data-nav="grade" data-grade="' + esc(g) + '"><span>' + gradeLabel(g) +
-          '</span><span class="ol-count">' + node.count + "</span></summary><div class=\"ol-children\">";
-        node.subjects.slice().sort(function (a, b) {
-          var ai = SUBJECT_ORDER.indexOf(a.name), bi = SUBJECT_ORDER.indexOf(b.name);
-          return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
-        }).forEach(function (s) {
-          var sActive = gActive && s.name === state.subject;
-          html += '<details class="ol-node' + (sActive ? " active" : "") + '"' + (sActive ? " open" : "") + ">" +
-            '<summary data-nav="subject" data-grade="' + esc(g) + '" data-subject="' + esc(s.name) + '"><span>' +
-            (isCore(s.name) ? "★ " : "") + esc(subjectZh(s.name) || s.name) +
-            '</span><span class="ol-count">' + s.count + "</span></summary><div class=\"ol-children\">";
-          s.topics.forEach(function (t) {
-            var tActive = sActive && t.name === state.topic;
-            html += '<button class="ol-leaf' + (tActive ? " active" : "") +
-              '" data-nav="topic" data-grade="' + esc(g) + '" data-subject="' + esc(s.name) +
-              '" data-topic="' + esc(t.name) + '"><span>' + esc(topicLabel(t.name)) +
-              '</span><span class="ol-count">' + t.count + "</span></button>";
-            t.subtopics.forEach(function (st) {
-              var stActive = tActive && st.name === state.subtopic;
-              html += '<button class="ol-leaf' + (stActive ? " active" : "") +
-                '" data-nav="subtopic" data-grade="' + esc(g) + '" data-subject="' + esc(s.name) +
-                '" data-topic="' + esc(t.name) + '" data-subtopic="' + esc(st.name) +
-                '"><span>↳ ' + esc(st.name) + '</span><span class="ol-count">' + st.count + "</span></button>";
-            });
-          });
-          html += "</div></details>";
-        });
-        html += "</div></details>";
-      });
-    });
-    document.getElementById("outlinePanel").innerHTML = html;
-  }
-
-  function openOutline() {
-    renderOutline();
-    document.getElementById("outlineOverlay").hidden = false;
-    document.getElementById("outlinePanel").hidden = false;
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeOutline() {
-    document.getElementById("outlineOverlay").hidden = true;
-    document.getElementById("outlinePanel").hidden = true;
-    document.body.style.overflow = "";
   }
 
   function applyNav(nav) {
@@ -491,23 +419,6 @@
     document.getElementById("favOnly").checked = false;
     buildGradeChips();
     refreshFilters();
-    renderOutline();
-    closeOutline();
-  }
-
-  function renderTopicBar() {
-    var bar = document.getElementById("topicBar");
-    if (!state.topic) { bar.hidden = true; bar.innerHTML = ""; return; }
-    var label = gradeLabel(state.grade) + " · " + (subjectZh(state.subject) || state.subject) +
-      " · " + topicLabel(state.topic) + (state.subtopic ? " · " + state.subtopic : "");
-    bar.hidden = false;
-    bar.innerHTML = "<span>当前主题：<b>" + esc(label) + "</b></span><button id=\"clearTopic\">清除主题</button>";
-    document.getElementById("clearTopic").addEventListener("click", function () {
-      state.topic = "";
-      state.subtopic = "";
-      refreshFilters();
-      renderOutline();
-    });
   }
 
   function buildGradeChips() {
@@ -612,25 +523,54 @@
     sel.value = state.type;
   }
 
+  function previewText(text, n) {
+    text = text || "";
+    if (text.length <= n) return text;
+    var cut = text.slice(0, n);
+    var space = cut.lastIndexOf(" ");
+    if (space > n * 0.6) cut = cut.slice(0, space);
+    return cut + "…";
+  }
+
   function itemHtml(i) {
     var showZh = document.getElementById("langZh").checked;
     var dialogClass = i.type === "dialogue" ? " dialogue-text" : "";
-    var enHtml = '<div class="en' + dialogClass + '">' + esc(i.en) + "</div>";
-    var zhHtml = showZh && i.zh ? '<div class="zh' + dialogClass + '">' + esc(i.zh) + "</div>" : "";
+    var collapsed = (i.en || "").length > COLLAPSE_EN ||
+      (showZh && (i.zh || "").length > COLLAPSE_ZH);
+    var workLink = i.type === "work" && i.link;
+    var linkStart = workLink
+      ? '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "在 Google 中搜索") + '">'
+      : "";
+    var linkEnd = workLink ? "</a>" : "";
+    var linkArrow = workLink ? " ↗" : "";
+    var enHtml = '<div class="en' + dialogClass + (collapsed ? " preview-only" : "") + '">' +
+      linkStart + esc(collapsed ? previewText(i.en, PREVIEW_EN) : i.en) + linkArrow + linkEnd + "</div>" +
+      (collapsed ? '<div class="en' + dialogClass + ' full-only">' + linkStart + esc(i.en) + linkArrow + linkEnd + "</div>" : "");
+    var zhHtml = "";
+    if (showZh && i.zh) {
+      zhHtml = '<div class="zh' + dialogClass + (collapsed ? " preview-only" : "") + '">' +
+        esc(collapsed ? previewText(i.zh, PREVIEW_ZH) : i.zh) + "</div>" +
+        (collapsed ? '<div class="zh' + dialogClass + ' full-only">' + esc(i.zh) + "</div>" : "");
+    }
     var details = (i.details || []).map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("");
     var meta = [];
     if (i.subtopic) meta.push(esc(i.subtopic));
     if (i.level) meta.push(esc(i.level));
+    if (i.link && !workLink) {
+      meta.push('<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "相关资料") + '">相关资料 ↗</a>');
+    }
     meta.push("p." + i.source.page);
     var emoji = (i.emojis || []).slice(0, 2).join("");
     var emojiHtml = emoji ? '<span class="emoji-row">' + emoji + "</span>" : "";
-    return '<li class="item" data-id="' + i.id + '">' +
+    var expandHtml = collapsed ? '<button class="expand-btn">展开全文</button>' : "";
+    return '<li class="item' + (collapsed ? " collapsed" : "") + '" data-id="' + i.id + '">' +
       '<button class="fav' + (favs[i.id] ? " on" : "") + '" title="收藏">' + (favs[i.id] ? "★" : "☆") + "</button>" +
       '<div class="item-body">' +
       '<div class="badges"><span class="badge type-' + i.type + '">' + typeLabel(i.type) + "</span>" + emojiHtml +
       (i.subtopic ? '<span class="badge">' + esc(i.subtopic) + "</span>" : "") + "</div>" +
       enHtml + zhHtml +
-      (details ? '<ul class="details">' + details + "</ul>" : "") +
+      (details ? '<ul class="details' + (collapsed ? " full-only" : "") + '">' + details + "</ul>" : "") +
+      expandHtml +
       '<div class="meta">' + meta.join(" · ") + "</div></div></li>";
   }
 
@@ -684,7 +624,8 @@
       var zh = subjectZh(subject);
       var summaryLabel = (isCore(subject) ? '<span class="subject-core">★ </span>' : "") +
         esc(subject) + (zh ? '<span class="subject-cn">' + esc(zh) + "</span>" : "");
-      html += '<details class="subject" open><summary>' + summaryLabel + "</summary>" + topicHtml + "</details>";
+      html += '<details class="subject" open style="--subject-color:' + subjectColor(subject) + '"><summary>' +
+        summaryLabel + "</summary>" + topicHtml + "</details>";
     });
     box.innerHTML = html;
     Array.prototype.forEach.call(box.querySelectorAll(".fav"), function (btn) {
@@ -696,9 +637,19 @@
         if (state.favOnly) refreshFilters();
       });
     });
+    Array.prototype.forEach.call(box.querySelectorAll(".expand-btn"), function (btn) {
+      btn.addEventListener("click", function () {
+        var li = btn.closest("li.item");
+        var isCollapsed = li.classList.toggle("collapsed");
+        btn.textContent = isCollapsed ? "展开全文" : "收起";
+      });
+    });
     document.getElementById("footer").innerHTML =
-      "来源：Core Knowledge Sequence 2023 · " + DATA.meta.item_count + " 条知识点 · 具体名词/动作配 emoji，抽象条目不配 · 收藏保存在本机浏览器 · " +
-      '<a href="attribution.html">版权与署名</a>';
+      '来源：<a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge Sequence 2023</a> · ' +
+      DATA.meta.item_count + " 条知识点 · 具体名词/动作配 emoji，抽象条目不配 · 具体作品配外部搜索链接 · 收藏保存在本机浏览器 · " +
+      '<a href="attribution.html">版权与署名</a> · 原版 PDF：' +
+      '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_PreSchool_W2.pdf" target="_blank" rel="noopener noreferrer">Preschool</a> / ' +
+      '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_GK8_W3.pdf" target="_blank" rel="noopener noreferrer">K–8</a>';
   }
 
   function refreshFilters() {
@@ -721,13 +672,11 @@
     state.topic = "";
     state.subtopic = "";
     refreshFilters();
-    renderOutline();
   });
   document.getElementById("topic").addEventListener("change", function (e) {
     state.topic = e.target.value;
     state.subtopic = "";
     refreshFilters();
-    renderOutline();
   });
   document.getElementById("type").addEventListener("change", function (e) {
     state.type = e.target.value; refreshFilters();
@@ -743,25 +692,9 @@
     state.limit += 600; render();
   });
 
-  document.getElementById("outlineToggle").addEventListener("click", openOutline);
-  document.getElementById("outlineOverlay").addEventListener("click", closeOutline);
-  document.getElementById("outlinePanel").addEventListener("click", function (e) {
-    if (e.target.id === "outlineClose") { closeOutline(); return; }
-    var el = e.target.closest("[data-nav]");
-    if (!el) return;
-    applyNav({
-      grade: el.dataset.grade,
-      subject: el.dataset.subject,
-      topic: el.dataset.topic,
-      subtopic: el.dataset.subtopic
-    });
-  });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeOutline(); });
-
   readParams();
   buildGradeChips();
   refreshFilters();
-  renderOutline();
 })();
 </script>
 </body>

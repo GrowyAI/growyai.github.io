@@ -14,7 +14,7 @@ Growy 是一套开放的育儿辅助工具集，帮助父母在信息爆炸的�
 | 🤖 AI 育儿伙伴 | 当你面对真实的育儿纠结时，Growy 结合你的家庭情况和孩子特点，提供信息与思路，陪你一起把问题想清楚。 | [growyai.lovable.app](https://growyai.lovable.app) |
 | 📋 每周优先级规划 | 帮忙碌的你，把那些容易被挤掉却真正重要的事，先放进这一周的时间里。不打卡，不监督，只是一份对自己的承诺。 | [priority.html](zh/priority.html) |
 | 💡 Growy 理念与故事 | 了解 Growy“辅助而不替代”的初心、它如何帮你缓解迷茫与焦虑，以及背后一位家长的个人故事。 | [about.html](zh/about.html) |
-| 📚 美国核心知识点速查 | 按学前 / K–8、年级、学科和主题查找 Core Knowledge 核心知识点，中英对照、筛选搜索与路线图。 | [core-knowledge/index.html](zh/core-knowledge/index.html) |
+| 📚 美国核心知识点速查 | 按学前 / K–8、年级、学科和主题查找 Core Knowledge 核心知识点，中英对照、筛选搜索与大纲。 | [core-knowledge/index.html](zh/core-knowledge/index.html) |
 
 > 所有工具都可以从项目首页 `index.html` 快速访问，无需登录，即刻使用。
 

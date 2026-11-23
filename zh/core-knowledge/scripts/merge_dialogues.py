@@ -1,9 +1,9 @@
 """Merge consecutive preschool dialogue lines into one dialogue item.
 
 The PDF exporter emitted each Adult:/Child: line as a separate item. This
-script collapses adjacent dialogue items from the same chapter into a single
-item, keeping the first item's id and combining English and Chinese with
-newlines. It then regenerates the CSV/XLSX and inline frontend data.
+script collapses adjacent dialogue items from the same chapter and page into
+a single item, keeping the first item's id and combining English and Chinese
+with newlines. It then regenerates the CSV/XLSX and inline frontend data.
 """
 
 import json
@@ -22,6 +22,7 @@ def dialogue_key(item):
         item.get("grade", ""),
         item.get("subject", ""),
         item.get("topic", ""),
+        item.get("source", {}).get("page", ""),
     )
 
 
@@ -60,9 +61,12 @@ def main():
 
     removed = len(data["items"]) - len(merged_items)
     data["items"] = merged_items
+    if isinstance(data.get("meta"), dict):
+        data["meta"]["item_count"] = len(merged_items)
 
     with open(SOURCE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write("\n")
 
     print("merged %d dialogue items; %d items remain" % (removed, len(merged_items)))
     subprocess.check_call([sys.executable, EXPORT])
