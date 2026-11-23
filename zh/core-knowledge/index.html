@@ -23,6 +23,7 @@
     --radius: 12px;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
     background: var(--bg);
@@ -63,13 +64,9 @@
   .search:focus { outline: 2px solid var(--accent); background: var(--surface); }
   .grade-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
-  .grade-row::-webkit-scrollbar { display: none; }
   .chip {
     flex: 0 0 auto;
     border: 1px solid var(--border);
@@ -85,6 +82,7 @@
   select {
     flex: 1 1 130px;
     min-width: 0;
+    max-width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 9px;
@@ -579,7 +577,11 @@
     var shown = list.slice(0, state.limit);
     var box = document.getElementById("content");
     document.getElementById("count").textContent = list.length + " 条 / 共 " + items.length + " 条";
-    document.getElementById("more").hidden = list.length <= shown.length;
+    var moreBtn = document.getElementById("more");
+    moreBtn.hidden = list.length <= shown.length;
+    if (!moreBtn.hidden) {
+      moreBtn.textContent = "显示更多（还有 " + (list.length - shown.length) + " 条）";
+    }
     if (!shown.length) {
       box.innerHTML = '<div class="empty">没有匹配的内容，换个筛选条件试试。</div>';
       return;
