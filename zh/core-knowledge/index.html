@@ -206,6 +206,12 @@
     border-radius: 6px;
     cursor: zoom-in;
   }
+  .image-error {
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .image-error a { color: var(--accent); text-decoration: none; }
   .lightbox {
     position: fixed; inset: 0; z-index: 100;
     background: rgba(15, 23, 42, .94);
@@ -642,9 +648,12 @@
     }
     meta.push("p." + i.source.page);
     var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[i.uid];
-    var icons = pic ? [] : (i.emojis || []).slice(0, 3);
+    var icons = (i.emojis || []).slice(0, 3);
+    // Keep the emoji row in the DOM even when a photo is present, so a dead
+    // Commons URL can fall back to it instead of showing a broken image.
     var iconHtml = icons.length
-      ? '<div class="icon-row">' + icons.map(function (e) { return "<span>" + esc(e) + "</span>"; }).join("") + "</div>"
+      ? '<div class="icon-row"' + (pic ? " hidden" : "") + ">" +
+        icons.map(function (e) { return "<span>" + esc(e) + "</span>"; }).join("") + "</div>"
       : "";
     var imageHtml = pic && pic.thumb
       ? '<div class="image-row"><img src="' + esc(pic.thumb) + '" alt="' + esc(i.en) +
@@ -868,15 +877,46 @@
   var lightboxImg = document.getElementById("lightboxImg");
   var lightboxCaption = document.getElementById("lightboxCaption");
   var lightboxClose = document.getElementById("lightboxClose");
+  var currentPic = null;
+
+  // A dead Commons URL should never leave a broken image in the list.
+  // Error events do not bubble, so listen in the capture phase.
+  document.getElementById("content").addEventListener("error", function (e) {
+    var img = e.target;
+    if (!img || !img.matches || !img.matches(".image-row img")) return;
+    var row = img.parentNode;
+    if (row) row.hidden = true;
+    var item = img.closest(".item");
+    if (!item || item.querySelector(".image-error")) return;
+    var icons = item.querySelector(".icon-row");
+    if (icons) icons.hidden = false;
+    var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[img.dataset.uid];
+    var note = document.createElement("div");
+    note.className = "image-error";
+    note.textContent = "图片暂时无法加载";
+    if (pic && pic.page) {
+      var link = document.createElement("a");
+      link.href = pic.page;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = " · Commons 原图 ↗";
+      note.appendChild(link);
+    }
+    var body = item.querySelector(".item-body");
+    if (body) body.appendChild(note);
+  }, true);
 
   function closeLightbox() {
     lightbox.hidden = true;
     document.body.classList.remove("lightbox-open");
+    currentPic = null;
     lightboxImg.removeAttribute("src");
   }
   function openLightbox(uid) {
     var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[uid];
     if (!pic) return;
+    currentPic = pic;
+    lightboxImg.style.display = "";
     lightboxImg.src = pic.full || pic.thumb;
     lightboxImg.alt = pic.en || uid;
     var license = pic.license ? " · " + esc(pic.license) : "";
@@ -891,6 +931,14 @@
     document.body.classList.add("lightbox-open");
     lightboxClose.focus();
   }
+  lightboxImg.addEventListener("error", function () {
+    if (lightbox.hidden || !currentPic) return;
+    lightboxImg.style.display = "none";
+    var source = currentPic.page
+      ? ' · <a href="' + esc(currentPic.page) + '" target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a>'
+      : "";
+    lightboxCaption.innerHTML = "原图暂时无法加载，可前往来源页查看。" + source;
+  });
   document.getElementById("content").addEventListener("click", function (e) {
     var img = e.target && e.target.closest ? e.target.closest(".image-row img") : null;
     if (img) openLightbox(img.dataset.uid);
