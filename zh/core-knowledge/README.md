@@ -17,12 +17,16 @@
 - `data/knowledge.json`：结构化数据源（7,077 条，含中文翻译、来源页码、emoji、作品搜索链接）
 - `data/knowledge.csv` / `data/knowledge.xlsx`：可下载表格视图
 - `data/questions.csv`：单独抽出的具体问题 / 对话条目
+- `data/image-pilot.json`：272 条人工核对的无版权图片（Wikimedia Commons 的 Public Domain / CC0，含缩略图、全图、许可与来源）；其中视觉艺术 68 条、历史地理 88 条、科学 57 条、音乐 24 条、语文经典作品 35 条
+- `data/image-pilot-inline.js`：上述图片的浏览器内联版本（禁止直接改）
 - `scripts/icon-choices.json` / `scripts/apply_icon_choices.py`：人工精选的图标方案（目前仅学前），写入 `emojis` 字段并重建导出文件
 - `scripts/add_emojis.py`：早期按名词 / 动作自动生成 emoji 的脚本，现已由人工精选方案取代
 - `scripts/add_work_links.py`：为引号中的具体作品 / 名称生成 Google 搜索链接
 - `scripts/repair_preschool_data.py` / `scripts/repair_k8_data.py`：按已确认问题修复学前 / K–8 数据（含 `scripts/k8_zh_fixes/` 中的中文修正表）
 - `scripts/build_topic_zh.py`：按固定顺序重建主题中文映射
 - `scripts/export_tables.py`：从 JSON 重新生成 CSV / XLSX / 内联 JS
+- `scripts/export_image_pilot.py`：从 `image-pilot.json` 重新生成图片内联 JS
+- `image-preview.html`：272 条图片的独立预览页（按科目筛选，尚未挂到首页）
 
 > 源 PDF、`data/raw/` 全文提取稿和从 PDF 抠出的图片均已放在本地目录，但被 `.gitignore` 排除，**不会提交到公开仓库**，以避免版权风险。
 
@@ -52,7 +56,7 @@ python scripts/add_work_links.py && python scripts/export_tables.py
 
 `apply_icon_choices.py` 只处理 `icon-choices.json` 里列出的年级；该年级未列入清单的条目图标会被清空，K–8 在确认方案前保持原样。`add_emojis.py` 是早期自动规则，不再用于公开数据。
 
-`add_work_links.py` 先识别英文正文中引号内的具体作品 / 名称，并排除章节标题和常见课堂短语；若仍未命中，再用中文译文里的第一处书名号《…》作为搜索词。每条最多生成一个 Google 搜索链接，写入 `work` 与 `link` 字段；若能把中文书名号与英文标题对应上，还会写入 `work_en`，供速查器直接把英文行里的作品名做成可点链接。它不抓取、不复制第三方内容，搜索结果版权归原方所有。
+`add_work_links.py` 先识别英文正文中引号内的具体作品 / 名称，并排除章节标题和常见课堂短语；若仍未命中，再用中文译文里的第一处书名号《…》作为搜索词。每条最多生成一个 Google 搜索链接，写入 `work` 与 `link` 字段；若能把中文书名号与英文标题对应上，还会写入 `work_en`，供速查器直接把英文行里的作品名做成可点链接；若中文括号里只有年份（如《星夜》（1889）），则改从英文行推断真正的作品名，不会把年份当链接锚点。它不抓取、不复制第三方内容，搜索结果版权归原方所有。
 
 翻译批次相关脚本（如 `make_translation_chunks.py`、`merge_translations.py`）需要先在本地生成 `translations/` 目录；该目录也被忽略，不会进入提交。
 

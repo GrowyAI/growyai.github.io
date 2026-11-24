@@ -23,6 +23,11 @@ BACKUP = os.path.join(DATA, "knowledge-before-work-links.json")
 QUOTE_RE = re.compile(r'["“]([^"”]{3,70})["”]')
 BOOK_RE = re.compile(r"《([^》]{1,80})》")
 BOOK_EN_RE = re.compile(r"《[^》]{1,80}》\s*[（(]([^）)]{2,80})[）)]")
+YEAR_ONLY_RE = re.compile(r"^[\d\s\-–—/]+$")
+YEAR_GROUP_RE = re.compile(
+    r"\s*[\[(]\s*(?:c\.\s*)?\d{3,4}[a-z]?(?:\s*[-–—/]\s*\d{2,4})?\s*[\])]"
+    r"|\s*,\s*(?:c\.\s*)?\d{3,4}[a-z]?\s*$"
+)
 
 STOP = {
     "language of instruction", "using the preschool sequence",
@@ -103,6 +108,49 @@ def search_url(work, subject):
     return "https://www.google.com/search?q=" + quote_plus(query)
 
 
+def english_title_from_en(item):
+    """Recover an English work title when 《中文》（…） held only a year.
+
+    The Chinese translation often has a date in parentheses, e.g.
+    《星夜》（1889）, which used to be stored as work_en. The English line
+    usually has the title too; take the text just before the last date,
+    dropping an artist prefix, a descriptive clause, or a "by Author" tail.
+    """
+    text = re.sub(r"\s+", " ", (item.get("en") or "")).strip()
+    text = text.replace("\\[", "[").replace("\\]", "]")
+    matches = list(YEAR_GROUP_RE.finditer(text))
+    before = text[:matches[-1].start()] if matches else text
+
+    # A semicolon usually separates background from the actual work title.
+    if ";" in before:
+        before = before.rsplit(";", 1)[1].strip()
+
+    # Assigned readings are often written "Title by Author (year)".
+    if item.get("subject") == "English Language Arts":
+        by = re.match(r"^(.{3,80}?)\s+by\s+", before, flags=re.I)
+        if by:
+            before = by.group(1)
+
+    # Most Visual Arts entries are "Artist, Title" or "Title, artist context".
+    if "," in before:
+        candidate = before.split(",", 1)[1].strip()
+        if len(candidate) >= 3 and re.search(r"[A-Za-z]", candidate):
+            before = candidate
+
+    # Drop a lowercase explanatory tail after a colon.
+    if ":" in before:
+        head, tail = before.split(":", 1)
+        if tail.strip() and tail.strip()[0].islower():
+            before = head
+
+    before = before.strip(" .,;:!?")
+    if not (3 <= len(before) <= 110) or not re.search(r"[A-Za-z]", before):
+        return ""
+    if YEAR_ONLY_RE.fullmatch(before):
+        return ""
+    return before
+
+
 def main():
     with open(SOURCE, encoding="utf-8") as f:
         data = json.load(f)
@@ -149,10 +197,20 @@ def main():
                     if en_match:
                         en_title = en_match.group(1).strip()
                         en_title = re.sub(r"^(?:英语|英文|English)\s*[:：]\s*", "", en_title, flags=re.I)
-                        if en_title and en_title in item.get("en", ""):
+                        if YEAR_ONLY_RE.fullmatch(en_title):
+                            # 《作品》（1940）: the parenthetical is a date, not a
+                            # title. Recover the real English title from `en`.
+                            item["work_en"] = english_title_from_en(item)
+                        elif en_title and en_title in item.get("en", ""):
                             item["work_en"] = en_title
                     item["link"] = search_url(title, item.get("subject", ""))
                     count += 1
+
+    # Older runs stored a bare year as work_en when 《作品》（1940） was seen.
+    # Recover the English title from the English line before inheriting.
+    for item in data["items"]:
+        if item.get("work_en") and YEAR_ONLY_RE.fullmatch(item["work_en"].strip()):
+            item["work_en"] = english_title_from_en(item)
 
     by_work = {}
     by_en = {}
@@ -171,6 +229,16 @@ def main():
             candidates |= by_en[item["en"]]
         if len(candidates) == 1:
             item["work_en"] = next(iter(candidates))
+
+    # Case differences (e.g. "untitled" vs "Untitled") break the viewer's
+    # exact-match anchor; use the spelling that actually appears in `en`.
+    for item in data["items"]:
+        anchor = item.get("work_en")
+        if not anchor or anchor in (item.get("en") or ""):
+            continue
+        found = re.search(re.escape(anchor), item.get("en") or "", flags=re.I)
+        if found:
+            item["work_en"] = found.group(0)
 
     with open(SOURCE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

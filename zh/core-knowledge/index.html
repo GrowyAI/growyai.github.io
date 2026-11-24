@@ -192,6 +192,42 @@
     line-height: 1.1;
     margin-top: 7px;
   }
+  /* A small thumbnail sits in the same slot as the curated icon row.
+     Max height ~3 lines of English text (15px * 1.2 * 3). */
+  .image-row { margin-top: 7px; }
+  .image-row img {
+    display: block;
+    width: auto;
+    max-width: 160px;
+    max-height: 96px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: zoom-in;
+  }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(15, 23, 42, .94);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px; padding: 58px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+  .lightbox img {
+    max-width: 100%; max-height: calc(100vh - 160px);
+    object-fit: contain; background: #fff; border-radius: 6px;
+  }
+  .lightbox .caption {
+    max-width: 720px; color: #e2e8f0; font-size: 13px; line-height: 1.5; text-align: center;
+  }
+  .lightbox .caption a { color: #93c5fd; }
+  .lightbox-close {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px;
+    width: 38px; height: 38px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1);
+    color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+  }
+  body.lightbox-open { overflow: hidden; }
   .details { margin: 5px 0 0; padding-left: 16px; color: var(--muted); font-size: 13px; }
   .details li { margin: 2px 0; }
   .item.collapsed .full-only { display: none; }
@@ -295,8 +331,14 @@
   <button class="more" id="more" hidden>显示更多</button>
   <p class="footer-note" id="footer"></p>
 </main>
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="图片全屏查看">
+  <button class="lightbox-close" id="lightboxClose" aria-label="关闭">×</button>
+  <img id="lightboxImg" alt="">
+  <div class="caption" id="lightboxCaption"></div>
+</div>
 <script src="data/knowledge-inline.js"></script>
 <script src="data/topic-zh-inline.js"></script>
+<script src="data/image-pilot-inline.js"></script>
 <script>
 (function () {
   var DATA = window.KNOWLEDGE;
@@ -599,9 +641,14 @@
       meta.push('<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "相关资料") + '">相关资料 ↗</a>');
     }
     meta.push("p." + i.source.page);
-    var icons = (i.emojis || []).slice(0, 3);
+    var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[i.uid];
+    var icons = pic ? [] : (i.emojis || []).slice(0, 3);
     var iconHtml = icons.length
       ? '<div class="icon-row">' + icons.map(function (e) { return "<span>" + esc(e) + "</span>"; }).join("") + "</div>"
+      : "";
+    var imageHtml = pic && pic.thumb
+      ? '<div class="image-row"><img src="' + esc(pic.thumb) + '" alt="' + esc(i.en) +
+        '" loading="lazy" referrerpolicy="no-referrer" data-uid="' + esc(i.uid) + '"></div>'
       : "";
     var expandHtml = collapsed ? '<button class="expand-btn">展开全文</button>' : "";
     return '<li class="item' + (collapsed ? " collapsed" : "") + '" data-id="' + i.id + '">' +
@@ -611,7 +658,7 @@
       (i.subtopic ? '<span class="badge">' + esc(i.subtopic) + "</span>" : "") + "</div>" +
       enHtml + zhHtml +
       (details ? '<ul class="details' + (collapsed ? " full-only" : "") + '">' + details + "</ul>" : "") +
-      iconHtml +
+      iconHtml + imageHtml +
       expandHtml +
       '<div class="meta">' + meta.join(" · ") + "</div></div></li>";
   }
@@ -692,7 +739,7 @@
     });
     document.getElementById("footer").innerHTML =
       '来源：<a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge Sequence 2023</a> · ' +
-      DATA.meta.item_count + " 条知识点 · 精选图标只给最具体的条目 · 具体作品配外部搜索链接 · 收藏保存在本机浏览器 · " +
+      DATA.meta.item_count + " 条知识点 · 精选图标与无版权图片只给最具体的条目 · 点击图片可全屏查看 · 具体作品配外部搜索链接 · 收藏保存在本机浏览器 · " +
       '<a href="attribution.html">版权与署名</a> · 原版 PDF：' +
       '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_PreSchool_W2.pdf" target="_blank" rel="noopener noreferrer">Preschool</a> / ' +
       '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_GK8_W3.pdf" target="_blank" rel="noopener noreferrer">K–8</a>';
@@ -816,6 +863,45 @@
 
   if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", applyFilterState);
   else mobileQuery.addListener(applyFilterState);
+
+  var lightbox = document.getElementById("lightbox");
+  var lightboxImg = document.getElementById("lightboxImg");
+  var lightboxCaption = document.getElementById("lightboxCaption");
+  var lightboxClose = document.getElementById("lightboxClose");
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    lightboxImg.removeAttribute("src");
+  }
+  function openLightbox(uid) {
+    var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[uid];
+    if (!pic) return;
+    lightboxImg.src = pic.full || pic.thumb;
+    lightboxImg.alt = pic.en || uid;
+    var license = pic.license ? " · " + esc(pic.license) : "";
+    var artist = pic.artist ? " · " + esc(pic.artist) : "";
+    var source = pic.page
+      ? ' · <a href="' + esc(pic.page) + '" target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a>'
+      : "";
+    lightboxCaption.innerHTML = esc(pic.en || "") +
+      (pic.zh ? "<br>" + esc(pic.zh) : "") +
+      '<br><span style="color:#94a3b8">' + license + artist + source + "</span>";
+    lightbox.hidden = false;
+    document.body.classList.add("lightbox-open");
+    lightboxClose.focus();
+  }
+  document.getElementById("content").addEventListener("click", function (e) {
+    var img = e.target && e.target.closest ? e.target.closest(".image-row img") : null;
+    if (img) openLightbox(img.dataset.uid);
+  });
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
+  });
 
   readParams();
   buildGradeChips();
