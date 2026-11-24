@@ -39,7 +39,7 @@ body{
 button{font-family:inherit}
 .text-btn{
   background:none;border:0;color:var(--muted);font-size:14px;
-  cursor:pointer;padding:6px 2px;line-height:1.4;
+  cursor:pointer;padding:6px 2px;line-height:1.4;text-decoration:none;
 }
 .text-btn:active{opacity:.6}
 .hero{
@@ -201,7 +201,7 @@ button{font-family:inherit}
 <body>
 <div class="wrap">
   <header class="top">
-    <button class="text-btn" id="homeBtn">‹ 返回首页</button>
+    <a href="../index.html" class="text-btn">‹ 返回首页</a>
     <div class="brand">🌱 <span>父母“资格考试”</span></div>
     <button class="text-btn" id="resetBtn">重置进度</button>
   </header>
@@ -786,7 +786,6 @@ async function makeTotalImage(){
 }
 
 /* ---------- global controls ---------- */
-document.getElementById('homeBtn').addEventListener('click', goHome);
 document.getElementById('resetBtn').addEventListener('click', function(){
   if(!window.confirm('确定重置全部进度和成绩吗？此操作不可撤销。')) return;
   dropStore(KEY_PROGRESS);
