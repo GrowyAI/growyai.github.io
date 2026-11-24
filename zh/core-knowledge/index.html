@@ -251,22 +251,16 @@
   .filter-toggle {
     display: none;
     border: 1px solid var(--border); background: var(--surface); color: var(--accent);
-    border-radius: 999px; width: 28px; height: 28px; padding: 0;
-    font-size: 13px; line-height: 1; cursor: pointer; flex: 0 0 auto;
+    border-radius: 999px; width: 34px; height: 34px; padding: 0;
+    font-size: 18px; line-height: 1; cursor: pointer; flex: 0 0 auto;
   }
   @media (max-width: 640px) {
     header { padding: 8px 12px calc(8px + env(safe-area-inset-top)); }
     h1 { font-size: 16px; }
     .title-row { margin-bottom: 6px; }
     .filter-toggle { display: inline-flex; align-items: center; justify-content: center; }
-    .controls {
-      max-height: 520px; overflow: hidden;
-      transition: max-height .25s ease, opacity .2s ease, visibility 0s linear 0s;
-    }
-    .controls.filters-collapsed {
-      max-height: 0; opacity: 0; visibility: hidden; pointer-events: none;
-      transition: max-height .25s ease, opacity .2s ease, visibility 0s linear .25s;
-    }
+    .controls { overflow: hidden; transition: max-height .22s ease, opacity .18s ease; }
+    .controls.filters-collapsed { opacity: 0; pointer-events: none; }
   }
 </style>
 </head>
@@ -559,20 +553,38 @@
     return cut + "…";
   }
 
+  function workAnchor(i) {
+    if (!i.link) return "";
+    var a = i.work_en || "";
+    if (a && (i.en || "").indexOf(a) >= 0) return a;
+    if (i.work && (i.en || "").indexOf(i.work) >= 0) return i.work;
+    return "";
+  }
+
+  function linkedEnHtml(i, text, anchor) {
+    if (!i.link) return esc(text);
+    if (i.type === "work") {
+      return '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "在 Google 中搜索") + '">' + esc(text) + " ↗</a>";
+    }
+    if (!anchor) return esc(text);
+    var idx = text.indexOf(anchor);
+    if (idx < 0) return esc(text);
+    return esc(text.slice(0, idx)) +
+      '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "在 Google 中搜索") + '">' +
+      esc(text.slice(idx, idx + anchor.length)) + " ↗</a>" +
+      esc(text.slice(idx + anchor.length));
+  }
+
   function itemHtml(i) {
     var showZh = document.getElementById("langZh").checked;
     var dialogClass = i.type === "dialogue" ? " dialogue-text" : "";
     var collapsed = (i.en || "").length > COLLAPSE_EN ||
       (showZh && (i.zh || "").length > COLLAPSE_ZH);
-    var workLink = i.type === "work" && i.link;
-    var linkStart = workLink
-      ? '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "在 Google 中搜索") + '">'
-      : "";
-    var linkEnd = workLink ? "</a>" : "";
-    var linkArrow = workLink ? " ↗" : "";
+    var anchor = workAnchor(i);
+    var inlineLinked = !!(i.link && (i.type === "work" || anchor));
     var enHtml = '<div class="en' + dialogClass + (collapsed ? " preview-only" : "") + '">' +
-      linkStart + esc(collapsed ? previewText(i.en, PREVIEW_EN) : i.en) + linkArrow + linkEnd + "</div>" +
-      (collapsed ? '<div class="en' + dialogClass + ' full-only">' + linkStart + esc(i.en) + linkArrow + linkEnd + "</div>" : "");
+      linkedEnHtml(i, collapsed ? previewText(i.en, PREVIEW_EN) : i.en, anchor) + "</div>" +
+      (collapsed ? '<div class="en' + dialogClass + ' full-only">' + linkedEnHtml(i, i.en, anchor) + "</div>" : "");
     var zhHtml = "";
     if (showZh && i.zh) {
       zhHtml = '<div class="zh' + dialogClass + (collapsed ? " preview-only" : "") + '">' +
@@ -583,7 +595,7 @@
     var meta = [];
     if (i.subtopic) meta.push(esc(i.subtopic));
     if (i.level) meta.push(esc(i.level));
-    if (i.link && !workLink) {
+    if (i.link && !inlineLinked) {
       meta.push('<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "相关资料") + '">相关资料 ↗</a>');
     }
     meta.push("p." + i.source.page);
@@ -728,18 +740,57 @@
 
   var controls = document.querySelector(".controls");
   var filterToggle = document.getElementById("filterToggle");
+  var mobileQuery = window.matchMedia("(max-width: 640px)");
   var filtersExpanded = true;
   var manualExpanded = false;
   var lastY = window.scrollY;
+  var collapseTimer = null;
+  var heightTimer = null;
+
+  function cancelCollapse() {
+    if (collapseTimer) { clearTimeout(collapseTimer); collapseTimer = null; }
+  }
 
   function applyFilterState() {
-    controls.classList.toggle("filters-collapsed", !filtersExpanded);
     filterToggle.textContent = filtersExpanded ? "▴" : "▾";
     filterToggle.setAttribute("aria-expanded", filtersExpanded ? "true" : "false");
     filterToggle.setAttribute("aria-label", filtersExpanded ? "收起筛选" : "展开筛选");
+    controls.classList.toggle("filters-collapsed", !filtersExpanded);
+
+    if (!mobileQuery.matches) {
+      clearTimeout(heightTimer);
+      controls.style.maxHeight = "";
+      controls.inert = false;
+      return;
+    }
+
+    controls.inert = !filtersExpanded;
+    clearTimeout(heightTimer);
+    var h = controls.scrollHeight;
+    controls.style.maxHeight = h + "px";
+    if (filtersExpanded) {
+      heightTimer = setTimeout(function () {
+        if (filtersExpanded && mobileQuery.matches) controls.style.maxHeight = "none";
+      }, 240);
+    } else {
+      void controls.offsetHeight;
+      controls.style.maxHeight = "0px";
+    }
+  }
+
+  function scheduleCollapse() {
+    if (collapseTimer) return;
+    collapseTimer = setTimeout(function () {
+      collapseTimer = null;
+      if (window.scrollY > 100 && !manualExpanded && filtersExpanded) {
+        filtersExpanded = false;
+        applyFilterState();
+      }
+    }, 120);
   }
 
   filterToggle.addEventListener("click", function () {
+    cancelCollapse();
     filtersExpanded = !filtersExpanded;
     manualExpanded = filtersExpanded;
     applyFilterState();
@@ -750,19 +801,26 @@
     var scrollingDown = y > lastY;
     lastY = y;
     if (y <= 10) {
-      filtersExpanded = true;
-      manualExpanded = false;
-    } else if (scrollingDown && y > 100 && !manualExpanded) {
-      filtersExpanded = false;
+      cancelCollapse();
+      if (!filtersExpanded || manualExpanded) {
+        filtersExpanded = true;
+        manualExpanded = false;
+        applyFilterState();
+      }
+    } else if (scrollingDown && y > 100 && !manualExpanded && filtersExpanded) {
+      scheduleCollapse();
+    } else if (!scrollingDown) {
+      cancelCollapse();
     }
-    applyFilterState();
   }, { passive: true });
 
-  applyFilterState();
+  if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", applyFilterState);
+  else mobileQuery.addListener(applyFilterState);
 
   readParams();
   buildGradeChips();
   refreshFilters();
+  applyFilterState();
 })();
 </script>
 </body>

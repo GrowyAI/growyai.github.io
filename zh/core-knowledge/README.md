@@ -52,7 +52,7 @@ python scripts/add_work_links.py && python scripts/export_tables.py
 
 `apply_icon_choices.py` 只处理 `icon-choices.json` 里列出的年级；该年级未列入清单的条目图标会被清空，K–8 在确认方案前保持原样。`add_emojis.py` 是早期自动规则，不再用于公开数据。
 
-`add_work_links.py` 只识别英文正文中引号内的具体作品 / 名称，并排除章节标题和常见课堂短语；每条最多生成一个 Google 搜索链接，写入 `work` 与 `link` 字段。它不抓取、不复制第三方内容，搜索结果版权归原方所有。
+`add_work_links.py` 先识别英文正文中引号内的具体作品 / 名称，并排除章节标题和常见课堂短语；若仍未命中，再用中文译文里的第一处书名号《…》作为搜索词。每条最多生成一个 Google 搜索链接，写入 `work` 与 `link` 字段；若能把中文书名号与英文标题对应上，还会写入 `work_en`，供速查器直接把英文行里的作品名做成可点链接。它不抓取、不复制第三方内容，搜索结果版权归原方所有。
 
 翻译批次相关脚本（如 `make_translation_chunks.py`、`merge_translations.py`）需要先在本地生成 `translations/` 目录；该目录也被忽略，不会进入提交。
 

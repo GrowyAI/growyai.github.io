@@ -2,9 +2,11 @@
 
 Quoted short titles in English text are detected conservatively, with section
 names and common classroom phrases excluded. Items already typed as `work`
-also get a link built directly from their English title, since those bullets
-are titles by definition. Each matching item gets one `work` title and one
-`link` (a Google search URL) field.
+also get a link built directly from their English title. As a final fallback,
+any item still without a link gets a Google search built from the first
+Chinese book-title mark 《...》 in its translation. Each matching item gets a
+`work` title, an optional `work_en` anchor when an English title can be paired,
+and a `link` (a Google search URL).
 """
 
 import json
@@ -19,6 +21,8 @@ SOURCE = os.path.join(DATA, "knowledge.json")
 BACKUP = os.path.join(DATA, "knowledge-before-work-links.json")
 
 QUOTE_RE = re.compile(r'["“]([^"”]{3,70})["”]')
+BOOK_RE = re.compile(r"《([^》]{1,80})》")
+BOOK_EN_RE = re.compile(r"《[^》]{1,80}》\s*[（(]([^）)]{2,80})[）)]")
 
 STOP = {
     "language of instruction", "using the preschool sequence",
@@ -111,12 +115,14 @@ def main():
 
     for item in data["items"]:
         item["work"] = ""
+        item["work_en"] = ""
         item["link"] = ""
         for match in QUOTE_RE.finditer(item.get("en", "")):
             if not looks_like_work(match.group(1), headings):
                 continue
             work = match.group(1).strip(" .,;:!?")
             item["work"] = work
+            item["work_en"] = work
             item["link"] = search_url(work, item.get("subject", ""))
             count += 1
             if len(examples) < 20:
@@ -127,10 +133,44 @@ def main():
             title = re.sub(r"\s+", " ", (item.get("en") or "").strip()).strip(" .,;:!?")
             if 3 <= len(title) <= 90:
                 item["work"] = title
+                item["work_en"] = title
                 item["link"] = search_url(title, item.get("subject", ""))
                 count += 1
                 if len(examples) < 20:
                     examples.append((title, item.get("subject", ""), "type=work"))
+
+        if not item["link"]:
+            match = BOOK_RE.search(item.get("zh", ""))
+            if match:
+                title = match.group(1).strip()
+                if title:
+                    item["work"] = title
+                    en_match = BOOK_EN_RE.search(item.get("zh", ""))
+                    if en_match:
+                        en_title = en_match.group(1).strip()
+                        en_title = re.sub(r"^(?:英语|英文|English)\s*[:：]\s*", "", en_title, flags=re.I)
+                        if en_title and en_title in item.get("en", ""):
+                            item["work_en"] = en_title
+                    item["link"] = search_url(title, item.get("subject", ""))
+                    count += 1
+
+    by_work = {}
+    by_en = {}
+    for item in data["items"]:
+        if item.get("work") and item.get("work_en"):
+            by_work.setdefault(item["work"], set()).add(item["work_en"])
+        if item.get("en") and item.get("work_en"):
+            by_en.setdefault(item["en"], set()).add(item["work_en"])
+    for item in data["items"]:
+        if not item["link"] or item.get("work_en"):
+            continue
+        candidates = set()
+        if item.get("work") in by_work:
+            candidates |= by_work[item["work"]]
+        if item.get("en") in by_en:
+            candidates |= by_en[item["en"]]
+        if len(candidates) == 1:
+            item["work_en"] = next(iter(candidates))
 
     with open(SOURCE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

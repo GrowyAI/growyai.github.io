@@ -24,7 +24,7 @@ GRADE_LABELS = {
 COLUMNS = [
     "id", "uid", "grade", "grade_label", "subject", "topic", "subtopic",
     "section", "section_zh", "type", "level", "en", "zh", "emojis",
-    "work", "link", "details", "source_doc", "source_page", "tags",
+    "work", "work_en", "link", "details", "source_doc", "source_page", "tags",
 ]
 
 
@@ -45,6 +45,7 @@ def row_for(item):
         item.get("zh", ""),
         " ".join(item.get("emojis", [])),
         item.get("work", ""),
+        item.get("work_en", ""),
         item.get("link", ""),
         " | ".join(item.get("details", [])),
         item.get("source", {}).get("doc", ""),
@@ -74,7 +75,7 @@ def write_xlsx(path, rows):
         "id": 20, "uid": 10, "grade": 10, "grade_label": 14, "subject": 26,
         "topic": 32, "subtopic": 20, "section": 28, "section_zh": 22,
         "type": 12, "level": 10, "en": 70, "zh": 40, "emojis": 10,
-        "work": 28, "link": 60, "details": 50, "source_doc": 12,
+        "work": 28, "work_en": 28, "link": 60, "details": 50, "source_doc": 12,
         "source_page": 12, "tags": 20,
     }
     for idx, col in enumerate(COLUMNS, 1):
