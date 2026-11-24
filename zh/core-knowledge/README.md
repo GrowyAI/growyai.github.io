@@ -14,11 +14,13 @@
 
 - `data/knowledge-inline.js`：页面运行时使用的内联数据（禁止直接改）
 - `data/topic-zh-inline.js`：374 个主题的中文映射
-- `data/knowledge.json`：结构化数据源（7,053 条，含中文翻译、来源页码、emoji、作品搜索链接）
+- `data/knowledge.json`：结构化数据源（7,077 条，含中文翻译、来源页码、emoji、作品搜索链接）
 - `data/knowledge.csv` / `data/knowledge.xlsx`：可下载表格视图
 - `data/questions.csv`：单独抽出的具体问题 / 对话条目
-- `scripts/add_emojis.py`：按具体名词 / 动作生成 emoji 提示
+- `scripts/icon-choices.json` / `scripts/apply_icon_choices.py`：人工精选的图标方案（目前仅学前），写入 `emojis` 字段并重建导出文件
+- `scripts/add_emojis.py`：早期按名词 / 动作自动生成 emoji 的脚本，现已由人工精选方案取代
 - `scripts/add_work_links.py`：为引号中的具体作品 / 名称生成 Google 搜索链接
+- `scripts/repair_preschool_data.py` / `scripts/repair_k8_data.py`：按已确认问题修复学前 / K–8 数据（含 `scripts/k8_zh_fixes/` 中的中文修正表）
 - `scripts/build_topic_zh.py`：按固定顺序重建主题中文映射
 - `scripts/export_tables.py`：从 JSON 重新生成 CSV / XLSX / 内联 JS
 
@@ -44,11 +46,11 @@
 ```bash
 python scripts/export_tables.py
 python scripts/build_topic_zh.py
-python scripts/add_emojis.py && python scripts/export_tables.py
+python scripts/apply_icon_choices.py
 python scripts/add_work_links.py && python scripts/export_tables.py
 ```
 
-`add_emojis.py` 会设置 `MAX_FREQUENCY = 100`，出现次数达到或超过 100 的 emoji 会被整类移除，避免重复刷屏。
+`apply_icon_choices.py` 只处理 `icon-choices.json` 里列出的年级；该年级未列入清单的条目图标会被清空，K–8 在确认方案前保持原样。`add_emojis.py` 是早期自动规则，不再用于公开数据。
 
 `add_work_links.py` 只识别英文正文中引号内的具体作品 / 名称，并排除章节标题和常见课堂短语；每条最多生成一个 Google 搜索链接，写入 `work` 与 `link` 字段。它不抓取、不复制第三方内容，搜索结果版权归原方所有。
 

@@ -166,24 +166,25 @@
   .type-work { background: var(--purple-soft); color: var(--purple); }
   .type-skill, .type-objective { background: var(--green-soft); color: var(--green); }
   .type-note { background: #f1f5f9; color: #475569; }
-  .en { font-size: 15px; color: var(--text); line-height: 1.2; }
+  /* Line rhythm stays 1.2 / 1.3; padding adds a slightly looser paragraph gap (~1.4 / 1.5). */
+  .en { font-size: 15px; color: var(--text); line-height: 1.2; padding-bottom: 0.2em; }
   .en a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); }
   .en a:hover { background: var(--accent-soft); }
-  .zh { font-size: 13px; color: var(--muted); line-height: 1.3; }
-  .en + .zh { margin-top: 1px; }
+  .zh { font-size: 13px; color: var(--muted); line-height: 1.3; padding-bottom: 0.2em; }
+  .en + .zh { margin-top: 5px; }
   .en.dialogue-text, .zh.dialogue-text { white-space: pre-line; }
   .subject-cn { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
   .subject-core { color: var(--subject-color, var(--accent)); }
   .meta { font-size: 11px; color: #94a3b8; margin-top: 4px; }
   .meta a { color: var(--accent); text-decoration: none; }
   .meta a:hover { text-decoration: underline; }
-  .emoji-row {
-    display: inline-flex;
-    align-items: center;
-    font-size: 15px;
-    line-height: 1;
-    letter-spacing: 1px;
-    margin-left: 1px;
+  .icon-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 34px;
+    line-height: 1.1;
+    margin-top: 7px;
   }
   .details { margin: 5px 0 0; padding-left: 16px; color: var(--muted); font-size: 13px; }
   .details li { margin: 2px 0; }
@@ -558,16 +559,19 @@
       meta.push('<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "相关资料") + '">相关资料 ↗</a>');
     }
     meta.push("p." + i.source.page);
-    var emoji = (i.emojis || []).slice(0, 2).join("");
-    var emojiHtml = emoji ? '<span class="emoji-row">' + emoji + "</span>" : "";
+    var icons = (i.emojis || []).slice(0, 3);
+    var iconHtml = icons.length
+      ? '<div class="icon-row">' + icons.map(function (e) { return "<span>" + esc(e) + "</span>"; }).join("") + "</div>"
+      : "";
     var expandHtml = collapsed ? '<button class="expand-btn">展开全文</button>' : "";
     return '<li class="item' + (collapsed ? " collapsed" : "") + '" data-id="' + i.id + '">' +
       '<button class="fav' + (favs[i.id] ? " on" : "") + '" title="收藏">' + (favs[i.id] ? "★" : "☆") + "</button>" +
       '<div class="item-body">' +
-      '<div class="badges"><span class="badge type-' + i.type + '">' + typeLabel(i.type) + "</span>" + emojiHtml +
+      '<div class="badges"><span class="badge type-' + i.type + '">' + typeLabel(i.type) + "</span>" +
       (i.subtopic ? '<span class="badge">' + esc(i.subtopic) + "</span>" : "") + "</div>" +
       enHtml + zhHtml +
       (details ? '<ul class="details' + (collapsed ? " full-only" : "") + '">' + details + "</ul>" : "") +
+      iconHtml +
       expandHtml +
       '<div class="meta">' + meta.join(" · ") + "</div></div></li>";
   }
@@ -648,7 +652,7 @@
     });
     document.getElementById("footer").innerHTML =
       '来源：<a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge Sequence 2023</a> · ' +
-      DATA.meta.item_count + " 条知识点 · 具体名词/动作配 emoji，抽象条目不配 · 具体作品配外部搜索链接 · 收藏保存在本机浏览器 · " +
+      DATA.meta.item_count + " 条知识点 · 精选图标只给最具体的条目 · 具体作品配外部搜索链接 · 收藏保存在本机浏览器 · " +
       '<a href="attribution.html">版权与署名</a> · 原版 PDF：' +
       '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_PreSchool_W2.pdf" target="_blank" rel="noopener noreferrer">Preschool</a> / ' +
       '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_GK8_W3.pdf" target="_blank" rel="noopener noreferrer">K–8</a>';
