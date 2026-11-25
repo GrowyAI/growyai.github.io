@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>中国课程标准学习大纲</title>
+<style>
+  :root {
+    --bg: #f7f5f4; --surface: #fffdfc; --surface-2: #f4efee; --border: #e5dcda;
+    --text: #2f2928; --muted: #7d7472; --accent: #8b4c4c; --accent-soft: #f4e7e7;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 15px; line-height: 1.55; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 16px 13px; }
+  .top { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 { margin: 0; font-size: 20px; }
+  h1 a { color: inherit; text-decoration: none; }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .link-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--accent); font-size: 13px;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+  }
+  .link-btn:hover { background: var(--accent-soft); }
+  main { max-width: 1080px; margin: 0 auto; padding: 18px 16px 40px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--muted); }
+  .stat b { display: block; font-size: 17px; color: var(--text); }
+  h2 { font-size: 15px; margin: 22px 0 10px; }
+  .matrix-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { border-collapse: collapse; width: 100%; min-width: 720px; }
+  table.ps { min-width: 680px; }
+  th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; }
+  th { background: var(--surface-2); font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  th:first-child, td:first-child { font-weight: 600; font-size: 13px; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .cell {
+    display: block; width: 100%; min-width: 106px; text-align: left;
+    border: 1px solid var(--border); border-radius: 10px; background: #fff;
+    padding: 9px 10px; cursor: pointer; color: var(--text);
+  }
+  .cell:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .cell-name { font-size: 13px; font-weight: 600; color: var(--sc, var(--text)); }
+  .cell-counts { font-size: 11px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .bar { height: 3px; border-radius: 2px; background: var(--surface-2); margin-top: 7px; }
+  .bar span { display: block; height: 100%; background: var(--sc, var(--accent)); border-radius: 2px; }
+  .overlay { position: fixed; inset: 0; background: rgba(47,41,40,.38); z-index: 20; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 94vw);
+    background: var(--surface); z-index: 21; overflow-y: auto;
+    box-shadow: -12px 0 32px rgba(47,41,40,.14); padding: 18px;
+  }
+  .drawer-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .drawer h3 { margin: 0; font-size: 18px; }
+  .drawer .crumb { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .drawer .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .close { border: none; background: var(--surface-2); border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; color: var(--muted); }
+  .topic { border: 1px solid var(--border); border-radius: 10px; margin-top: 8px; background: #fff; }
+  .topic summary { cursor: pointer; padding: 10px 12px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; }
+  .topic summary .n { color: var(--muted); font-weight: 400; font-size: 11px; white-space: nowrap; }
+  .topic-body { border-top: 1px solid var(--border); padding: 8px 12px 12px; }
+  .topic .topic { margin: 6px 0; }
+  .preview { margin: 0 0 8px; padding-left: 16px; font-size: 12px; color: var(--muted); }
+  .preview li { margin: 4px 0; }
+  .view-all { display: inline-block; font-size: 12px; color: var(--accent); text-decoration: none; }
+  .view-all:hover { text-decoration: underline; }
+  .all-link { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--accent); text-decoration: none; }
+  .all-link:hover { text-decoration: underline; }
+  .empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
+  .note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  @media (max-width: 640px) {
+    header { padding: 14px 12px 12px; }
+    main { padding: 14px 12px 32px; }
+    h1 { font-size: 18px; }
+    .top { align-items: flex-start; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .drawer { padding: 14px; }
+  }
+  .site-foot {
+    max-width: 980px; margin: 0 auto; padding: 18px 16px 32px;
+    font-size: 12px; color: #948987; text-align: center;
+  }
+  .site-foot a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1>中国课程标准<a href="index.html">学习大纲</a></h1>
+      <div class="sub">幼儿园按年龄段 × 领域，小学初中按年级 × 科目；点击格子看目标 / 主题预览，再进入速查器。</div>
+    </div>
+    <div class="nav-links">
+      <a class="link-btn" href="../index.html">Growy 首页</a>
+      <a class="link-btn" href="index.html">进入速查器 →</a>
+      <a class="link-btn" href="attribution.html">来源与版权</a>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="stats" id="stats"></div>
+
+  <h2>幼儿园 · 年龄段 × 领域</h2>
+  <div class="matrix-wrap">
+    <table class="ps" id="psMatrix">
+      <thead><tr><th>年龄段</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="note">通用教育建议在每个年龄段都会显示，所以领域计数包含这些建议。</p>
+
+  <h2>小学初中 · 年级 × 科目</h2>
+  <div class="matrix-wrap">
+    <table id="ssMatrix">
+      <thead><tr><th>年级</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="note">语文课程标准中标注「全学段通用」的条目在每个年级都会显示。</p>
+</main>
+
+<footer class="site-foot">
+  来源：
+  <a href="http://www.moe.gov.cn/srcsite/A06/s3327/201210/t20121009_143254.html" target="_blank" rel="noopener noreferrer">教育部《3-6岁儿童学习与发展指南》</a> ·
+  <a href="https://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html" target="_blank" rel="noopener noreferrer">教育部《义务教育课程方案和课程标准（2022年版）》</a> ·
+  非官方整理，若有出入以原文为准 · <a href="attribution.html">来源与版权</a>
+</footer>
+
+<div class="overlay" id="overlay" hidden></div>
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-head">
+    <div>
+      <div class="crumb" id="drawerCrumb"></div>
+      <h3 id="drawerTitle"></h3>
+      <div class="meta" id="drawerMeta"></div>
+    </div>
+    <button class="close" id="drawerClose" title="关闭">×</button>
+  </div>
+  <div id="drawerBody"></div>
+</aside>
+
+<script src="data/preschool-inline.js"></script>
+<script src="data/primary-secondary-inline.js"></script>
+<script>
+(function () {
+  var PS = window.PRESCHOOL_DATA;
+  var SS = window.PRIMARY_SECONDARY_DATA;
+  var psItems = PS.items;
+  var ssItems = SS.items;
+  var PS_STAGES = ["小班", "中班", "大班"];
+  var GRADES = [
+    { key: "x1", label: "小学低段" },
+    { key: "x2", label: "小学中段" },
+    { key: "x3", label: "小学高段" },
+    { key: "j1", label: "初中" }
+  ];
+  var SUBJECT_ORDER = ["语文", "数学", "英语"];
+  var SUBJECT_COLORS = { "语文": "#8b4c4c", "数学": "#8c704a", "英语": "#6e6a8c" };
+  var DOMAIN_COLORS = {
+    "健康": "#8a5a5a", "语言": "#6e6a8c", "社会": "#8c704a",
+    "科学": "#5c7a72", "艺术": "#8e6170"
+  };
+
+  function unique(list) {
+    var out = [];
+    list.forEach(function (x) { if (out.indexOf(x) < 0) out.push(x); });
+    return out;
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function clip(t, n) {
+    t = String(t == null ? "" : t);
+    return t.length > n ? t.slice(0, n) + "…" : t;
+  }
+  function viewerUrl(params) {
+    var p = new URLSearchParams();
+    Object.keys(params).forEach(function (k) { p.set(k, params[k]); });
+    return "index.html?" + p.toString();
+  }
+  function psGoalKey(i) { return i.domain + "|" + i.aspect + "|" + i.goal_no; }
+  function psCell(stage, domain) {
+    return psItems.filter(function (i) {
+      return i.domain === domain && (i.type === "suggestion" || i.stage === stage);
+    });
+  }
+  function ssCell(stageKey, subject) {
+    return ssItems.filter(function (i) {
+      return i.subject === subject && (i.stage_key === stageKey || i.stage_key === "all");
+    });
+  }
+  function psDomains() {
+    return unique(psItems.map(function (i) { return i.domain; }));
+  }
+  function maxCount(rows, cols, fn) {
+    var max = 0;
+    rows.forEach(function (r) {
+      cols.forEach(function (c) { max = Math.max(max, fn(r, c).length); });
+    });
+    return max;
+  }
+  function cellHtml(name, color, arr, extra, attrs) {
+    var pct = extra.max ? Math.max(6, Math.round(arr.length / extra.max * 100)) : 0;
+    var counts = "<span>" + arr.length + " 条</span>" +
+      (extra.second ? "<span>" + extra.second + "</span>" : "");
+    return '<button class="cell" style="--sc:' + esc(color) + '" ' + attrs + '>' +
+      '<div class="cell-name">' + esc(name) + "</div>" +
+      '<div class="cell-counts">' + counts + "</div>" +
+      '<div class="bar"><span style="width:' + pct + '%"></span></div></button>';
+  }
+
+  function buildStats() {
+    var goalCount = unique(psItems.filter(function (i) { return i.goal_no; }).map(psGoalKey)).length;
+    var topicCount = unique(ssItems.map(function (i) {
+      return i.subject + "|" + i.domain + "|" + i.topic;
+    })).length;
+    document.getElementById("stats").innerHTML = [
+      ["年级", PS_STAGES.length + GRADES.length],
+      ["幼儿园领域", psDomains().length],
+      ["幼儿园目标", goalCount],
+      ["小学初中主题", topicCount],
+      ["条目总数", psItems.length + ssItems.length]
+    ].map(function (p) {
+      return '<div class="stat"><b>' + p[1] + "</b>" + p[0] + "</div>";
+    }).join("");
+  }
+
+  function buildPreschoolMatrix() {
+    var table = document.getElementById("psMatrix");
+    var domains = psDomains();
+    var head = table.querySelector("thead tr");
+    head.innerHTML = "<th>年龄段</th>" + domains.map(function (d) {
+      return "<th>" + esc(d) + "</th>";
+    }).join("");
+    var max = maxCount(PS_STAGES, domains, psCell);
+    table.querySelector("tbody").innerHTML = PS_STAGES.map(function (stage) {
+      var tds = domains.map(function (domain) {
+        var arr = psCell(stage, domain);
+        var aspects = unique(arr.map(function (i) { return i.aspect; })).length;
+        return "<td>" + cellHtml(domain, DOMAIN_COLORS[domain] || "#8b4c4c", arr,
+          { max: max, second: aspects + " 方面" },
+          'data-stage="' + esc(stage) + '" data-kind="ps" data-name="' + esc(domain) + '"') + "</td>";
+      }).join("");
+      return "<tr><td>" + esc(stage) + "</td>" + tds + "</tr>";
+    }).join("");
+  }
+
+  function buildSubjectsMatrix() {
+    var stages = GRADES.map(function (g) { return g.key; });
+    var table = document.getElementById("ssMatrix");
+    var head = table.querySelector("thead tr");
+    head.innerHTML = "<th>年级</th>" + SUBJECT_ORDER.map(function (s) {
+      return "<th>" + esc(s) + "</th>";
+    }).join("");
+    var max = maxCount(stages, SUBJECT_ORDER, ssCell);
+    table.querySelector("tbody").innerHTML = GRADES.map(function (g) {
+      var tds = SUBJECT_ORDER.map(function (subject) {
+        var arr = ssCell(g.key, subject);
+        var topics = unique(arr.map(function (i) { return i.domain + "|" + i.topic; })).length;
+        return "<td>" + cellHtml(subject, SUBJECT_COLORS[subject] || "#8b4c4c", arr,
+          { max: max, second: topics + " 主题" },
+          'data-stage="' + esc(g.key) + '" data-kind="ss" data-name="' + esc(subject) + '"') + "</td>";
+      }).join("");
+      return "<tr><td>" + esc(g.label) + "</td>" + tds + "</tr>";
+    }).join("");
+  }
+
+  function previewHtml(arr) {
+    return '<ul class="preview">' + arr.slice(0, 2).map(function (i) {
+      return "<li>" + esc(clip(i.text, 96)) + "</li>";
+    }).join("") + "</ul>";
+  }
+
+  function openPreschool(stage, domain) {
+    var arr = psCell(stage, domain);
+    var aspects = unique(arr.map(function (i) { return i.aspect; }));
+    var goals = unique(arr.filter(function (i) { return i.goal_no; }).map(psGoalKey));
+    showDrawer("大纲 / 幼儿园 / " + stage, domain,
+      arr.length + " 条 · " + aspects.length + " 个方面 · " + goals.length + " 个目标",
+      aspects.length ? aspects.map(function (aspect) {
+        var aItems = arr.filter(function (i) { return i.aspect === aspect; });
+        var gKeys = unique(aItems.filter(function (i) { return i.goal_no; }).map(psGoalKey));
+        var inner = gKeys.map(function (k) {
+          var gItems = aItems.filter(function (i) { return psGoalKey(i) === k; });
+          var first = gItems[0];
+          return '<details class="topic" open><summary><span>目标' + esc(first.goal_no) + " " +
+            esc(first.goal) + '</span><span class="n">' + gItems.length + " 条</span></summary>" +
+            '<div class="topic-body">' + previewHtml(gItems) +
+            '<a class="view-all" href="' + esc(viewerUrl({
+              grade: stage, domain: domain, aspect: aspect, goal: k
+            })) + '">在速查器中查看全部 ' + gItems.length + " 条 →</a></div></details>";
+        }).join("");
+        var suggestions = aItems.filter(function (i) { return i.type === "suggestion"; });
+        if (suggestions.length) {
+          inner += '<details class="topic"><summary><span>教育建议</span><span class="n">' +
+            suggestions.length + ' 组</span></summary><div class="topic-body">' +
+            previewHtml(suggestions) + "</div></details>";
+        }
+        return '<details class="topic" open><summary><span>' + esc(aspect) +
+          '</span><span class="n">' + aItems.length + " 条</span></summary><div class=\"topic-body\">" +
+          inner + '<a class="view-all" href="' + esc(viewerUrl({
+            grade: stage, domain: domain, aspect: aspect
+          })) + '">查看「' + esc(aspect) + "」全部 →</a></div></details>";
+      }).join("") + '<a class="all-link" href="' + esc(viewerUrl({
+        grade: stage, domain: domain
+      })) + '">打开 ' + esc(stage) + " · " + esc(domain) + " 全部内容 →</a>"
+        : '<div class="empty">这个格子暂时没有内容。</div>');
+  }
+
+  function openSubjects(stageKey, subject) {
+    var arr = ssCell(stageKey, subject);
+    var label = GRADES.filter(function (g) { return g.key === stageKey; })[0].label;
+    var domains = unique(arr.map(function (i) { return i.domain; }));
+    var topics = unique(arr.map(function (i) { return i.domain + "|" + i.topic; }));
+    showDrawer("大纲 / 小学初中 / " + label, subject,
+      arr.length + " 条 · " + domains.length + " 个领域 · " + topics.length + " 个主题",
+      domains.length ? domains.map(function (domain) {
+        var dItems = arr.filter(function (i) { return i.domain === domain; });
+        var tNames = unique(dItems.map(function (i) { return i.topic; }));
+        var inner = tNames.map(function (topic) {
+          var tItems = dItems.filter(function (i) { return i.topic === topic; });
+          return '<details class="topic" open><summary><span>' + esc(topic) +
+            '</span><span class="n">' + tItems.length + " 条</span></summary>" +
+            '<div class="topic-body">' + previewHtml(tItems) +
+            '<a class="view-all" href="' + esc(viewerUrl({
+              grade: stageKey, subject: subject, domain: domain, topic: topic
+            })) + '">在速查器中查看全部 ' + tItems.length + " 条 →</a></div></details>";
+        }).join("");
+        return '<details class="topic" open><summary><span>' + esc(domain) +
+          '</span><span class="n">' + dItems.length + " 条</span></summary><div class=\"topic-body\">" +
+          inner + "</div></details>";
+      }).join("") + '<a class="all-link" href="' + esc(viewerUrl({
+        grade: stageKey, subject: subject
+      })) + '">打开 ' + esc(label) + " · " + esc(subject) + " 全部内容 →</a>"
+        : '<div class="empty">这个格子暂时没有内容。</div>');
+  }
+
+  function showDrawer(crumb, title, meta, body) {
+    document.getElementById("drawerCrumb").textContent = crumb;
+    var h = document.getElementById("drawerTitle");
+    h.textContent = title;
+    h.style.color = SUBJECT_COLORS[title] || DOMAIN_COLORS[title] || "";
+    document.getElementById("drawerMeta").textContent = meta;
+    document.getElementById("drawerBody").innerHTML = body;
+    document.getElementById("overlay").hidden = false;
+    document.getElementById("drawer").hidden = false;
+    document.body.style.overflow = "hidden";
+    document.getElementById("drawerClose").focus();
+  }
+  function closeDrawer() {
+    document.getElementById("overlay").hidden = true;
+    document.getElementById("drawer").hidden = true;
+    document.body.style.overflow = "";
+  }
+  document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+  document.getElementById("overlay").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest("table tbody .cell") : null;
+    if (!btn) return;
+    if (btn.dataset.kind === "ps") openPreschool(btn.dataset.stage, btn.dataset.name);
+    else openSubjects(btn.dataset.stage, btn.dataset.name);
+  });
+
+  buildStats();
+  buildPreschoolMatrix();
+  buildSubjectsMatrix();
+})();
+</script>
+</body>
+</html>

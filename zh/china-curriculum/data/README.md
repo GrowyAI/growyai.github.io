@@ -1,0 +1,101 @@
+# 数据包说明
+
+本目录放数据；界面在上层 `index.html`，顶部一行年级按钮直接列出幼儿园与小学初中的各年级：
+
+1. **幼儿园阶段**：教育部 2012 年《3-6岁儿童学习与发展指南》，按小班 / 中班 / 大班组织。
+2. **小学与初中阶段**：教育部 2022 年版语文、数学、英语课程标准，按学段组织。
+
+官方 PDF / DOC 和 OCR / 抽取出的中间文本都在被 gitignore 的 `../source/` 下，不进入公开仓库。
+
+## 文件
+
+### 幼儿园
+
+- `preschool.json`：canonical 数据，含 `meta` 与 `items`。
+- `preschool-inline.js`：静态页面直接加载的 `window.PRESCHOOL_DATA`。
+- `preschool.csv` / `preschool.xlsx`：表格版。
+- `preschool-preview.md`：按领域 → 方面 → 目标排版的可读预览。
+
+由 `../scripts/build_preschool_data.py` 从本地 `.doc` 抽取文本生成。
+
+### 小学与初中（语文 / 数学 / 英语）
+
+- `primary-secondary.json`：三科合并的 canonical 数据，含 `meta` 与 `items`。
+- `chinese.json` / `math.json` / `english.json`：按科目拆出的同一批条目。
+- `primary-secondary-inline.js`：静态页面可加载的 `window.PRIMARY_SECONDARY_DATA`。
+- `primary-secondary.csv` / `primary-secondary.xlsx`：表格版。
+- `primary-secondary-preview.md`：按科目 → 学段 → 领域 → 主题排版的可读预览。
+
+由 `../scripts/build_subjects_data.py` 从本地 OCR 文本生成。三份标准都是扫描图片 PDF、没有文字层，因此需要先运行 `../scripts/ocr_pdfs.py`；OCR 结果缓存在 `../source/extracted/ocr/`，不会进仓库。
+
+## 界面接入
+
+`index.html` 同时加载上面两个 inline JS，顶部只有一行年级按钮（与英文版一致），不再分数据集 tab，也没有「全部 / 全学段」选项：
+
+- 幼儿园年级：`小班` / `中班` / `大班`，分类下拉为 `domain` / `aspect` / `goal` / `type`。
+- 小学初中年级：`x1` 小学低段 / `x2` 小学中段 / `x3` 小学高段 / `j1` 初中，分类下拉为 `subject` / `domain` / `topic` / `type`。
+
+所有筛选共用一个 URL 参数 `grade`：幼儿园用 `小班` / `中班` / `大班`（URL 中会被编码），小学初中用 `x1` / `x2` / `x3` / `j1`；另有 `subject` / `domain` / `aspect` / `goal` / `topic` / `type` / `q`。切换年级会清空其他筛选。旧的 `?view=preschool&stage=...` 链接仍可打开，会自动改写成 `?grade=...`。
+
+分类下拉随年级变化：选幼儿园年级显示领域 / 方面 / 目标，选小学初中年级显示科目 / 领域 / 主题。搜索框、收藏与长条目折叠共用；收藏存在浏览器 `localStorage` 的 `cn-curriculum-favs`，`uid` 前缀不同，不会互相覆盖。幼儿园选中年龄段后仍显示通用教育建议；小学初中选中年级后仍显示「全学段通用」条目，因此去掉该筛选项不会丢失内容。
+
+## 数据规模
+
+### 幼儿园
+
+- 5 个领域、11 个方面、32 个目标。
+- 316 条发展水平条目：小班 94 / 中班 105 / 大班 117。
+- 109 组教育建议，其中 59 组带 `examples` 举例。
+- 共 425 条 item，`uid` 唯一。
+
+### 小学与初中
+
+共 **716 条 item**，`uid` 全部唯一，`text` 无空值、无控制字符，`source_page` 齐全。
+
+| 科目 | 条目 | 构成 |
+| --- | ---: | --- |
+| 语文 | 189 | 学段要求 73 / 学习内容 80 / 教学提示 23 / 主题与载体 3 / 阶段说明 10 |
+| 数学 | 150 | 内容要求 107 / 学业要求 27 / 教学提示 16 |
+| 英语 | 377 | 内容要求 361 / 教学提示 16 |
+
+学段键 `stage_key`：`x1` 小学低段（1–2 年级）、`x2` 小学中段、`x3` 小学高段、`j1` 初中、`all` 全学段通用（界面不再提供单独的「全学段」筛选，这 32 条会出现在每个年级里）。英语标准中的「预备级（1–2 年级）」已并入 `x1`，相关领域名称也统一显示为「小学低段学习活动」，避免与语文、数学的小学低段错位。
+
+## 字段说明
+
+### 幼儿园 item
+
+| 字段 | 含义 |
+| --- | --- |
+| `uid` | 稳定标识，如 `ps-h-a1-g1-x-01` |
+| `domain` / `aspect` | 领域 / 方面 |
+| `goal_no` / `goal` | 目标序号 / 目标标题 |
+| `type` | `goal` 或 `suggestion` |
+| `text` | 发展水平条目或教育建议正文 |
+| `examples` | 教育建议中的举例（仅 `suggestion` 可能有） |
+| `reference` | 身高体重参考标准（仅健康领域目标 1 的发展水平条目） |
+| `stage` / `age` | 发展水平条目所属年龄段（`suggestion` 无此字段） |
+| `source_page` | 所属“方面”在指南印刷版中的起始页 |
+| `source_id` | 指向 `meta.source` |
+
+### 小学与初中 item
+
+| 字段 | 含义 |
+| --- | --- |
+| `uid` | 稳定标识，如 `ch-x1-sta-xxxxxxxx` / `ma-j1-con-xxxxxxxx` / `en-x2-con-xxxxxxxx` |
+| `seq` | 构建时的顺序号 |
+| `subject` / `subject_key` | 科目中文名 / 键（`chinese` / `math` / `english`） |
+| `stage` / `stage_key` | 学段中文名 / 稳定键 |
+| `domain` | 领域或课程要素，如「数与代数」「语言知识」「阅读与鉴赏」 |
+| `topic` | 子主题或要求类别，如「数与运算」「语音知识」「教学提示」 |
+| `type` | `stage_requirement` / `content` / `academic` / `tip` / `theme` / `note` |
+| `text` | 抽出的条目正文 |
+| `source_page` | 印刷版起始页 |
+| `source_pdf_page` | 对应 PDF 物理页 |
+| `source_id` | 指向 `meta.sources` 中的一份标准 |
+
+## 来源与边界
+
+- 幼儿园：《3-6岁儿童学习与发展指南》，教基二〔2012〕4号，教育部，2012-10-09。<http://www.moe.gov.cn/srcsite/A06/s3327/201210/t20121009_143254.html>
+- 小学初中：《义务教育课程方案和课程标准（2022年版）》通知所附语文、数学、英语课程标准，教育部，2022-04-21。<https://www.moe.gov.cn/srcsite/A26/s8001/202204/t20220420_619921.html>
+
+这是**非官方整理**，不是教育部原文或官方版本。条目从行政指导文件中抽取并结构化，保留文件名、发布机构、日期和官方链接；若有出入以教育部发布的原文为准。官方 PDF / DOC 不复制到本站，不复制页面图片或版式，不作任何官方背书或商业性原版转载。OCR 识别可能存在个别错字，已对常见混淆做规则修正，但不保证与纸质文本逐字一致。

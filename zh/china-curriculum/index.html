@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>中国课程标准知识速查</title>
+<style>
+  :root {
+    --bg: #f7f5f4;
+    --surface: #fffdfc;
+    --surface-2: #f4efee;
+    --border: #e5dcda;
+    --text: #2f2928;
+    --muted: #7d7472;
+    --accent: #8b4c4c;
+    --accent-soft: #f4e7e7;
+    --amber: #8a6a3c;
+    --amber-soft: #f6eee1;
+    --green: #4f7568;
+    --green-soft: #e7f0ec;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px calc(10px + env(safe-area-inset-top));
+  }
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 17px; margin: 0; font-weight: 650; min-width: 0; }
+  .title-info { font-size: 12px; color: var(--muted); text-decoration: none; opacity: .75; margin-left: 5px; vertical-align: 1px; }
+  .title-info:hover { color: var(--accent); opacity: 1; }
+  .count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .nav-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px 11px; border: 1px solid var(--border); border-radius: 999px;
+    background: var(--surface); color: var(--accent); font-size: 13px;
+    text-decoration: none; cursor: pointer;
+  }
+  .controls { display: grid; gap: 8px; min-width: 0; }
+  .controls > * { min-width: 0; max-width: 100%; }
+  .search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .search:focus { outline: 2px solid var(--accent); background: var(--surface); }
+  .grade-row { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+  .chip {
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
+  select {
+    flex: 1 1 130px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+  }
+  .filter-row > select { flex: 1 1 calc(50% - 4px); }
+  .toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 13px; color: var(--muted); white-space: nowrap; cursor: pointer;
+  }
+  .toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+  .filter-toggle {
+    display: none;
+    border: 1px solid var(--border); background: var(--surface); color: var(--accent);
+    border-radius: 999px; width: 34px; height: 34px; padding: 0;
+    font-size: 18px; line-height: 1; cursor: pointer; flex: 0 0 auto;
+  }
+  .topic-bar {
+    margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent); font-size: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .topic-bar button { border: none; background: transparent; color: var(--accent); font-size: 12px; cursor: pointer; }
+  main { padding: 12px 14px 80px; max-width: 900px; margin: 0 auto; }
+  details.domain {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  details.domain > summary {
+    padding: 12px 14px;
+    font-weight: 620;
+    font-size: 15px;
+    cursor: pointer;
+    background: var(--surface-2);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--domain-color, var(--accent));
+  }
+  details.domain > summary::-webkit-details-marker { display: none; }
+  details.domain > summary::after { content: "+"; color: var(--muted); font-size: 18px; }
+  details.domain[open] > summary::after { content: "−"; }
+  .domain-count { color: var(--muted); font-size: 12px; font-weight: 400; margin-left: 8px; }
+  .aspect-group { border-top: 1px solid var(--border); }
+  .aspect-title {
+    padding: 10px 14px; font-weight: 600; font-size: 14px;
+    background: #fbf8f7; color: var(--domain-color, var(--accent));
+  }
+  .goal-title {
+    padding: 7px 14px; font-size: 13px; font-weight: 600;
+    color: var(--domain-color, var(--accent)); background: var(--accent-soft);
+  }
+  .goal-title span { color: var(--muted); font-weight: 400; }
+  .topic-title {
+    padding: 5px 14px 5px 26px; font-size: 12px; color: var(--muted);
+    background: #fcfaf9; border-top: 1px solid #f0eae8;
+  }
+  ul.items { list-style: none; margin: 0; padding: 0; }
+  li.item {
+    position: relative;
+    padding: 10px 14px;
+    border-top: 1px solid #f0eae8;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .item-body { flex: 1; min-width: 0; }
+  .badges { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-bottom: 4px; padding-right: 28px; }
+  .badge {
+    font-size: 11px; padding: 1px 7px; border-radius: 999px;
+    background: var(--surface-2); color: var(--muted); white-space: nowrap;
+  }
+  .type-goal, .type-stage_requirement { background: var(--green-soft); color: var(--green); }
+  .type-suggestion, .type-tip { background: var(--amber-soft); color: var(--amber); }
+  .type-content, .type-theme { background: var(--accent-soft); color: var(--accent); }
+  .type-academic { background: #eeeaf5; color: #6e6a8c; }
+  .type-note { background: var(--surface-2); color: var(--muted); }
+  .text { font-size: 15px; color: var(--text); line-height: 1.45; }
+  .examples {
+    margin: 6px 0 0; padding-left: 18px;
+    color: var(--muted); font-size: 13px; line-height: 1.5;
+  }
+  .examples li { margin: 2px 0; }
+  .example-preview { margin-top: 5px; font-size: 12px; color: var(--muted); }
+  .reference {
+    margin-top: 6px; padding: 6px 9px; border-radius: 8px;
+    background: var(--surface-2); color: var(--muted); font-size: 12px;
+  }
+  .reference ul { margin: 3px 0 0; padding-left: 17px; }
+  .item.collapsed .full-only { display: none; }
+  .item:not(.collapsed) .preview-only { display: none; }
+  .expand-btn {
+    border: none; background: transparent; color: var(--accent);
+    font-size: 12px; padding: 3px 0 0; cursor: pointer;
+  }
+  .fav {
+    position: absolute; top: 10px; right: 12px;
+    border: none; background: transparent; color: #c9bfbc;
+    font-size: 22px; line-height: 1; cursor: pointer; padding: 0 2px;
+  }
+  .fav.on { color: var(--accent); }
+  .meta { font-size: 11px; color: #9a8f8c; margin-top: 4px; }
+  .meta a { color: var(--accent); text-decoration: none; }
+  .empty {
+    text-align: center; color: var(--muted); padding: 48px 16px;
+    background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+  .more {
+    display: block; width: 100%; margin-top: 12px; padding: 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface); color: var(--accent); font-size: 14px; cursor: pointer;
+  }
+  .footer-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 24px; }
+  .footer-note a { color: var(--accent); }
+  @media (max-width: 640px) {
+    header { padding: 8px 12px calc(8px + env(safe-area-inset-top)); }
+    h1 { font-size: 16px; }
+    .title-row { margin-bottom: 6px; }
+    .filter-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .controls { overflow: hidden; transition: max-height .22s ease, opacity .18s ease; }
+    .controls.filters-collapsed { opacity: 0; pointer-events: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title-row">
+    <h1>中国课程标准知识速查<a class="title-info" href="attribution.html" title="来源与版权">ⓘ</a></h1>
+    <div class="header-actions">
+      <a class="nav-btn" href="roadmap.html">大纲</a>
+      <a class="nav-btn" href="attribution.html">来源</a>
+      <a class="nav-btn" href="../index.html">返回首页</a>
+      <span class="count" id="count"></span>
+      <button class="filter-toggle" id="filterToggle" aria-expanded="true" aria-label="收起筛选">▴</button>
+    </div>
+  </div>
+  <div class="topic-bar" id="topicBar" hidden></div>
+  <div class="controls">
+    <input id="search" class="search" type="search" placeholder="搜索发展目标、教育建议或课程内容…" autocomplete="off">
+    <div class="grade-row" id="grades"></div>
+    <div class="filter-row">
+      <select id="subject" aria-label="科目" hidden></select>
+      <select id="domain" aria-label="领域"></select>
+      <select id="topic" aria-label="主题" hidden></select>
+      <select id="aspect" aria-label="方面"></select>
+      <select id="goal" aria-label="目标"></select>
+      <select id="type" aria-label="类型"></select>
+      <label class="toggle"><input type="checkbox" id="favOnly">只看收藏</label>
+    </div>
+  </div>
+</header>
+<main>
+  <div id="content"></div>
+  <button class="more" id="more" hidden>显示更多</button>
+  <p class="footer-note" id="footer"></p>
+</main>
+<script src="data/preschool-inline.js"></script>
+<script src="data/primary-secondary-inline.js"></script>
+<script>
+(function () {
+  var PS = window.PRESCHOOL_DATA;
+  var SS = window.PRIMARY_SECONDARY_DATA;
+  var SS_STAGE_KEYS = ["x1", "x2", "x3", "j1", "all"];
+  var SS_STAGE_LABELS = {
+    x1: "小学低段",
+    x2: "小学中段",
+    x3: "小学高段",
+    j1: "初中",
+    all: "全学段通用"
+  };
+  var GRADES = [
+    { key: "小班", label: "小班", view: "preschool" },
+    { key: "中班", label: "中班", view: "preschool" },
+    { key: "大班", label: "大班", view: "preschool" },
+    { key: "x1", label: "小学低段", view: "subjects" },
+    { key: "x2", label: "小学中段", view: "subjects" },
+    { key: "x3", label: "小学高段", view: "subjects" },
+    { key: "j1", label: "初中", view: "subjects" }
+  ];
+  var GRADE_MAP = {};
+  GRADES.forEach(function (g) { GRADE_MAP[g.key] = g; });
+  var TOTAL_ITEMS = PS.items.length + SS.items.length;
+  var SUBJECT_ORDER = ["语文", "数学", "英语"];
+  var SUBJECT_COLORS = { "语文": "#8b4c4c", "数学": "#8c704a", "英语": "#6e6a8c" };
+  var DOMAIN_COLORS = {
+    "健康": "#8a5a5a",
+    "语言": "#6e6a8c",
+    "社会": "#8c704a",
+    "科学": "#5c7a72",
+    "艺术": "#8e6170"
+  };
+  var FAV_KEY = "cn-curriculum-favs";
+  var LIMIT = 600;
+  var FOLD_CHARS = 260;
+  var FOLD_PREVIEW = 240;
+
+  var favs = {};
+  try { favs = JSON.parse(localStorage.getItem(FAV_KEY) || "{}"); } catch (e) { favs = {}; }
+
+  var state = {
+    grade: GRADES[0].key,
+    subject: "",
+    domain: "",
+    aspect: "",
+    goal: "",
+    topic: "",
+    type: "",
+    q: "",
+    favOnly: false,
+    limit: LIMIT
+  };
+
+  function asArray(v) { return v == null ? [] : (Array.isArray(v) ? v : [v]); }
+  function unique(list) {
+    var out = [];
+    list.forEach(function (x) { if (out.indexOf(x) < 0) out.push(x); });
+    return out;
+  }
+
+  var PS_DOMAIN_ORDER = unique(PS.items.map(function (i) { return i.domain; }));
+  var PS_ASPECT_ORDER = unique(PS.items.map(function (i) { return i.domain + "|" + i.aspect; }));
+  var SS_DOMAIN_ORDER = unique(SS.items.map(function (i) { return i.domain; }));
+  var SS_TOPIC_ORDER = unique(SS.items.map(function (i) { return i.subject + "|" + i.domain + "|" + i.topic; }));
+  function gradeCfg() { return GRADE_MAP[state.grade]; }
+  function currentView() { return gradeCfg().view; }
+
+  function psGoalKey(i) { return i.domain + "|" + i.aspect + "|" + i.goal_no; }
+
+  var VIEWS = {
+    preschool: {
+      placeholder: "搜索发展目标或教育建议…",
+      data: PS,
+      items: PS.items,
+      matchStage: function (i) {
+        return i.type === "suggestion" || i.stage === state.grade;
+      },
+      goalKey: psGoalKey,
+      typeOrder: ["goal", "suggestion"],
+      typeLabels: { goal: "发展水平", suggestion: "教育建议" },
+      searchFields: function (i) {
+        return [i.text, i.goal, i.domain, i.aspect, i.stage, (i.examples || []).join(" ")];
+      },
+      source: function (i) { return PS.meta.source; },
+      sourceNote: PS.meta.source.document_no
+    },
+    subjects: {
+      placeholder: "搜索语文、数学、英语的内容要求…",
+      data: SS,
+      items: SS.items,
+      matchStage: function (i) {
+        return i.stage_key === state.grade || i.stage_key === "all";
+      },
+      goalKey: function () { return ""; },
+      typeOrder: ["stage_requirement", "content", "academic", "tip", "theme", "note"],
+      typeLabels: SS.meta.type_names || {},
+      searchFields: function (i) {
+        return [i.text, i.subject, i.stage, i.domain, i.topic, i.type];
+      },
+      source: function (i) {
+        return (SS.meta.sources || []).filter(function (s) { return s.id === i.source_id; })[0] || null;
+      },
+      sourceNote: "2022 年版课程标准"
+    }
+  };
+
+  function cfg() { return VIEWS[currentView()]; }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function typeLabel(t) {
+    var labels = cfg().typeLabels;
+    return labels[t] || t;
+  }
+  function stageText(i) {
+    if (currentView() === "preschool") return i.stage ? i.stage + " · " + i.age : "各年龄段通用";
+    return i.stage || "";
+  }
+  function groupColor(domain, subject) {
+    if (subject) return SUBJECT_COLORS[subject] || "#8b4c4c";
+    return DOMAIN_COLORS[domain] || "#8b4c4c";
+  }
+
+  function readParams() {
+    var p = new URLSearchParams(location.search);
+    var g = p.get("grade");
+    // Old links used view=preschool&stage=...; keep them working.
+    if (!g && p.get("view") === "preschool") g = p.get("stage");
+    state.grade = GRADE_MAP[g] ? g : GRADES[0].key;
+    state.q = p.get("q") || "";
+    state.favOnly = false;
+
+    var c = cfg();
+    var subject = p.get("subject");
+    state.subject = currentView() === "subjects" && subject && SUBJECT_ORDER.indexOf(subject) >= 0 ? subject : "";
+    state.domain = p.get("domain") || "";
+    state.topic = p.get("topic") || "";
+    state.aspect = p.get("aspect") || "";
+    state.goal = p.get("goal") || "";
+    var type = p.get("type") || "";
+    state.type = type && c.typeOrder.indexOf(type) >= 0 ? type : "";
+    document.getElementById("search").value = state.q;
+    document.getElementById("favOnly").checked = false;
+  }
+
+  function syncUrl() {
+    try {
+      var p = new URLSearchParams();
+      p.set("grade", state.grade);
+      if (state.subject) p.set("subject", state.subject);
+      if (state.domain) p.set("domain", state.domain);
+      if (state.aspect) p.set("aspect", state.aspect);
+      if (state.goal) p.set("goal", state.goal);
+      if (state.topic) p.set("topic", state.topic);
+      if (state.type) p.set("type", state.type);
+      if (state.q) p.set("q", state.q);
+      history.replaceState(null, "", location.href.split("?")[0] + "?" + p.toString());
+    } catch (e) {}
+  }
+
+  function applyGrade(gradeKey) {
+    if (!GRADE_MAP[gradeKey] || gradeKey === state.grade) return;
+    state.grade = gradeKey;
+    state.subject = "";
+    state.domain = "";
+    state.aspect = "";
+    state.goal = "";
+    state.topic = "";
+    state.type = "";
+    state.q = "";
+    state.favOnly = false;
+    state.limit = LIMIT;
+    document.getElementById("search").value = "";
+    document.getElementById("favOnly").checked = false;
+    updateChrome();
+    buildGradeChips();
+    refreshFilters();
+  }
+
+  function commonFiltered(skip) {
+    skip = skip || {};
+    var c = cfg();
+    var q = state.q.trim().toLowerCase();
+    return c.items.filter(function (i) {
+      if (!c.matchStage(i)) return false;
+      if (currentView() === "subjects" && !skip.subject && state.subject && i.subject !== state.subject) return false;
+      if (!skip.domain && state.domain && i.domain !== state.domain) return false;
+      if (currentView() === "preschool") {
+        if (!skip.aspect && state.aspect && i.aspect !== state.aspect) return false;
+        if (!skip.goal && state.goal && c.goalKey(i) !== state.goal) return false;
+      } else {
+        if (!skip.topic && state.topic && i.topic !== state.topic) return false;
+      }
+      if (!skip.type && state.type && i.type !== state.type) return false;
+      if (!skip.favOnly && state.favOnly && !favs[i.uid]) return false;
+      if (!skip.q && q) {
+        var hay = c.searchFields(i).join(" ").toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+  function filteredItems() { return commonFiltered({}); }
+
+  function updateChrome() {
+    var c = cfg();
+    document.title = "中国课程标准知识速查";
+    document.getElementById("search").placeholder = c.placeholder;
+    document.getElementById("subject").hidden = currentView() !== "subjects";
+    document.getElementById("topic").hidden = currentView() !== "subjects";
+    document.getElementById("aspect").hidden = currentView() !== "preschool";
+    document.getElementById("goal").hidden = currentView() !== "preschool";
+  }
+
+  function buildGradeChips() {
+    var box = document.getElementById("grades");
+    box.innerHTML = GRADES.map(function (g) {
+      return '<button class="chip' + (g.key === state.grade ? " active" : "") +
+        '" data-grade="' + esc(g.key) + '">' + esc(g.label) + "</button>";
+    }).join("");
+    Array.prototype.forEach.call(box.querySelectorAll(".chip"), function (chip) {
+      chip.addEventListener("click", function () { applyGrade(chip.dataset.grade); });
+    });
+  }
+
+  function setSelect(id, label, list, value, counts, keyOf) {
+    var sel = document.getElementById(id);
+    var items = list || [];
+    sel.innerHTML = '<option value="">全部' + esc(label) + " (" + items.length + ")</option>" +
+      items.map(function (x) {
+        var key = keyOf ? keyOf(x) : x;
+        var text = keyOf ? x.label : x;
+        return '<option value="' + esc(key) + '">' + esc(text) + " (" + (counts[key] || 0) + ")</option>";
+      }).join("");
+    sel.value = value || "";
+  }
+
+  function buildSubjects() {
+    if (currentView() !== "subjects") return;
+    var counts = {};
+    commonFiltered({ subject: true }).forEach(function (i) {
+      counts[i.subject] = (counts[i.subject] || 0) + 1;
+    });
+    if (state.subject && !counts[state.subject]) {
+      state.subject = "";
+      state.domain = "";
+      state.topic = "";
+    }
+    var list = SUBJECT_ORDER.filter(function (s) { return counts[s]; });
+    setSelect("subject", "科目", list, state.subject, counts);
+  }
+
+  function buildDomains() {
+    var counts = {};
+    commonFiltered({ domain: true, aspect: true, goal: true, topic: true }).forEach(function (i) {
+      counts[i.domain] = (counts[i.domain] || 0) + 1;
+    });
+    if (state.domain && !counts[state.domain]) {
+      state.domain = "";
+      state.aspect = "";
+      state.goal = "";
+      state.topic = "";
+    }
+    var order = currentView() === "preschool" ? PS_DOMAIN_ORDER : SS_DOMAIN_ORDER;
+    var list = order.filter(function (d) { return counts[d]; });
+    setSelect("domain", "领域", list, state.domain, counts);
+  }
+
+  function buildAspects() {
+    if (currentView() !== "preschool") return;
+    var counts = {};
+    commonFiltered({ aspect: true, goal: true }).forEach(function (i) {
+      if (!state.domain || i.domain === state.domain) counts[i.aspect] = (counts[i.aspect] || 0) + 1;
+    });
+    if (state.aspect && !counts[state.aspect]) { state.aspect = ""; state.goal = ""; }
+    var list = PS_ASPECT_ORDER.filter(function (a) {
+      var parts = a.split("|");
+      return counts[parts[1]] && (!state.domain || parts[0] === state.domain);
+    }).map(function (a) { return a.split("|")[1]; });
+    setSelect("aspect", "方面", list, state.aspect, counts);
+  }
+
+  function buildGoals() {
+    if (currentView() !== "preschool") return;
+    var counts = {};
+    var labels = {};
+    commonFiltered({ goal: true }).forEach(function (i) {
+      var k = cfg().goalKey(i);
+      counts[k] = (counts[k] || 0) + 1;
+      labels[k] = "目标" + i.goal_no + " " + i.goal;
+    });
+    if (state.goal && !counts[state.goal]) state.goal = "";
+    var list = Object.keys(counts).map(function (k) { return { key: k, label: labels[k] }; });
+    setSelect("goal", "目标", list, state.goal, counts, function (x) { return x.key; });
+  }
+
+  function buildTopics() {
+    if (currentView() !== "subjects") return;
+    var counts = {};
+    var labels = {};
+    commonFiltered({ topic: true }).forEach(function (i) {
+      if (state.domain && i.domain !== state.domain) return;
+      var k = i.subject + "|" + i.domain + "|" + i.topic;
+      counts[k] = (counts[k] || 0) + 1;
+      labels[k] = i.topic;
+    });
+    if (state.topic && !Object.keys(counts).some(function (k) {
+      return k.split("|")[2] === state.topic;
+    })) state.topic = "";
+    var displayCounts = {};
+    var displayOrder = [];
+    SS_TOPIC_ORDER.forEach(function (k) {
+      var parts = k.split("|");
+      if (!counts[k] || (state.subject && parts[0] !== state.subject) ||
+          (state.domain && parts[1] !== state.domain)) return;
+      var t = k.split("|")[2];
+      if (displayOrder.indexOf(t) < 0) displayOrder.push(t);
+      displayCounts[t] = (displayCounts[t] || 0) + counts[k];
+    });
+    var list = displayOrder.map(function (t) { return { key: t, label: labels[t] || t }; });
+    setSelect("topic", "主题", list, state.topic, displayCounts, function (x) { return x.key; });
+  }
+
+  function buildTypes() {
+    var counts = {};
+    var c = cfg();
+    commonFiltered({ type: true }).forEach(function (i) { counts[i.type] = (counts[i.type] || 0) + 1; });
+    if (state.type && !counts[state.type]) state.type = "";
+    var order = c.typeOrder.concat(Object.keys(counts).filter(function (t) {
+      return c.typeOrder.indexOf(t) < 0;
+    }));
+    var list = order.filter(function (t) { return counts[t]; }).map(function (t) {
+      return { key: t, label: typeLabel(t) };
+    });
+    setSelect("type", "类型", list, state.type, counts, function (x) { return x.key; });
+  }
+
+  function renderTopicBar() {
+    var bar = document.getElementById("topicBar");
+    var current = currentView() === "preschool" ? state.goal : state.topic;
+    if (!current) { bar.hidden = true; bar.innerHTML = ""; return; }
+    var label = current;
+    if (currentView() === "preschool") {
+      for (var k = 0; k < cfg().items.length; k++) {
+        var i = cfg().items[k];
+        if (cfg().goalKey(i) === current) {
+          label = i.domain + " · " + i.aspect + " · 目标" + i.goal_no + " " + i.goal;
+          break;
+        }
+      }
+    } else {
+      label = gradeCfg().label + " · " + (state.domain ? state.domain + " · " : "") + current;
+    }
+    bar.hidden = false;
+    bar.innerHTML = "<span>当前" + (currentView() === "preschool" ? "目标" : "主题") + "：<b>" +
+      esc(label) + "</b></span><button id=\"clearCurrent\">清除" +
+      (currentView() === "preschool" ? "目标" : "主题") + "</button>";
+    document.getElementById("clearCurrent").addEventListener("click", function () {
+      if (currentView() === "preschool") state.goal = "";
+      else state.topic = "";
+      refreshFilters();
+    });
+  }
+
+  function itemHtml(i) {
+    var exs = asArray(i.examples);
+    var text = i.text || "";
+    var foldText = text.length > FOLD_CHARS;
+    var collapsed = foldText || exs.join("").length > 180;
+    var textHtml = foldText
+      ? '<span class="preview-only">' + esc(text.slice(0, FOLD_PREVIEW)) + "…</span>" +
+        '<span class="full-only">' + esc(text) + "</span>"
+      : esc(text);
+    var examplesHtml = exs.length
+      ? '<ul class="examples' + (collapsed ? " full-only" : "") + '">' +
+        exs.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>"
+      : "";
+    var previewHtml = exs.length > 0 && collapsed && !foldText
+      ? '<div class="preview-only example-preview">含 ' + exs.length + " 条举例，展开查看</div>"
+      : "";
+    var refHtml = i.reference
+      ? '<div class="reference">参考标准<ul>' + asArray(i.reference).map(function (r) {
+          return "<li>" + esc(r) + "</li>";
+        }).join("") + "</ul></div>"
+      : "";
+    var badges = '<span class="badge type-' + esc(i.type) + '">' + esc(typeLabel(i.type)) + "</span>";
+    if (currentView() === "subjects") badges += '<span class="badge">' + esc(i.subject) + "</span>";
+    badges += '<span class="badge">' + esc(stageText(i)) + "</span>";
+    var src = cfg().source(i);
+    var linkHtml = src && src.url
+      ? ' · <a href="' + esc(src.url) + '" target="_blank" rel="noopener noreferrer">官方来源 ↗</a>'
+      : "";
+    return '<li class="item' + (collapsed ? " collapsed" : "") + '" data-id="' + esc(i.uid) + '">' +
+      '<button class="fav' + (favs[i.uid] ? " on" : "") + '" title="收藏">' + (favs[i.uid] ? "★" : "☆") + "</button>" +
+      '<div class="item-body">' +
+      '<div class="badges">' + badges + "</div>" +
+      '<div class="text">' + textHtml + "</div>" +
+      examplesHtml + previewHtml + refHtml +
+      (collapsed ? '<button class="expand-btn">展开全文</button>' : "") +
+      '<div class="meta">p.' + esc(i.source_page) + " · " +
+      esc(src && src.title ? src.title : cfg().data.meta.title) + linkHtml + "</div>" +
+      "</div></li>";
+  }
+
+  function bindItemActions(box) {
+    Array.prototype.forEach.call(box.querySelectorAll(".fav"), function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.closest("li").dataset.id;
+        if (favs[id]) { delete favs[id]; btn.classList.remove("on"); btn.textContent = "☆"; }
+        else { favs[id] = 1; btn.classList.add("on"); btn.textContent = "★"; }
+        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+        if (state.favOnly) refreshFilters();
+      });
+    });
+    Array.prototype.forEach.call(box.querySelectorAll(".expand-btn"), function (btn) {
+      btn.addEventListener("click", function () {
+        var li = btn.closest("li.item");
+        var isCollapsed = li.classList.toggle("collapsed");
+        btn.textContent = isCollapsed ? "展开全文" : "收起";
+      });
+    });
+  }
+
+  function renderPreschool(shown) {
+    var tree = {};
+    shown.forEach(function (i) {
+      tree[i.domain] = tree[i.domain] || { count: 0, aspects: {} };
+      tree[i.domain].count++;
+      tree[i.domain].aspects[i.aspect] = tree[i.domain].aspects[i.aspect] || { goals: {} };
+      var g = cfg().goalKey(i);
+      tree[i.domain].aspects[i.aspect].goals[g] = tree[i.domain].aspects[i.aspect].goals[g] || {
+        no: i.goal_no, goal: i.goal, items: []
+      };
+      tree[i.domain].aspects[i.aspect].goals[g].items.push(i);
+    });
+    var html = "";
+    PS_DOMAIN_ORDER.forEach(function (domain) {
+      if (!tree[domain]) return;
+      var aspectHtml = "";
+      PS_ASPECT_ORDER.forEach(function (a) {
+        var parts = a.split("|");
+        if (parts[0] !== domain || !tree[domain].aspects[parts[1]]) return;
+        var goalHtml = "";
+        Object.keys(tree[domain].aspects[parts[1]].goals).forEach(function (k) {
+          var grp = tree[domain].aspects[parts[1]].goals[k];
+          goalHtml += '<div class="goal-title">目标' + esc(grp.no) + " " + esc(grp.goal) +
+            ' <span>(' + grp.items.length + ")</span></div>" +
+            '<ul class="items">' + grp.items.map(itemHtml).join("") + "</ul>";
+        });
+        aspectHtml += '<div class="aspect-group"><div class="aspect-title">' + esc(parts[1]) +
+          "</div>" + goalHtml + "</div>";
+      });
+      html += '<details class="domain" open style="--domain-color:' + groupColor(domain) +
+        '"><summary>' + esc(domain) + '<span class="domain-count">' + tree[domain].count +
+        " 条</span></summary>" + aspectHtml + "</details>";
+    });
+    return html;
+  }
+
+  function renderSubjects(shown) {
+    var tree = {};
+    shown.forEach(function (i) {
+      tree[i.subject] = tree[i.subject] || { count: 0, stages: {} };
+      tree[i.subject].count++;
+      var st = tree[i.subject].stages[i.stage_key] || { count: 0, domains: {} };
+      tree[i.subject].stages[i.stage_key] = st;
+      st.count++;
+      var dm = st.domains[i.domain] || { count: 0, topics: {} };
+      st.domains[i.domain] = dm;
+      dm.count++;
+      dm.topics[i.topic] = dm.topics[i.topic] || [];
+      dm.topics[i.topic].push(i);
+    });
+    var html = "";
+    SUBJECT_ORDER.forEach(function (subject) {
+      if (!tree[subject]) return;
+      var stageHtml = "";
+      SS_STAGE_KEYS.forEach(function (sk) {
+        if (!tree[subject].stages[sk]) return;
+        var stage = tree[subject].stages[sk];
+        var domainHtml = "";
+        SS_DOMAIN_ORDER.forEach(function (domain) {
+          if (!stage.domains[domain]) return;
+          var dm = stage.domains[domain];
+          var topicHtml = "";
+          SS_TOPIC_ORDER.forEach(function (k) {
+            var parts = k.split("|");
+            if (parts[0] !== subject || parts[1] !== domain || !dm.topics[parts[2]]) return;
+            topicHtml += '<div class="topic-title">' + esc(parts[2]) + " (" +
+              dm.topics[parts[2]].length + ")</div>" +
+              '<ul class="items">' + dm.topics[parts[2]].map(itemHtml).join("") + "</ul>";
+          });
+          domainHtml += '<div class="goal-title">' + esc(domain) + " <span>(" +
+            dm.count + ")</span></div>" + topicHtml;
+        });
+        stageHtml += '<div class="aspect-group"><div class="aspect-title">' +
+          esc(SS_STAGE_LABELS[sk] || sk) + " · " + stage.count + " 条</div>" +
+          domainHtml + "</div>";
+      });
+      html += '<details class="domain" open style="--domain-color:' + groupColor("", subject) +
+        '"><summary>' + esc(subject) + '<span class="domain-count">' + tree[subject].count +
+        " 条</span></summary>" + stageHtml + "</details>";
+    });
+    return html;
+  }
+
+  function render() {
+    var list = filteredItems();
+    var shown = list.slice(0, state.limit);
+    var box = document.getElementById("content");
+    document.getElementById("count").textContent = list.length + " 条 / 全库 " + TOTAL_ITEMS + " 条";
+    var moreBtn = document.getElementById("more");
+    moreBtn.hidden = list.length <= shown.length;
+    if (!moreBtn.hidden) moreBtn.textContent = "显示更多（还有 " + (list.length - shown.length) + " 条）";
+    if (!shown.length) {
+      box.innerHTML = '<div class="empty">没有匹配的内容，换个筛选条件试试。</div>';
+    } else {
+      box.innerHTML = currentView() === "preschool" ? renderPreschool(shown) : renderSubjects(shown);
+      bindItemActions(box);
+    }
+    var src = currentView() === "preschool"
+      ? PS.meta.source
+      : (SS.meta.sources && SS.meta.sources[0]);
+    var sourceTitle = currentView() === "preschool"
+      ? "教育部《3-6岁儿童学习与发展指南》"
+      : "教育部《义务教育课程方案和课程标准（2022年版）》通知";
+    var warning = currentView() === "preschool"
+      ? "非官方整理，若有出入以原文为准"
+      : "非官方整理，OCR 抽取可能有个别错字，若有出入以原文为准";
+    document.getElementById("footer").innerHTML =
+      "来源：<a href=\"" + esc(src && src.url ? src.url : "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" +
+      esc(sourceTitle) + "</a> · " + esc(cfg().sourceNote) + " · " + warning +
+      " · 收藏保存在本机浏览器 · " + '<a href="attribution.html">来源与版权</a>';
+  }
+
+  function refreshFilters() {
+    state.limit = LIMIT;
+    if (currentView() === "subjects") buildSubjects();
+    buildDomains();
+    buildAspects();
+    buildTopics();
+    buildGoals();
+    buildTypes();
+    render();
+    renderTopicBar();
+    syncUrl();
+  }
+
+  var timer;
+  document.getElementById("search").addEventListener("input", function (e) {
+    clearTimeout(timer);
+    timer = setTimeout(function () { state.q = e.target.value; refreshFilters(); }, 180);
+  });
+  document.getElementById("subject").addEventListener("change", function (e) {
+    state.subject = e.target.value;
+    state.domain = "";
+    state.topic = "";
+    refreshFilters();
+  });
+  document.getElementById("domain").addEventListener("change", function (e) {
+    state.domain = e.target.value;
+    state.aspect = "";
+    state.goal = "";
+    state.topic = "";
+    refreshFilters();
+  });
+  document.getElementById("aspect").addEventListener("change", function (e) {
+    state.aspect = e.target.value;
+    state.goal = "";
+    refreshFilters();
+  });
+  document.getElementById("goal").addEventListener("change", function (e) {
+    state.goal = e.target.value;
+    refreshFilters();
+  });
+  document.getElementById("topic").addEventListener("change", function (e) {
+    state.topic = e.target.value;
+    refreshFilters();
+  });
+  document.getElementById("type").addEventListener("change", function (e) {
+    state.type = e.target.value;
+    refreshFilters();
+  });
+  document.getElementById("favOnly").addEventListener("change", function (e) {
+    state.favOnly = e.target.checked;
+    refreshFilters();
+  });
+  document.getElementById("more").addEventListener("click", function () {
+    state.limit += LIMIT;
+    render();
+  });
+
+  var controls = document.querySelector(".controls");
+  var filterToggle = document.getElementById("filterToggle");
+  var mobileQuery = window.matchMedia("(max-width: 640px)");
+  var filtersExpanded = true;
+  var manualExpanded = false;
+  var lastY = window.scrollY;
+  var collapseTimer = null;
+  var heightTimer = null;
+
+  function cancelCollapse() {
+    if (collapseTimer) { clearTimeout(collapseTimer); collapseTimer = null; }
+  }
+  function applyFilterState() {
+    filterToggle.textContent = filtersExpanded ? "▴" : "▾";
+    filterToggle.setAttribute("aria-expanded", filtersExpanded ? "true" : "false");
+    filterToggle.setAttribute("aria-label", filtersExpanded ? "收起筛选" : "展开筛选");
+    controls.classList.toggle("filters-collapsed", !filtersExpanded);
+    if (!mobileQuery.matches) {
+      clearTimeout(heightTimer);
+      controls.style.maxHeight = "";
+      controls.inert = false;
+      return;
+    }
+    controls.inert = !filtersExpanded;
+    clearTimeout(heightTimer);
+    var h = controls.scrollHeight;
+    controls.style.maxHeight = h + "px";
+    if (filtersExpanded) {
+      heightTimer = setTimeout(function () {
+        if (filtersExpanded && mobileQuery.matches) controls.style.maxHeight = "none";
+      }, 240);
+    } else {
+      void controls.offsetHeight;
+      controls.style.maxHeight = "0px";
+    }
+  }
+  function scheduleCollapse() {
+    if (collapseTimer) return;
+    collapseTimer = setTimeout(function () {
+      collapseTimer = null;
+      if (window.scrollY > 100 && !manualExpanded && filtersExpanded) {
+        filtersExpanded = false;
+        applyFilterState();
+      }
+    }, 120);
+  }
+  filterToggle.addEventListener("click", function () {
+    cancelCollapse();
+    filtersExpanded = !filtersExpanded;
+    manualExpanded = filtersExpanded;
+    applyFilterState();
+  });
+  window.addEventListener("scroll", function () {
+    var y = window.scrollY;
+    var scrollingDown = y > lastY;
+    lastY = y;
+    if (y <= 10) {
+      cancelCollapse();
+      if (!filtersExpanded || manualExpanded) {
+        filtersExpanded = true;
+        manualExpanded = false;
+        applyFilterState();
+      }
+    } else if (scrollingDown && y > 100 && !manualExpanded && filtersExpanded) {
+      scheduleCollapse();
+    } else if (!scrollingDown) {
+      cancelCollapse();
+    }
+  }, { passive: true });
+  if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", applyFilterState);
+  else mobileQuery.addListener(applyFilterState);
+
+  readParams();
+  updateChrome();
+  buildGradeChips();
+  refreshFilters();
+  applyFilterState();
+})();
+</script>
+</body>
+</html>

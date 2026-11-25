@@ -23,3 +23,6 @@ zh/core-knowledge/translations/
 zh/core-knowledge/data/knowledge-before-*.json
 zh/core-knowledge/scripts/__pycache__/
 *.pyc
+
+# China curriculum tool: official source PDFs/docs and downloaded pages (not committed)
+zh/china-curriculum/source/
