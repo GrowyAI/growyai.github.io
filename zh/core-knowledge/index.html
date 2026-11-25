@@ -12,8 +12,8 @@
     --border: #dfe4ea;
     --text: #1f2933;
     --muted: #64748b;
-    --accent: #2563eb;
-    --accent-soft: #e8f0fe;
+    --accent: #42657d;
+    --accent-soft: #e9eff3;
     --amber: #b45309;
     --amber-soft: #fef3c7;
     --green: #15803d;
@@ -226,7 +226,7 @@
   .lightbox .caption {
     max-width: 720px; color: #e2e8f0; font-size: 13px; line-height: 1.5; text-align: center;
   }
-  .lightbox .caption a { color: #93c5fd; }
+  .lightbox .caption a { color: #b6cad6; }
   .lightbox-close {
     position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px;
     width: 38px; height: 38px; border-radius: 999px;
@@ -401,7 +401,7 @@
     for (var k = 0; k < keys.length; k++) {
       if (subject.indexOf(keys[k]) === 0) return SUBJECT_COLORS[keys[k]];
     }
-    return "#2563eb";
+    return "#42657d";
   }
   function topicZh(topic) { return (window.TOPIC_ZH && window.TOPIC_ZH[topic]) || ""; }
   function topicLabel(topic) {

@@ -7,7 +7,7 @@
 <style>
   :root {
     --bg: #f6f8fb; --surface: #fff; --border: #e2e8f0; --text: #0f172a;
-    --muted: #64748b; --accent: #2563eb; --accent-soft: #eff6ff;
+    --muted: #64748b; --accent: #42657d; --accent-soft: #eef3f6;
     --amber: #b45309; --amber-soft: #fffbeb; --radius: 12px;
   }
   * { box-sizing: border-box; }
@@ -41,12 +41,12 @@
     padding: 9px 10px; cursor: pointer; color: var(--text);
   }
   .cell:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .cell.core { border-color: var(--sc, #bfdbfe); background: #f8fbff; }
+  .cell.core { border-color: var(--sc, #c6d6e0); background: #f7fafb; }
   .cell-name { font-size: 13px; font-weight: 600; color: var(--sc, var(--text)); }
   .cell-name .star { color: var(--sc, var(--accent)); }
   .cell-en { font-size: 10px; color: var(--muted); margin: 2px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cell-counts { font-size: 11px; color: var(--muted); display: flex; gap: 8px; }
-  .bar { height: 3px; border-radius: 2px; background: #dbeafe; margin-top: 7px; }
+  .bar { height: 3px; border-radius: 2px; background: #dce6ec; margin-top: 7px; }
   .bar span { display: block; height: 100%; background: var(--sc, var(--accent)); border-radius: 2px; }
   .preschool { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
   .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 20; }
@@ -190,7 +190,7 @@
     for (var k = 0; k < keys.length; k++) {
       if (s.indexOf(keys[k]) === 0) return SUBJECT_COLORS[keys[k]];
     }
-    return "#2563eb";
+    return "#42657d";
   }
   function zh(s) { return ZH[s] || ""; }
   function esc(s) {

@@ -31,7 +31,7 @@
   .stat b { display: block; font-size: 17px; color: var(--text); }
   h2 { font-size: 15px; margin: 22px 0 10px; }
   .matrix-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
-  table { border-collapse: collapse; width: 100%; min-width: 720px; }
+  table { border-collapse: collapse; width: 100%; min-width: 1180px; }
   table.ps { min-width: 680px; }
   th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; }
   th { background: var(--surface-2); font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
@@ -157,8 +157,19 @@
     { key: "x3", label: "小学高段" },
     { key: "j1", label: "初中" }
   ];
-  var SUBJECT_ORDER = ["语文", "数学", "英语"];
-  var SUBJECT_COLORS = { "语文": "#8b4c4c", "数学": "#8c704a", "英语": "#6e6a8c" };
+  var SUBJECT_ORDER = [
+    "语文", "数学", "英语", "道德与法治", "历史", "地理",
+    "科学", "物理", "化学", "生物学", "信息科技",
+    "体育与健康", "艺术", "劳动", "日语", "俄语"
+  ];
+  var SUBJECT_COLORS = {
+    "语文": "#8b4c4c", "数学": "#8c704a", "英语": "#6e6a8c",
+    "道德与法治": "#9a5b5b", "历史": "#7d6a4f", "地理": "#557a76",
+    "科学": "#6a7e9c", "物理": "#7a6a9c", "化学": "#a06b5a",
+    "生物学": "#5f8a6a", "信息科技": "#8a6f8f",
+    "体育与健康": "#8a614f", "艺术": "#9a6275", "劳动": "#6f8159",
+    "日语": "#7b718f", "俄语": "#627f8c"
+  };
   var DOMAIN_COLORS = {
     "健康": "#8a5a5a", "语言": "#6e6a8c", "社会": "#8c704a",
     "科学": "#5c7a72", "艺术": "#8e6170"

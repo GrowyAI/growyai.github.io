@@ -275,8 +275,19 @@
   var GRADE_MAP = {};
   GRADES.forEach(function (g) { GRADE_MAP[g.key] = g; });
   var TOTAL_ITEMS = PS.items.length + SS.items.length;
-  var SUBJECT_ORDER = ["语文", "数学", "英语"];
-  var SUBJECT_COLORS = { "语文": "#8b4c4c", "数学": "#8c704a", "英语": "#6e6a8c" };
+  var SUBJECT_ORDER = [
+    "语文", "数学", "英语", "道德与法治", "历史", "地理",
+    "科学", "物理", "化学", "生物学", "信息科技",
+    "体育与健康", "艺术", "劳动", "日语", "俄语"
+  ];
+  var SUBJECT_COLORS = {
+    "语文": "#8b4c4c", "数学": "#8c704a", "英语": "#6e6a8c",
+    "道德与法治": "#9a5b5b", "历史": "#7d6a4f", "地理": "#557a76",
+    "科学": "#6a7e9c", "物理": "#7a6a9c", "化学": "#a06b5a",
+    "生物学": "#5f8a6a", "信息科技": "#8a6f8f",
+    "体育与健康": "#8a614f", "艺术": "#9a6275", "劳动": "#6f8159",
+    "日语": "#7b718f", "俄语": "#627f8c"
+  };
   var DOMAIN_COLORS = {
     "健康": "#8a5a5a",
     "语言": "#6e6a8c",

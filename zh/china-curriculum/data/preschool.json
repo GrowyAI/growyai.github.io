@@ -33,6 +33,12 @@
     "item_types": {
       "goal": "小班/中班/大班在各目标下的发展水平条目",
       "suggestion": "对应目标的教育建议；举例放在 examples 字段"
+    },
+    "filter": {
+      "version": "concrete-v1",
+      "rule": "发展目标全部保留；教育建议带具体举例，或建议本身给出具体行动时展示。",
+      "kept": 420,
+      "excluded": 5
     }
   },
   "items": [
@@ -1419,18 +1425,6 @@
       "goal": "具有良好的生活与卫生习惯",
       "source_id": "moe-preschool-2012",
       "source_page": 9,
-      "uid": "ps-h-a3-g1-s-06",
-      "type": "suggestion",
-      "text": "帮助幼儿养成良好的个人卫生习惯。如：",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
       "uid": "ps-h-a3-g1-s-07",
       "type": "suggestion",
       "text": "早晚刷牙、饭后漱口。",
@@ -1458,18 +1452,6 @@
       "uid": "ps-h-a3-g1-s-09",
       "type": "suggestion",
       "text": "提醒幼儿保护五官，如不乱挖耳朵、鼻孔，看电视时保持3米左右的距离等。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-10",
-      "type": "suggestion",
-      "text": "激发幼儿参加体育活动的兴趣，养成锻炼的习惯。如：",
       "examples": []
     },
     {
@@ -1944,18 +1926,6 @@
       "uid": "ps-l-a1-g1-s-01",
       "type": "suggestion",
       "text": "多给幼儿提供倾听和交谈的机会。如：经常和幼儿一起谈论他感兴趣的话题，或一起看图书、讲故事。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-02",
-      "type": "suggestion",
-      "text": "引导幼儿学会认真倾听。如：",
       "examples": []
     },
     {
@@ -5641,18 +5611,6 @@
       "goal": "具有初步的艺术表现与创造能力",
       "source_id": "moe-preschool-2012",
       "source_page": 45,
-      "uid": "ps-a-a2-g2-s-01",
-      "type": "suggestion",
-      "text": "尊重幼儿自发的表现和创造，并给予适当的指导。如：",
-      "examples": []
-    },
-    {
-      "domain": "艺术",
-      "aspect": "表现与创造",
-      "goal_no": 2,
-      "goal": "具有初步的艺术表现与创造能力",
-      "source_id": "moe-preschool-2012",
-      "source_page": 45,
       "uid": "ps-a-a2-g2-s-02",
       "type": "suggestion",
       "text": "鼓励幼儿在生活中细心观察、体验，为艺术活动积累经验与素材。如，观察不同树种的形态、色彩等。",
@@ -5668,18 +5626,6 @@
       "uid": "ps-a-a2-g2-s-03",
       "type": "suggestion",
       "text": "提供丰富的材料，如图书、照片、绘画或音乐作品等，让幼儿自主选择，用自己喜欢的方式去模仿或创作，成人不做过多要求。",
-      "examples": []
-    },
-    {
-      "domain": "艺术",
-      "aspect": "表现与创造",
-      "goal_no": 2,
-      "goal": "具有初步的艺术表现与创造能力",
-      "source_id": "moe-preschool-2012",
-      "source_page": 45,
-      "uid": "ps-a-a2-g2-s-04",
-      "type": "suggestion",
-      "text": "根据幼儿的生活经验，与幼儿共同确定艺术表达表现的主题，引导幼儿围绕主题展开想象，进行艺术表现。",
       "examples": []
     },
     {
