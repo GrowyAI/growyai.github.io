@@ -1162,7 +1162,7 @@ GENERIC_PAGES = {
 }
 
 # Subjects whose content chapter is written for junior high only.
-JUNIOR_ONLY = {"history", "geography", "physics", "chemistry", "biology", "russian"}
+JUNIOR_ONLY = {"history", "geography", "physics", "chemistry", "biology", "japanese", "russian"}
 
 # Standards whose core content is published as two-column tables; OCR flattens
 # the columns, so keep one neutral item type instead of guessing the column.

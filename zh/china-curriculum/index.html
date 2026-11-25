@@ -257,20 +257,20 @@
   var SS = window.PRIMARY_SECONDARY_DATA;
   var SS_STAGE_KEYS = ["x1", "x2", "x3", "j1", "all"];
   var SS_STAGE_LABELS = {
-    x1: "小学低段",
-    x2: "小学中段",
-    x3: "小学高段",
-    j1: "初中",
+    x1: "1-2年级",
+    x2: "3-4年级",
+    x3: "5-6年级",
+    j1: "7-9年级",
     all: "全学段通用"
   };
   var GRADES = [
-    { key: "小班", label: "小班", view: "preschool" },
-    { key: "中班", label: "中班", view: "preschool" },
-    { key: "大班", label: "大班", view: "preschool" },
-    { key: "x1", label: "小学低段", view: "subjects" },
-    { key: "x2", label: "小学中段", view: "subjects" },
-    { key: "x3", label: "小学高段", view: "subjects" },
-    { key: "j1", label: "初中", view: "subjects" }
+    { key: "小班", label: "3-4岁", view: "preschool" },
+    { key: "中班", label: "4-5岁", view: "preschool" },
+    { key: "大班", label: "5-6岁", view: "preschool" },
+    { key: "x1", label: "1-2年级", view: "subjects" },
+    { key: "x2", label: "3-4年级", view: "subjects" },
+    { key: "x3", label: "5-6年级", view: "subjects" },
+    { key: "j1", label: "7-9年级", view: "subjects" }
   ];
   var GRADE_MAP = {};
   GRADES.forEach(function (g) { GRADE_MAP[g.key] = g; });
