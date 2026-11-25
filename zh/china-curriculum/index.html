@@ -167,10 +167,10 @@
   }
   .type-goal, .type-stage_requirement { background: var(--green-soft); color: var(--green); }
   .type-suggestion, .type-tip { background: var(--amber-soft); color: var(--amber); }
-  .type-content, .type-theme { background: var(--accent-soft); color: var(--accent); }
+  .type-content, .type-theme, .type-appendix { background: var(--accent-soft); color: var(--accent); }
   .type-academic { background: #eeeaf5; color: #6e6a8c; }
   .type-note { background: var(--surface-2); color: var(--muted); }
-  .text { font-size: 15px; color: var(--text); line-height: 1.45; }
+  .text { font-size: 15px; color: var(--text); line-height: 1.45; white-space: pre-line; }
   .examples {
     margin: 6px 0 0; padding-left: 18px;
     color: var(--muted); font-size: 13px; line-height: 1.5;
@@ -354,10 +354,11 @@
       data: SS,
       items: SS.items,
       matchStage: function (i) {
-        return i.stage_key === state.grade || i.stage_key === "all";
+        if (i.stage_key === state.grade || i.stage_key === "all") return true;
+        return i.stage_key === "p" && (state.grade === "x1" || state.grade === "x2" || state.grade === "x3");
       },
       goalKey: function () { return ""; },
-      typeOrder: ["stage_requirement", "content", "academic", "tip", "theme", "note"],
+      typeOrder: ["stage_requirement", "content", "academic", "tip", "theme", "note", "appendix"],
       typeLabels: SS.meta.type_names || {},
       searchFields: function (i) {
         return [i.text, i.subject, i.stage, i.domain, i.topic, i.type];

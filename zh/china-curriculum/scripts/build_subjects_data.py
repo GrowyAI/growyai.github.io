@@ -180,6 +180,7 @@ STAGES = OrderedDict([
     ("x2", "小学中段（3-4年级）"),
     ("x3", "小学高段（5-6年级）"),
     ("j1", "初中（7-9年级）"),
+    ("p", "小学1-6年级"),
     ("all", "全学段"),
 ])
 CN_STAGE_NUM = {"一": "x1", "二": "x2", "三": "x3", "四": "j1"}
@@ -191,6 +192,7 @@ TYPE_NAMES = {
     "tip": "教学提示",
     "theme": "主题与载体",
     "note": "阶段说明",
+    "appendix": "课标附录",
 }
 
 # OCR confusions seen in the scanned standards. Only unambiguous visual errors
@@ -223,6 +225,209 @@ CORRECTIONS = {
     "新兴体育类运助": "新兴体育类运动",
     "不解奋斗": "不懈奋斗",
 }
+
+
+# --- Appendix data -------------------------------------------------------
+# The scanned appendices of the MOE Chinese standard are not reliably
+# machine-readable.  The lists below are curated from the official PDF
+# (appendices 1-5) and cross-checked against the official table descriptions.
+# They are kept here so the public data layer stays deterministic.
+
+APPENDIX_POEMS_PRIMARY = """
+江南(江南可采莲)|汉乐府
+长歌行(青青园中葵)|汉乐府
+敕勒歌(敕勒川)|北朝民歌
+咏鹅(鹅鹅鹅)|骆宾王
+风(解落三秋叶)|李峤
+咏柳(碧玉妆成一树高)|贺知章
+回乡偶书(少小离家老大回)|贺知章
+凉州词(黄河远上白云间)|王之涣
+登鹳雀楼(白日依山尽)|王之涣
+春晓(春眠不觉晓)|孟浩然
+凉州词(葡萄美酒夜光杯)|王翰
+出塞(秦时明月汉时关)|王昌龄
+芙蓉楼送辛渐(寒雨连江夜入吴)|王昌龄
+鹿柴(空山不见人)|王维
+送元二使安西(渭城朝雨浥轻尘)|王维
+九月九日忆山东兄弟(独在异乡为异客)|王维
+静夜思(床前明月光)|李白
+古朗月行(小时不识月)|李白
+望庐山瀑布(日照香炉生紫烟)|李白
+赠汪伦(李白乘舟将欲行)|李白
+黄鹤楼送孟浩然之广陵(故人西辞黄鹤楼)|李白
+早发白帝城(朝辞白帝彩云间)|李白
+望天门山(天门中断楚江开)|李白
+别董大(千里黄云白日曛)|高适
+绝句(两个黄鹂鸣翠柳)|杜甫
+春夜喜雨(好雨知时节)|杜甫
+绝句(迟日江山丽)|杜甫
+江畔独步寻花(黄师塔前江水东)|杜甫
+枫桥夜泊(月落乌啼霜满天)|张继
+滁州西涧(独怜幽草涧边生)|韦应物
+渔歌子(西塞山前白鹭飞)|张志和
+塞下曲(月黑雁飞高)|卢纶
+游子吟(慈母手中线)|孟郊
+早春呈水部张十八员外(天街小雨润如酥)|韩愈
+望洞庭(湖光秋月两相和)|刘禹锡
+浪淘沙(九曲黄河万里沙)|刘禹锡
+赋得古原草送别(离离原上草)|白居易
+池上(小娃撑小艇)|白居易
+忆江南(江南好)|白居易
+小儿垂钓(蓬头稚子学垂纶)|胡令能
+悯农(锄禾日当午)|李绅
+悯农(春种一粒粟)|李绅
+江雪(千山鸟飞绝)|柳宗元
+寻隐者不遇(松下问童子)|贾岛
+山行(远上寒山石径斜)|杜牧
+清明(清明时节雨纷纷)|杜牧
+江南春(千里莺啼绿映红)|杜牧
+蜂(不论平地与山尖)|罗隐
+江上渔者(江上往来人)|范仲淹
+元日(爆竹声中一岁除)|王安石
+泊船瓜洲(京口瓜洲一水间)|王安石
+书湖阴先生壁(茅檐长扫净无苔)|王安石
+六月二十七日望湖楼醉书(黑云翻墨未遮山)|苏轼
+饮湖上初晴后雨(水光潋滟晴方好)|苏轼
+惠崇春江晚景(竹外桃花三两枝)|苏轼
+题西林壁(横看成岭侧成峰)|苏轼
+夏日绝句(生当作人杰)|李清照
+三衢道中(梅子黄时日日晴)|曾几
+示儿(死去元知万事空)|陆游
+秋夜将晓出篱门迎凉有感(三万里河东入海)|陆游
+四时田园杂兴(昼出耘田夜绩麻)|范成大
+四时田园杂兴(梅子金黄杏子肥)|范成大
+小池(泉眼无声惜细流)|杨万里
+晓出净慈寺送林子方(毕竟西湖六月中)|杨万里
+春日(胜日寻芳泗水滨)|朱熹
+观书有感(半亩方塘一鉴开)|朱熹
+题临安邸(山外青山楼外楼)|林升
+游园不值(应怜屐齿印苍苔)|叶绍翁
+乡村四月(绿遍山原白满川)|翁卷
+墨梅(我家洗砚池头树)|王冕
+石灰吟(千锤万凿出深山)|于谦
+竹石(咬定青山不放松)|郑燮
+所见(牧童骑黄牛)|袁枚
+己亥杂诗(九州生气恃风雷)|龚自珍
+村居(草长莺飞二月天)|高鼎
+"""
+
+APPENDIX_POEMS_JUNIOR = """
+关雎(关关雎鸠)|《诗经》
+蒹葭(蒹葭苍苍)|《诗经》
+十五从军征(十五从军征)|汉乐府
+观沧海(东临碣石)|曹操
+饮酒(结庐在人境)|陶潜
+木兰辞(唧唧复唧唧)|北朝民歌
+送杜少府之任蜀州(城阙辅三秦)|王勃
+登幽州台歌(前不见古人)|陈子昂
+次北固山下(客路青山外)|王湾
+使至塞上(单车欲问边)|王维
+闻王昌龄左迁龙标遥有此寄(杨花落尽子规啼)|李白
+行路难(金樽清酒斗十千)|李白
+黄鹤楼(昔人已乘黄鹤去)|崔颢
+望岳(岱宗夫如何)|杜甫
+春望(国破山河在)|杜甫
+茅屋为秋风所破歌(八月秋高风怒号)|杜甫
+白雪歌送武判官归京(北风卷地白草折)|岑参
+酬乐天扬州初逢席上见赠(巴山楚水凄凉地)|刘禹锡
+卖炭翁(卖炭翁)|白居易
+钱塘湖春行(孤山寺北贾亭西)|白居易
+雁门太守行(黑云压城城欲摧)|李贺
+赤壁(折戟沉沙铁未销)|杜牧
+泊秦淮(烟笼寒水月笼沙)|杜牧
+夜雨寄北(君问归期未有期)|李商隐
+无题(相见时难别亦难)|李商隐
+相见欢(无言独上西楼)|李煜
+渔家傲(塞下秋来风景异)|范仲淹
+浣溪沙(一曲新词酒一杯)|晏殊
+登飞来峰(飞来山上千寻塔)|王安石
+江城子(老夫聊发少年狂)|苏轼
+水调歌头(明月几时有)|苏轼
+渔家傲(天接云涛连晓雾)|李清照
+游山西村(莫笑农家腊酒浑)|陆游
+南乡子(何处望神州)|辛弃疾
+破阵子(醉里挑灯看剑)|辛弃疾
+过零丁洋(辛苦遭逢起一经)|文天祥
+天净沙·秋思(枯藤老树昏鸦)|马致远
+山坡羊·潼关怀古(峰峦如聚)|张养浩
+己亥杂诗(浩荡离愁白日斜)|龚自珍
+满江红(小住京华)|秋瑾
+《论语》十二章(学而时习之；吾日三省吾身；吾十有五而志于学；温故而知新；学而不思则罔；贤哉回也；知之者不如好之者；不义而富且贵；三人行；子在川上曰；三军可夺帅也；博学而笃志)|《论语》
+曹刿论战|《左传》
+《孟子》三则(鱼我所欲也；得道多助，失道寡助；天将降大任于是人也)|《孟子》
+《庄子》一则(北冥有鱼……亦若是则已矣。)|《庄子》
+《礼记》一则(虽有嘉肴)|《礼记》
+《吕氏春秋》一则(伯牙鼓琴……世无足复为鼓琴者。)|《吕氏春秋》
+邹忌讽齐王纳谏|《战国策》
+出师表|诸葛亮
+桃花源记|陶潜
+答谢中书书|陶弘景
+三峡|郦道元
+杂说(四)|韩愈
+陋室铭|刘禹锡
+小石潭记|柳宗元
+岳阳楼记|范仲淹
+醉翁亭记|欧阳修
+爱莲说|周敦颐
+记承天寺夜游|苏轼
+送东阳马生序(余幼时即嗜学……况才之过于余者乎)|宋濂
+湖心亭看雪|张岱
+"""
+
+BASIC_CHARS_BY_STROKES = OrderedDict([
+    ("1", "一"),
+    ("2", "二十厂七儿八人入几九了刀力又"),
+    ("3", "三干工土才下大小口上山巾千个广门己子也女飞习马"),
+    ("4", "王开天元云木五不太友车牙比切止少日中贝内水见午牛手气毛长片爪反父从今分公月风六文方火户心双书"),
+    ("5", "玉打正去古本可左右石平北旦目电田叫四生禾们白他瓜用册外冬鸟包主市立半让出奶加皮母"),
+    ("6", "动老地耳共机过在百有页光当早虫同吃回网肉年先竹自向后行全会合爷多冰交衣问字羊关米灯江阳阴好她妈羽红"),
+    ("7", "进远走把花村更豆医来时里足男吵听吹财钉我利每体你住身近坐岛饭床库间快灾迟张"),
+    ("8", "玩青现顶抬直林画雨到非果国明忠和的金爸采朋鱼狗饱京放河学空房视话织经"),
+    ("9", "春城草面轻背点是星昨看胆胖亮美前首洗穿语说孩"),
+    ("10", "班起都校样桌铅笔饿高站海家被祥课"),
+    ("11", "理雪常晚船盒彩猫着情"),
+    ("12", "煮期晴跑短道裤"),
+    ("13", "跳"),
+])
+
+APPENDIX_READING = [
+    "童话：安徒生童话、格林童话、叶圣陶《稻草人》、张天翼《宝葫芦的秘密》。",
+    "寓言：中国古今寓言、《伊索寓言》。",
+    "故事：成语故事、神话故事、民间故事、中外历史故事。",
+    "诗歌散文作品：鲁迅《朝花夕拾》、冰心《繁星·春水》、《艾青诗选》、方志敏《可爱的中国》、《革命烈士诗抄》、中外童谣、儿童诗歌。",
+    "长篇名著：吴承恩《西游记》、施耐庵《水浒传》、老舍《骆驼祥子》、罗广斌和杨益言《红岩》、埃德加·斯诺《红星照耀中国》、斯威夫特《格列佛游记》、夏洛蒂·勃朗特《简·爱》、高尔基《童年》、奥斯特洛夫斯基《钢铁是怎样炼成的》。",
+    "科普科幻作品：《十万个为什么》、儒勒·凡尔纳《海底两万里》。",
+]
+
+APPENDIX_GRAMMAR = [
+    "词的分类：名词、动词、形容词、数词、量词、代词、副词、介词、连词、助词、语气词、叹词。",
+    "短语的结构：并列式、偏正式、主谓式、动宾式、补充式。",
+    "单句的成分：主语、谓语、宾语、定语、状语、补语。",
+    "复句的类型：并列、递进、选择、转折、因果、假设、条件。",
+    "常用标点符号：句号、问号、感叹号、逗号、顿号、分号、冒号、引号、括号、破折号、省略号、书名号。",
+    "常见修辞手法：比喻、拟人、夸张、排比、对偶、反复、设问、反问。",
+]
+
+# A few all-stage items actually spell out separate grade bands.  Split only
+# those curated cases; genuinely cross-stage items stay under 全学段.
+GRADE_BAND_RE = re.compile(
+    r"(?P<band>1[～~—-]2|3[～~—-]4|5[～~—-]6|7[～~—-]9|1[～~—-]6|1[～~—-]4|5[～~—-]9|56|79|一[～~—-]二|三[～~—-]四|五[～~—-]六|七[～~—-]九)年级"
+)
+BAND_STAGES = {
+    "1～2": ["x1"], "3～4": ["x2"], "5～6": ["x3"], "7～9": ["j1"],
+    "1-2": ["x1"], "3-4": ["x2"], "5-6": ["x3"], "7-9": ["j1"],
+    "1~2": ["x1"], "3~4": ["x2"], "5~6": ["x3"], "7~9": ["j1"],
+    "1—2": ["x1"], "3—4": ["x2"], "5—6": ["x3"], "7—9": ["j1"],
+    "一二": ["x1"], "三四": ["x2"], "五六": ["x3"], "七九": ["j1"],
+    "1～6": ["p"], "1-6": ["p"], "1~6": ["p"], "1—6": ["p"],
+    "1～4": ["x1", "x2"], "1-4": ["x1", "x2"], "1~4": ["x1", "x2"],
+    "5～9": ["x3", "j1"], "5-9": ["x3", "j1"], "5~9": ["x3", "j1"],
+    "12": ["x1"], "34": ["x2"], "56": ["x3"], "79": ["j1"],
+    "16": ["p"], "14": ["x1", "x2"], "59": ["x3", "j1"],
+    "一二": ["x1"], "三四": ["x2"], "五六": ["x3"], "七九": ["j1"],
+}
+CIRCLED_RE = re.compile(r"[①②③④⑤⑥⑦⑧⑨⑩]")
+LINE_BREAK_RE = re.compile(r"(?<=[\u4e00-\u9fa5。；;：:])(?=[①②③④⑤⑥⑦⑧⑨⑩])")
 
 
 def load_ocr(key: str) -> list[tuple[int, list[str]]]:
@@ -331,6 +536,137 @@ def make_item(
         "source_pdf_page": pdf_page,
         "source_id": source_id,
     }
+
+
+def item_uid(item: dict) -> str:
+    subject = item["subject_key"]
+    seed = "|".join([
+        subject, item["stage_key"], item["domain"], item["topic"],
+        item["type"], item["text"],
+    ])
+    if subject not in ("chinese", "math", "english"):
+        seed = f"{item.get('seq', 0)}|{seed}"
+    digest = hashlib.sha1(seed.encode("utf-8")).hexdigest()[:8]
+    return f"{subject[:2]}-{item['stage_key']}-{item['type'][:3]}-{digest}"
+
+
+def parse_appendix_chinese() -> list[dict]:
+    """Curated, concrete lists from the appendices of the 2022 Chinese standard."""
+    source = SOURCES["chinese"]
+    items: list[dict] = []
+    counter = 0
+
+    def add(stage: str, topic: str, text: str, page: int) -> None:
+        nonlocal counter
+        counter += 1
+        items.append(make_item(
+            counter, "chinese", source["id"], stage, "课标附录", topic,
+            "appendix", text, page, page + source["pdf_offset"],
+        ))
+
+    for group, raw, page in (
+        ("1-6年级（75篇）", APPENDIX_POEMS_PRIMARY, 58),
+        ("7-9年级（60篇/段）", APPENDIX_POEMS_JUNIOR, 61),
+    ):
+        stage = "p" if group.startswith("1-6") else "j1"
+        for line in raw.strip().splitlines():
+            title, author = line.split("|", 1)
+            add(stage, "优秀诗文背诵推荐篇目", f"{title}（{author}）", page)
+
+    total = sum(len(chars) for chars in BASIC_CHARS_BY_STROKES.values())
+    if total != 300:
+        raise SystemExit(f"basic character table must contain 300 chars, got {total}")
+    for strokes, chars in BASIC_CHARS_BY_STROKES.items():
+        add("x1", "识字、写字教学基本字表",
+            f"{strokes}画（{len(chars)}字）：{' '.join(chars)}", 66)
+    add("p", "义务教育语文课程常用字表",
+        "字表一收2500字，可作为第三学段（5-6年级）识字、写字教学评价的依据；完整字表见官方 PDF 附录5。", 70)
+    add("p", "义务教育语文课程常用字表",
+        "字表二收1000字；两个字表合计3500个常用汉字。完整字表见官方 PDF 附录5。", 70)
+    for text in APPENDIX_READING:
+        add("p", "关于课内外读物的建议", text, 64)
+    for text in APPENDIX_GRAMMAR:
+        add("p", "关于语法修辞知识的说明", text, 65)
+    return items
+
+
+def unique(values: list[str]) -> list[str]:
+    out: list[str] = []
+    for value in values:
+        if value not in out:
+            out.append(value)
+    return out
+
+
+def split_stage_bands(items: list[dict]) -> list[dict]:
+    """Split only curated all-stage items that contain explicit grade bands."""
+    out: list[dict] = []
+    for item in items:
+        if item.get("stage_key") != "all" or item.get("type") == "appendix":
+            out.append(item)
+            continue
+        text = item["text"]
+        matches = list(GRADE_BAND_RE.finditer(text))
+        if not matches:
+            out.append(item)
+            continue
+        prefix = text[:matches[0].start()].strip("：:，,。；; ")
+        segments: list[tuple[list[str], str, str]] = []
+        for idx, match in enumerate(matches):
+            start = match.end()
+            end = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
+            segment = text[start:end].strip("：:，,。；; ")
+            raw_band = match.group("band")
+            label = raw_band.replace("～", "-").replace("~", "-").replace("—", "-")
+            band_key = raw_band.replace("～", "").replace("~", "").replace("—", "").replace("-", "")
+            stages = BAND_STAGES.get(band_key, BAND_STAGES.get(raw_band, []))
+            if not stages:
+                continue
+            if segment.startswith("及以上各学段") or segment.startswith("及以上"):
+                stages = ["x2", "x3", "j1"] if "3" in band_key else stages
+            if not segment:
+                if segments:
+                    old_stages, old_text, old_label = segments[-1]
+                    segments[-1] = (unique(old_stages + stages), old_text, old_label)
+                else:
+                    segments.append((stages, "", label))
+                continue
+            if segments and not segments[-1][1]:
+                stages = unique(segments[-1][0] + stages)
+                label = segments[-1][2]
+                segments[-1] = (stages, segment, label)
+            else:
+                segments.append((stages, segment, label))
+        if not segments or not any(text for _, text, _ in segments):
+            out.append(item)
+            continue
+        for stages, segment, label in segments:
+            if not segment:
+                continue
+            body = segment
+            if body.startswith("及以上"):
+                body = re.sub(r"^及以上(?:各学段)?[：:]?", "", body).strip()
+                head = f"{prefix}{label}及以上：" if prefix else f"{label}及以上："
+            else:
+                head = f"{prefix}（{label}）：" if prefix else f"{label}："
+            for stage in stages:
+                new = dict(item)
+                new["stage_key"] = stage
+                new["stage"] = STAGES[stage]
+                new["text"] = head + body
+                new["uid"] = item_uid(new)
+                out.append(new)
+    return out
+
+
+def add_line_breaks(items: list[dict]) -> list[dict]:
+    """Keep multi-point items as one record but make internal points visible."""
+    for item in items:
+        text = item.get("text", "")
+        if CIRCLED_RE.search(text):
+            item["text"] = LINE_BREAK_RE.sub("\n", text)
+            item["uid"] = item_uid(item)
+    return items
 
 
 def parse_chinese() -> list[dict]:
@@ -1089,6 +1425,8 @@ def classify_concrete(item: dict) -> tuple[str, str]:
     meta = len(F_META.findall(text))
     weak = len(F_WEAK_META.findall(text))
 
+    if item.get("type") == "appendix":
+        return "keep", ""
     garble = filter_garble(text, item.get("subject_key", ""))
     if garble:
         return "drop", garble
@@ -1129,7 +1467,12 @@ def build() -> tuple[dict, list[dict]]:
     for key in GENERIC_PAGES:
         if (OCR / f"{key}.txt").exists():
             all_items.extend(parse_generic(key))
+    all_items.extend(parse_appendix_chinese())
+    # Classify the original OCR items first; stage splitting and line breaks
+    # are presentation-level transforms of items that already passed.
     kept, excluded = filter_items(all_items)
+    kept = split_stage_bands(kept)
+    kept = add_line_breaks(kept)
     return {
         "meta": {
             "title": "中国小学初中课程标准知识点",
@@ -1144,7 +1487,9 @@ def build() -> tuple[dict, list[dict]]:
                 "tip": "教学提示",
                 "theme": "主题与载体",
                 "note": "阶段说明",
+                "appendix": "教育部课程标准附录中的具体清单",
             },
+            "appendix_note": "附录清单依据教育部 2022 年版课标 PDF 整理；扫描表格无法可靠自动识别的部分已人工校对，完整原表请以官方 PDF 为准。",
             "filter": {
                 "version": FILTER_VERSION,
                 "rule": FILTER_RULE,

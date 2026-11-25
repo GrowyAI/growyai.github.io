@@ -202,7 +202,9 @@
   }
   function ssCell(stageKey, subject) {
     return ssItems.filter(function (i) {
-      return i.subject === subject && (i.stage_key === stageKey || i.stage_key === "all");
+      if (i.subject !== subject) return false;
+      if (i.stage_key === stageKey || i.stage_key === "all") return true;
+      return i.stage_key === "p" && stageKey !== "j1";
     });
   }
   function psDomains() {
