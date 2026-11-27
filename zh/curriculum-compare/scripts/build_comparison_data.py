@@ -2652,6 +2652,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   .tabs button.active {
     background: var(--cn); border-color: var(--cn); color: #fff;
   }
+  .tabs button .count {
+    margin-left: 2px; opacity: .72; font-variant-numeric: tabular-nums;
+  }
+  .tabs button.active .count { opacity: .9; }
+  .filter-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 4px; }
+  .filter-row button {
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    border-radius: 8px; padding: 5px 0; font-size: 11px; cursor: pointer;
+  }
+  .filter-row button.active { background: var(--cn); border-color: var(--cn); color: #fff; }
+  .side-note { margin: 5px 0 0; font-size: 11px; color: var(--muted); }
+  .empty { padding: 24px 12px; text-align: center; color: var(--muted); font-size: 13px; }
   main { padding: 10px 12px 24px; max-width: 480px; margin: 0 auto; }
   .card {
     background: var(--surface);
@@ -2665,9 +2677,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     font-size: 12px; color: var(--cn); background: var(--cn-soft);
     padding: 2px 8px; border-radius: 999px;
   }
-  .pager { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); position: relative; }
-  .pager::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
+  .pager { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+  .pager-label { position: relative; display: inline-block; }
+  .pager-label::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
     border-radius: 2px; background: linear-gradient(to right, var(--cn) var(--pct, 0%), var(--border) var(--pct, 0%));
   }
   .pager button {
@@ -2721,11 +2734,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   .ev-block { margin-bottom: 7px; }
   .ev-block h3 { margin: 0 0 2px; font-size: 13px; color: var(--us); }
   .ev-block.cn h3 { color: var(--cn); }
-  .ev-grade { margin: 0 0 2px; font-size: 11px; color: var(--muted); }
-  .ev-text {
-    margin: 0; font-size: 13px; line-height: 1.45; color: var(--text);
+  .ev-item + .ev-item { margin-top: 6px; }
+  .ev-grade { margin: 0 0 3px; font-size: 12px; color: var(--text); font-weight: 600; }
+  .ev-content {
     background: var(--surface-2); border-radius: 8px; padding: 5px 7px;
   }
+  .ev-text { margin: 0; font-size: 13px; line-height: 1.45; color: var(--text); }
+  .ev-content .ev-source + .ev-text { margin-top: 6px; }
   .ev-source { margin: 2px 0 0; font-size: 11px; color: var(--muted); }
   footer { margin-top: 10px; font-size: 12px; color: var(--muted); text-align: center; }
   footer a { color: var(--cn); text-decoration: none; }
@@ -2744,11 +2759,12 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   </div>
   <p class="sub">数学 / 科学 / 地理 / 语言 / 文化 / 儿童发展 / 艺术 · 按概念顺序单条阅读</p>
   <nav class="tabs" id="tabs"></nav>
+  <div class="filter-row" id="comparability"></div>
 </header>
 <main>
   <section class="card" id="card"></section>
   <footer>
-    仅为本页七个领域的 <span id="total"></span> 条精选可比条目，不是课程标准全部知识点。
+    本页精选七个领域的 <span id="total"></span> 条概念，不是课标全部内容；“仅美国 / 仅中国”表示本套资料中只在该侧找到对应概念，不代表另一侧绝对缺失。
   </footer>
 </main>
 <script id="dataset" type="application/json">__PAYLOAD__</script>
@@ -2767,14 +2783,67 @@ const BAND_MAP = {
   "小学1-6年级": [1, 2, 3], "全学段通用": [0, 1, 2, 3, 4],
   "学前": [0], "1-2年级": [1], "3-4年级": [2], "5-6年级": [3], "7-9年级": [4]
 };
-const rowsByDomain = {};
+const GRADE_RANK = {
+  "美国幼儿园前班（对应中国小班、中班）": 0,
+  "幼儿园小班（3-4岁）": 0.1,
+  "幼儿园小班/中班/大班（通用）": 0.2,
+  "幼儿园中班（4-5岁）": 0.3,
+  "美国幼儿园大班（K）": 0.4,
+  "幼儿园大班（5-6岁）": 0.4,
+  "小学1-6年级": 1,
+  "小学1-2年级": 1,
+  "美国小学1年级": 1,
+  "美国小学2年级": 2,
+  "美国小学3年级": 3,
+  "小学3-4年级": 3,
+  "美国小学4年级": 4,
+  "美国小学5年级": 5,
+  "小学5-6年级": 5,
+  "美国小学6年级": 6,
+  "美国初中7年级": 7,
+  "初中7-9年级": 7,
+  "美国初中8年级": 8
+};
+function gradeRank(ev) {
+  const key = ev && ev["年级"];
+  return GRADE_RANK[key] === undefined ? 99 : GRADE_RANK[key];
+}
+const allRowsByDomain = {};
 DOMAINS.forEach(function(d) {
-  rowsByDomain[d] = DATA["概念簇"].filter(function(r) { return r["领域"] === d; })
+  allRowsByDomain[d] = DATA["概念簇"].filter(function(r) { return r["领域"] === d; })
     .sort(function(a, b) { return a.story_order - b.story_order; });
 });
-const state = { domain: "数学", idx: 0 };
+const state = { domain: "数学", comparability: "可比", idx: 0 };
 const card = document.getElementById("card");
 const tabs = document.getElementById("tabs");
+const filterBar = document.getElementById("comparability");
+const FILTERS = [["可比", "可比项"], ["仅中国", "仅中国"], ["仅美国", "仅美国"], ["全部", "全部"]];
+function visibleRows() {
+  return allRowsByDomain[state.domain].filter(function(r) {
+    return state.comparability === "全部" || r["可比性"] === state.comparability;
+  });
+}
+function renderFilters() {
+  const domainRows = allRowsByDomain[state.domain];
+  filterBar.innerHTML = FILTERS.map(function(pair) {
+    const value = pair[0], label = pair[1];
+    const n = value === "全部"
+      ? domainRows.length
+      : domainRows.filter(function(r) { return r["可比性"] === value; }).length;
+    return "<button data-comparability=\"" + value + "\"" +
+      (value === state.comparability ? " class=\"active\"" : "") + ">" +
+      label + " " + n + "</button>";
+  }).join("");
+  filterBar.querySelectorAll("button").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      state.comparability = btn.dataset.comparability;
+      state.idx = 0;
+      renderTabs();
+      renderFilters();
+      render();
+    });
+  });
+}
 
 function esc(value) {
   return String(value == null ? "" : value)
@@ -2804,15 +2873,22 @@ function sourceRef(ev) {
 function bandsFor(label) {
   return BAND_MAP[label] || [];
 }
+function domainCount(domain) {
+  return state.comparability === "全部"
+    ? allRowsByDomain[domain].length
+    : allRowsByDomain[domain].filter(function(r) { return r["可比性"] === state.comparability; }).length;
+}
 function renderTabs() {
   tabs.innerHTML = DOMAINS.map(function(d) {
-    return "<button data-domain=\"" + d + "\"" + (d === state.domain ? " class=\"active\"" : "") + ">" + (DOMAIN_LABELS[d] || d) + "</button>";
+    return "<button data-domain=\"" + d + "\"" + (d === state.domain ? " class=\"active\"" : "") + ">" +
+      (DOMAIN_LABELS[d] || d) + " <span class=\"count\">" + domainCount(d) + "</span></button>";
   }).join("");
   tabs.querySelectorAll("button").forEach(function(btn) {
     btn.addEventListener("click", function() {
       state.domain = btn.dataset.domain;
       state.idx = 0;
       renderTabs();
+      renderFilters();
       render();
     });
   });
@@ -2827,47 +2903,69 @@ function trackCells(row, side) {
     return "<span class=\"cell\">" + (present.has(band) ? "<i class=\"dot " + cls + "\"></i>" : "") + "</span>";
   }).join("");
 }
-function evidenceHtml(row) {
-  const pairs = [
-    ["美国", row["美国"]["最早证据"][0], row["美国"]["后续代表证据"], false],
-    ["中国", row["中国"]["最早证据"][0], row["中国"]["后续代表证据"], true]
-  ];
-  return pairs.map(function(pair) {
-    const side = pair[0], first = pair[1], later = pair[2], isCn = pair[3];
-    let html = "<div class=\"ev-block" + (isCn ? " cn" : "") + "\"><h3>" + side + " · 最早</h3>";
-    html += "<p class=\"ev-grade\">" + esc(first && first["年级"]) + "</p>";
-    html += "<p class=\"ev-text\">" + esc(first && first["文本"]) + "</p>";
-    html += "<p class=\"ev-source\">" + esc(sourceRef(first)) + "</p>";
-    html += "<h3>" + side + " · 后续</h3>";
-    if (later) {
-      html += "<p class=\"ev-grade\">" + esc(later["年级"]) + "</p>";
-      html += "<p class=\"ev-text\">" + esc(plainEvidence(later["文本"])) + "</p>";
-      html += "<p class=\"ev-source\">" + esc(sourceRef(later)) + "</p>";
-    } else {
-      html += "<p class=\"ev-text\">无后续代表证据</p>";
-    }
-    return html + "</div>";
-  }).join("");
+function activeSides(row) {
+  if (row["可比性"] === "仅美国") return ["美国"];
+  if (row["可比性"] === "仅中国") return ["中国"];
+  return ["美国", "中国"];
 }
-function microEvidenceHtml(row) {
-  return ["美国", "中国"].map(function(side) {
-    const evs = row[side]["最早证据"] || [];
+function oneSidedNote(row) {
+  if (!row["可比性"] || row["可比性"] === "可比") return "";
+  const other = row["可比性"] === "仅美国" ? "中国" : "美国";
+  return "<p class=\"ev-source\">" + other + "：本资料未涵盖（" +
+    esc(row["单侧原因"] || "本数据未收录对侧对应概念") + "）</p>";
+}
+function sideEvidence(row, side) {
+  const evs = (row[side]["最早证据"] || []).slice();
+  const later = row[side]["后续代表证据"];
+  if (later) evs.push(later);
+  return evs.sort(function(a, b) { return gradeRank(a) - gradeRank(b); });
+}
+function evidenceItemHtml(grade, evs) {
+  const body = evs.map(function(ev) {
+    const ref = sourceRef(ev);
+    return "<p class=\"ev-text\">" + esc(plainEvidence(ev && ev["文本"])) + "</p>" +
+      (ref ? "<p class=\"ev-source\">" + esc(ref) + "</p>" : "");
+  }).join("");
+  return "<div class=\"ev-item\">" +
+    "<p class=\"ev-grade\">" + esc(grade) + "</p>" +
+    "<div class=\"ev-content\">" + body + "</div>" +
+    "</div>";
+}
+function evidenceHtml(row) {
+  return activeSides(row).map(function(side) {
+    const evs = sideEvidence(row, side);
     const isCn = side === "中国";
     let html = "<div class=\"ev-block" + (isCn ? " cn" : "") + "\"><h3>" + side + "</h3>";
     if (!evs.length) {
-      html += "<p class=\"ev-text\">无对应条目</p>";
+      html += "<div class=\"ev-content\"><p class=\"ev-text\">无对应条目</p></div>";
     } else {
+      let grade = null;
+      let group = [];
+      function flush() {
+        if (group.length) html += evidenceItemHtml(grade, group);
+      }
       evs.forEach(function(ev) {
-        html += "<p class=\"ev-grade\">" + esc(ev["年级"]) + "</p>";
-        html += "<p class=\"ev-text\">" + esc(plainEvidence(ev["文本"])) + "</p>";
-        html += "<p class=\"ev-source\">" + esc(sourceRef(ev)) + "</p>";
+        const nextGrade = ev && ev["年级"];
+        if (nextGrade !== grade) {
+          flush();
+          grade = nextGrade;
+          group = [];
+        }
+        group.push(ev);
       });
+      flush();
     }
     return html + "</div>";
-  }).join("");
+  }).join("") + oneSidedNote(row);
 }
 function axesHtml(row) {
   let html = "";
+  if (row["可比性"] && row["可比性"] !== "可比") {
+    html += "<div class=\"reading\"><p><span class=\"reading-label\">说明：</span>" +
+      esc(row["单侧原因"] || "本数据未收录对侧对应概念") + "。" +
+      esc(row["深度解读"] || row["短结论"]) + "</p></div>";
+    return html;
+  }
   if (row["深度参数"] && row["深度参数"].length) {
     if (row["单侧标记"]) html += "<span class=\"flag\">" + esc(row["单侧标记"]) + "</span>";
     html += "<table class=\"axes\"><tbody>";
@@ -2882,24 +2980,38 @@ function axesHtml(row) {
   return html;
 }
 function render() {
-  const list = rowsByDomain[state.domain];
+  const list = visibleRows();
+  if (!list.length) {
+    card.innerHTML = "<div class=\"empty\">当前筛选下暂无条目。</div>";
+    return;
+  }
   const row = list[state.idx];
   const pct = ((state.idx + 1) / list.length * 100).toFixed(2) + "%";
+  const oneSided = row["可比性"] && row["可比性"] !== "可比";
+  const sides = oneSided ? [row["可比性"] === "仅美国" ? "美国" : "中国"] : ["美国", "中国"];
+  const labelCls = function(side) { return side === "美国" ? "us-label" : "cn-label"; };
+  const trackRows = sides.map(function(side) {
+    return "<div class=\"track-row\"><span class=\"side " + labelCls(side) + "\">" + side + "</span>" +
+      trackCells(row, side) + "</div>";
+  }).join("");
+  const missingNote = oneSided
+    ? "<p class=\"side-note\">另一侧：本资料未涵盖（" + esc(row["单侧原因"] || "本数据未收录对侧对应概念") + "）</p>"
+    : "";
   card.innerHTML =
-    "<div class=\"card-top\"><span class=\"group\">" + esc(row["分组"]) + "</span>" +
+    "<div class=\"card-top\"><span class=\"group\">" + esc(row["分组"]) +
+    (oneSided ? " · " + esc(row["可比性"]) : "") + "</span>" +
     "<span class=\"pager\" style=\"--pct:" + pct + "\"><button id=\"prev\" aria-label=\"上一条\">←</button>" +
-    "概念 " + (state.idx + 1) + " / " + list.length +
+    "<span class=\"pager-label\">概念 " + (state.idx + 1) + " / " + list.length + "</span>" +
     "<button id=\"next\" aria-label=\"下一条\">→</button></span></div>" +
     "<h2>" + esc(row["概念簇"]) + "</h2>" +
     "<p class=\"takeaway\">" + esc(row["短结论"]) + "</p>" +
     "<div class=\"track\">" +
     "<div class=\"track-head\"><span></span>" + BANDS.map(function(b) { return "<span>" + b + "</span>"; }).join("") + "</div>" +
-    "<div class=\"track-row\"><span class=\"side us-label\">美国</span>" + trackCells(row, "美国") + "</div>" +
-    "<div class=\"track-row\"><span class=\"side cn-label\">中国</span>" + trackCells(row, "中国") + "</div>" +
+    trackRows + missingNote +
     "</div>" +
     axesHtml(row) +
     "<div class=\"evidence\"><p class=\"evidence-label\">证据</p>" +
-    (row["类型"] === "微指标" ? microEvidenceHtml(row) : evidenceHtml(row)) + "</div>";
+    evidenceHtml(row) + "</div>";
 
   document.getElementById("prev").addEventListener("click", function() {
     state.idx = (state.idx - 1 + list.length) % list.length;
@@ -2911,13 +3023,15 @@ function render() {
   });
 }
 document.addEventListener("keydown", function(e) {
-  const list = rowsByDomain[state.domain];
+  const list = visibleRows();
+  if (!list.length) return;
   if (e.key === "ArrowRight") { state.idx = (state.idx + 1) % list.length; render(); }
   if (e.key === "ArrowLeft") { state.idx = (state.idx - 1 + list.length) % list.length; render(); }
 });
 document.getElementById("badge").textContent = "精选 " + DATA["概念簇"].length + " 条";
 document.getElementById("total").textContent = DATA["概念簇"].length;
 renderTabs();
+renderFilters();
 render();
 </script>
 </body>
@@ -3020,6 +3134,494 @@ def micro_distribution(
     ]
 
 
+# 单侧概念簇：从两套源资料中未被现有可比簇占用的主题生成。
+# “仅美国/仅中国”只表示本数据集中只在该侧形成概念簇，不代表绝对意义上的课程有无。
+ONE_SIDED_SPECS: list[dict[str, Any]] = [
+    {
+        "id": "one-us-ela-poetry", "side": "美国", "domain": "语言与读写", "group": "文学与诗歌",
+        "concept": "诗歌体裁与赏析", "short": "本套美国资料把诗歌单列为跨年级阅读线索，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Poetry", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-punctuation", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "大小写与标点规范", "short": "本套美国资料把拼写与标点写成独立的语言目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Capitalization and Punctuation", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-conventions", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "语言规则与句子结构", "short": "本套美国资料单列语言规则训练，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Language Conventions", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-research", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "资料查询与研究写作", "short": "本套美国资料把资料查找、整理与成文连成一条线，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Conducting Research", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-grammar", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "语法知识", "short": "本套美国资料把语法项目单列为年级目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Grammar", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-narrative", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "叙事写作进阶", "short": "本套美国资料把叙事写作按年级细化，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Narrative Writing", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-music-elements", "side": "美国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "音乐要素：节奏、旋律与音色", "short": "本套美国资料把音乐要素作为独立目标贯穿K-8，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Music"], "topic_regex": "Elements of Music", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-music-listening", "side": "美国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "音乐聆听与理解", "short": "本套美国资料单列聆听与理解曲目，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Music"], "topic_regex": "Listening and Understanding", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-art-elements", "side": "美国", "domain": "艺术", "group": "美术与创造",
+        "concept": "美术要素与视觉表达", "short": "本套美国资料把色彩、线条、构图等美术要素单列，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Visual Arts"], "topic_regex": "Elements of Art", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-art-history", "side": "美国", "domain": "艺术", "group": "美术与创造",
+        "concept": "艺术史与流派", "short": "本套美国资料按时期和流派组织艺术史内容，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Visual Arts"], "topic_regex": "Art History", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-presidents", "side": "美国", "domain": "文化", "group": "国家认同",
+        "concept": "总统与政治制度", "short": "本套美国资料把总统与政治制度单列，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "Presidents and Politics", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-westward", "side": "美国", "domain": "文化", "group": "国家认同",
+        "concept": "西进运动与国家叙事", "short": "本套美国资料以历史事件叙述国家形成，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "Westward Expansion", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-civil-war", "side": "美国", "domain": "文化", "group": "国家认同",
+        "concept": "内战、原因与重建", "short": "本套美国资料把内战原因、冲突与后果连成专题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "The Civil War", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ancient", "side": "美国", "domain": "文化", "group": "文化传承",
+        "concept": "古代文明的持久思想", "short": "本套美国资料单列古代文明的思想遗产，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "Lasting Ideas from Ancient Civilizations", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-exploration", "side": "美国", "domain": "文化", "group": "多元理解",
+        "concept": "探索、贸易与文化交流", "short": "本套美国资料以探索与贸易解释文化接触，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "Exploration, Trade, and Settlement", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-world-geography", "side": "美国", "domain": "地理", "group": "世界地理",
+        "concept": "世界地理专题", "short": "本套美国资料单列世界地理专题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "World Geography", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-biographies", "side": "美国", "domain": "科学", "group": "探究与工程",
+        "concept": "科学家传记与科学史", "short": "本套美国资料把科学家生平作为独立内容，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Science Biographies", "text_regex": ".*",
+    },
+    {
+        "id": "one-cn-poetry-recite", "side": "中国", "domain": "语言与读写", "group": "文学与诗歌",
+        "concept": "优秀诗文背诵篇目", "short": "本套中国资料给出分学段古诗文背诵篇目，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "优秀诗文背诵推荐篇目",
+    },
+    {
+        "id": "one-cn-character-list", "side": "中国", "domain": "语言与读写", "group": "识字与书写",
+        "concept": "识字写字基本字表", "short": "本套中国资料以基本字表规定识字写字进度，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "识字、写字教学基本字表",
+    },
+    {
+        "id": "one-cn-critical-reading", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
+        "concept": "思辨性阅读与表达", "short": "本套中国资料把思辨性阅读单列为学习任务群，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "思辨性阅读与表达",
+    },
+    {
+        "id": "one-cn-practical-reading", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
+        "concept": "实用性阅读与交流", "short": "本套中国资料单列实用文本阅读与交流，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "实用性阅读与交流",
+    },
+    {
+        "id": "one-cn-whole-book", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
+        "concept": "整本书阅读", "short": "本套中国资料把整本书阅读列为独立任务群，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "整本书阅读",
+    },
+    {
+        "id": "one-cn-language-cross", "side": "中国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "语文跨学科学习", "short": "本套中国资料单列跨学科语文实践，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "跨学科学习",
+    },
+    {
+        "id": "one-cn-morality", "side": "中国", "domain": "文化", "group": "国家认同",
+        "concept": "道德与法治课程内容", "short": "本套中国资料把道德与法治单列为课程内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["道德与法治"], "text_regex": "课程内容",
+    },
+    {
+        "id": "one-cn-labor-tasks", "side": "中国", "domain": "文化", "group": "文化传承",
+        "concept": "劳动任务群", "short": "本套中国资料用任务群组织劳动教育，美国侧未在本数据中形成对应簇。",
+        "subjects": ["劳动"], "text_regex": "任务群",
+    },
+    {
+        "id": "one-cn-labor-craft", "side": "中国", "domain": "文化", "group": "文化传承",
+        "concept": "传统工艺制作", "short": "本套中国资料把传统工艺制作写入劳动内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["劳动"], "text_regex": "传统工艺制作",
+    },
+    {
+        "id": "one-cn-pe-health", "side": "中国", "domain": "儿童发展", "group": "卫生与自理",
+        "concept": "体育与健康：健康教育", "short": "本套中国资料把健康教育列为体育课程专题，美国侧未在本数据中形成对应簇。",
+        "subjects": ["体育与健康"], "text_regex": "健康教育",
+    },
+    {
+        "id": "one-cn-pe-fitness", "side": "中国", "domain": "儿童发展", "group": "动作与平衡",
+        "concept": "体育与健康：体能", "short": "本套中国资料把体能单列为学段内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["体育与健康"], "text_regex": "体能",
+    },
+    {
+        "id": "one-cn-pe-sports", "side": "中国", "domain": "儿童发展", "group": "投掷与协调",
+        "concept": "专项运动技能", "short": "本套中国资料列出专项运动技能的具体要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["体育与健康"], "text_regex": "项目具体要求",
+    },
+    {
+        "id": "one-cn-science-environment", "side": "中国", "domain": "科学", "group": "生态与地球",
+        "concept": "人类活动与环境", "short": "本套中国资料单列人类活动与环境专题，美国侧未在本数据中形成对应簇。",
+        "subjects": ["科学"], "text_regex": "人类活动与环境",
+    },
+    {
+        "id": "one-cn-art-music", "side": "中国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "音乐学科内容", "short": "本套中国资料把音乐作为艺术课程分科内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "音乐",
+    },
+    {
+        "id": "one-cn-art-drama", "side": "中国", "domain": "艺术", "group": "表演与戏剧",
+        "concept": "戏剧（含戏曲）", "short": "本套中国资料单列戏剧与戏曲内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "戏剧（含戏曲）",
+    },
+    {
+        "id": "one-cn-art-dance", "side": "中国", "domain": "艺术", "group": "表演与戏剧",
+        "concept": "舞蹈", "short": "本套中国资料把舞蹈列为艺术课程分科内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "舞蹈",
+    },
+    {
+        "id": "one-cn-art-film", "side": "中国", "domain": "艺术", "group": "表演与戏剧",
+        "concept": "影视与数字媒体艺术", "short": "本套中国资料单列影视与数字媒体艺术，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "影视（含数字媒体艺术）",
+    },
+]
+
+ONE_SIDED_EXTRA: list[dict[str, Any]] = [
+    # 美国：数学
+    {
+        "id": "one-us-math-sorting", "side": "美国", "domain": "数学", "group": "数与运算",
+        "concept": "分类、配对与规律", "short": "本套美国资料把分类、配对与规律列为学前数学推理目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Mathematics"], "topic_regex": "Mathematical Reasoning and Number Sense", "text_regex": "I-MR1|I-MR2",
+    },
+    {
+        "id": "one-us-math-shapes", "side": "美国", "domain": "数学", "group": "图形与测量",
+        "concept": "图形识别与分类", "short": "本套美国资料单列学前图形识别与分类，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Mathematics"], "topic_regex": "Mathematical Reasoning and Number Sense", "text_regex": "I-MR3",
+    },
+    {
+        "id": "one-us-math-counting", "side": "美国", "domain": "数学", "group": "数与运算",
+        "concept": "学前数数与数量对应", "short": "本套美国资料把学前数数、数量对应和序数写成连续目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Mathematics"], "topic_regex": "Mathematical Reasoning and Number Sense", "text_regex": "I-MR4",
+    },
+    {
+        "id": "one-us-math-number-system", "side": "美国", "domain": "数学", "group": "数的扩展",
+        "concept": "数系与有理数运算", "short": "本套美国资料把数系、公因数与有理数写成独立主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Mathematics"], "topic_regex": "The Number System", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-math-ratios", "side": "美国", "domain": "数学", "group": "数与运算",
+        "concept": "比与比例关系", "short": "本套美国资料单列比与比例关系，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Mathematics"], "topic_regex": "Ratios and Proportional Relationships", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-math-functions", "side": "美国", "domain": "数学", "group": "代数",
+        "concept": "函数初步", "short": "本套美国资料把函数作为初中独立主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Mathematics"], "topic_regex": "Functions", "text_regex": ".*",
+    },
+    # 美国：科学
+    {
+        "id": "one-us-science-genetics", "side": "美国", "domain": "科学", "group": "生命科学",
+        "concept": "遗传基础", "short": "本套美国资料单列遗传主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Genetics", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-respiration", "side": "美国", "domain": "科学", "group": "生命科学",
+        "concept": "细胞呼吸", "short": "本套美国资料把细胞呼吸列为独立内容，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Cellular Respiration", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-metabolic", "side": "美国", "domain": "科学", "group": "物质与化学",
+        "concept": "代谢反应", "short": "本套美国资料把代谢反应单列为科学内容，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Metabolic Reactions", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-forces", "side": "美国", "domain": "科学", "group": "运动与能量",
+        "concept": "远距离作用力", "short": "本套美国资料单列磁力、电力等非接触作用力，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Forces at a Distance", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-collisions", "side": "美国", "domain": "科学", "group": "运动与能量",
+        "concept": "碰撞与运动", "short": "本套美国资料把碰撞作为独立物理主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Collisions", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-geohazard", "side": "美国", "domain": "科学", "group": "生态与地球",
+        "concept": "地震与火山", "short": "本套美国资料单列地震与火山主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Earthquakes and Volcanoes", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-stars", "side": "美国", "domain": "科学", "group": "生态与地球",
+        "concept": "恒星与星空规律", "short": "本套美国资料把恒星和可预测的天象写成独立主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Stars", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-hazards", "side": "美国", "domain": "科学", "group": "生态与地球",
+        "concept": "自然灾害与安全", "short": "本套美国资料单列自然灾害主题，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "Natural Hazards", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-science-geoevent", "side": "美国", "domain": "科学", "group": "生态与地球",
+        "concept": "地质事件对人类的影响", "short": "本套美国资料单列地质事件对人类的影响，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Science"], "topic_regex": "How Geologic Events can Affect People", "text_regex": ".*",
+    },
+    # 美国：地理 / 语言 / 文化 / 儿童发展 / 艺术
+    {
+        "id": "one-us-geo-rivers", "side": "美国", "domain": "地理", "group": "自然地理",
+        "concept": "世界重要河流", "short": "本套美国资料单列世界重要河流，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "Important Rivers of the World", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-speaking", "side": "美国", "domain": "语言与读写", "group": "听说与口语",
+        "concept": "课堂听说与讨论", "short": "本套美国资料把听说与课堂讨论按年级列出，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Listening and Speaking", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-ela-fiction", "side": "美国", "domain": "语言与读写", "group": "文学与诗歌",
+        "concept": "虚构类文学阅读", "short": "本套美国资料单列虚构类文学作品阅读，中国侧未在本数据中形成对应簇。",
+        "subjects": ["English Language Arts"], "topic_regex": "Fiction", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-culture-religions", "side": "美国", "domain": "文化", "group": "多元理解",
+        "concept": "世界宗教与多元理解", "short": "本套美国资料单列世界宗教史，中国侧未在本数据中形成对应簇。",
+        "subjects": ["History and Geography"], "topic_regex": "History of World Religions", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-child-movement-space", "side": "美国", "domain": "儿童发展", "group": "动作与平衡",
+        "concept": "空间中的身体控制", "short": "本套美国资料把学前身体空间控制写成目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Movement and Coordination"], "topic_regex": "Movement and Coordination", "text_regex": "I-MC2|I-MC5",
+    },
+    {
+        "id": "one-us-child-movement-cooperate", "side": "美国", "domain": "儿童发展", "group": "投掷与协调",
+        "concept": "协作与模仿动作", "short": "本套美国资料单列同伴协作与模仿动作，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Movement and Coordination"], "topic_regex": "Movement and Coordination", "text_regex": "I-MC3|I-MC10",
+    },
+    {
+        "id": "one-us-child-self", "side": "美国", "domain": "儿童发展", "group": "常规与协作",
+        "concept": "自我认识与身体部位", "short": "本套美国资料把姓名、身体部位等自我认识列为学前目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Social and Emotional Development"], "topic_regex": "Autonomy and Social Skills", "text_regex": "I-AS1|I-AS2",
+    },
+    {
+        "id": "one-us-child-social", "side": "美国", "domain": "儿童发展", "group": "常规与协作",
+        "concept": "问候与同伴互动", "short": "本套美国资料单列问候、请求与同伴互动规则，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Social and Emotional Development"], "topic_regex": "Autonomy and Social Skills", "text_regex": "I-AS5",
+    },
+    {
+        "id": "one-us-child-rules", "side": "美国", "domain": "儿童发展", "group": "常规与协作",
+        "concept": "规则、责任与任务转换", "short": "本套美国资料把规则遵守、分内职责和任务转换列为目标，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Social and Emotional Development"], "topic_regex": "Autonomy and Social Skills", "text_regex": "I-AS6",
+    },
+    {
+        "id": "one-us-child-workhabits", "side": "美国", "domain": "儿童发展", "group": "常规与协作",
+        "concept": "坚持与工作习惯", "short": "本套美国资料单列学前坚持完成任务的工作习惯，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Social and Emotional Development"], "topic_regex": "Work Habits", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-art-architecture", "side": "美国", "domain": "艺术", "group": "美术与创造",
+        "concept": "建筑与空间艺术", "short": "本套美国资料单列建筑艺术内容，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Visual Arts"], "topic_regex": "Architecture", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-art-sculpture", "side": "美国", "domain": "艺术", "group": "美术与创造",
+        "concept": "雕塑艺术", "short": "本套美国资料单列雕塑内容，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Visual Arts"], "topic_regex": "Sculpture", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-music-songs", "side": "美国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "歌曲与歌唱", "short": "本套美国资料把歌曲与歌唱按年级列出，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Music"], "topic_regex": "Songs", "text_regex": ".*",
+    },
+    {
+        "id": "one-us-music-composers", "side": "美国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "作曲家与作品", "short": "本套美国资料单列作曲家及其作品，中国侧未在本数据中形成对应簇。",
+        "subjects": ["Music"], "topic_regex": "Composers and Their Music", "text_regex": ".*",
+    },
+    # 中国：数学（替换原来的单一“数量关系”簇）
+    {
+        "id": "one-cn-math-life", "side": "中国", "domain": "数学", "group": "数与运算",
+        "concept": "生活情境中的数量关系", "short": "本套中国资料把生活情境中的数量关系单列，美国侧未在本数据中形成对应簇。",
+        "subjects": ["数学"], "text_regex": "生活情境|生活.*问题|实际情境",
+    },
+    {
+        "id": "one-cn-math-pattern", "side": "中国", "domain": "数学", "group": "数与运算",
+        "concept": "变化规律与探索", "short": "本套中国资料单列变化规律与探索要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["数学"], "text_regex": "变化规律|探索简单规律|规律",
+    },
+    {
+        "id": "one-cn-math-estimate", "side": "中国", "domain": "数学", "group": "数与运算",
+        "concept": "估算方法", "short": "本套中国资料把估算作为独立要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["数学"], "text_regex": "估算",
+    },
+    {
+        "id": "one-cn-math-model", "side": "中国", "domain": "数学", "group": "代数",
+        "concept": "常见数量关系模型", "short": "本套中国资料单列总价、路程、正比例等数量关系模型，美国侧未在本数据中形成对应簇。",
+        "subjects": ["数学"], "text_regex": "总价|路程|成正比的量|等量",
+    },
+    {
+        "id": "one-cn-math-preschool", "side": "中国", "domain": "数学", "group": "数与运算",
+        "concept": "学前数学认知", "short": "本套中国资料在学前指南中单列数学认知，美国侧未在本数据中形成对应簇。",
+        "subjects": ["科学"], "text_regex": "数学认知",
+    },
+    # 中国：科学
+    {
+        "id": "one-cn-science-inquiry", "side": "中国", "domain": "科学", "group": "探究与工程",
+        "concept": "科学探究", "short": "本套中国资料把科学探究单列为课程内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["科学"], "text_regex": "科学探究",
+    },
+    {
+        "id": "one-cn-science-strategy", "side": "中国", "domain": "科学", "group": "探究与工程",
+        "concept": "科学教学策略建议", "short": "本套中国资料单列科学教学策略建议，美国侧未在本数据中形成对应簇。",
+        "subjects": ["科学"], "text_regex": "教学策略建议",
+    },
+    {
+        "id": "one-cn-science-content", "side": "中国", "domain": "科学", "group": "综合与工程",
+        "concept": "科学课程内容", "short": "本套中国资料单列科学课程内容条目，美国侧未在本数据中形成对应簇。",
+        "subjects": ["科学"], "text_regex": "content",
+    },
+    {
+        "id": "one-cn-physics-engineering", "side": "中国", "domain": "科学", "group": "探究与工程",
+        "concept": "物理学与工程实践", "short": "本套中国资料把物理学与工程实践列为主题，美国侧未在本数据中形成对应簇。",
+        "subjects": ["物理"], "text_regex": "物理学与工程实践",
+    },
+    {
+        "id": "one-cn-chem-resources", "side": "中国", "domain": "科学", "group": "物质与化学",
+        "concept": "化学与资源环境健康", "short": "本套中国资料单列化学与资源、能源、材料、环境、健康的联系，美国侧未在本数据中形成对应簇。",
+        "subjects": ["化学"], "text_regex": "化学与资源、能源、材料、环境、健康",
+    },
+    # 中国：地理
+    {
+        "id": "one-cn-geo-hometown-field", "side": "中国", "domain": "地理", "group": "区域与行政",
+        "concept": "家乡野外考察", "short": "本套中国资料把家乡野外考察单列为地理实践，美国侧未在本数据中形成对应簇。",
+        "subjects": ["地理"], "text_regex": "野外考察",
+    },
+    {
+        "id": "one-cn-geo-hometown-dev", "side": "中国", "domain": "地理", "group": "人文地理",
+        "concept": "家乡发展与规划", "short": "本套中国资料单列家乡环境、生产发展与规划，美国侧未在本数据中形成对应簇。",
+        "subjects": ["地理"], "text_regex": "发展规划|家乡环境",
+    },
+    {
+        "id": "one-cn-geo-polar", "side": "中国", "domain": "地理", "group": "世界地理",
+        "concept": "极地科学与环境保护", "short": "本套中国资料单列南北极科学考察与环境保护，美国侧未在本数据中形成对应簇。",
+        "subjects": ["地理"], "text_regex": "南极、北极|极地",
+    },
+    {
+        "id": "one-cn-geo-country-impact", "side": "中国", "domain": "地理", "group": "人文地理",
+        "concept": "国家对自然环境的改造", "short": "本套中国资料单列国家改造自然环境的影响分析，美国侧未在本数据中形成对应簇。",
+        "subjects": ["地理"], "text_regex": "改造活动|自然环境的影响",
+    },
+    {
+        "id": "one-cn-geo-practice", "side": "中国", "domain": "地理", "group": "区域与行政",
+        "concept": "地理实验与考察方案", "short": "本套中国资料把地理实验和考察方案设计列为内容要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["地理"], "text_regex": "地理实验|考察方案",
+    },
+    # 中国：语言 / 文化 / 儿童发展 / 艺术
+    {
+        "id": "one-cn-english-strategies", "side": "中国", "domain": "语言与读写", "group": "听说与口语",
+        "concept": "英语学习策略", "short": "本套中国资料把英语学习策略单列为内容要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["英语"], "text_regex": "学习策略内容要求",
+    },
+    {
+        "id": "one-cn-english-themes", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
+        "concept": "英语主题内容要求", "short": "本套中国资料按主题组织英语内容要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["英语"], "text_regex": "主题内容要求",
+    },
+    {
+        "id": "one-cn-chinese-grammar", "side": "中国", "domain": "语言与读写", "group": "写作与表达",
+        "concept": "语法修辞知识", "short": "本套中国资料单列语法修辞知识说明，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "语法修辞知识",
+    },
+    {
+        "id": "one-cn-chinese-extra-reading", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
+        "concept": "课内外读物建议", "short": "本套中国资料给出课内外读物建议，美国侧未在本数据中形成对应簇。",
+        "subjects": ["语文"], "text_regex": "课内外读物",
+    },
+    {
+        "id": "one-cn-history-ancient", "side": "中国", "domain": "文化", "group": "文化传承",
+        "concept": "中国古代历史线索", "short": "本套中国资料单列中国古代历史基本线索，美国侧未在本数据中形成对应簇。",
+        "subjects": ["历史"], "text_regex": "中国古代历史",
+    },
+    {
+        "id": "one-cn-history-modern", "side": "中国", "domain": "文化", "group": "国家认同",
+        "concept": "中国近代历史与革命传统", "short": "本套中国资料单列中国近代历史与革命传统，美国侧未在本数据中形成对应簇。",
+        "subjects": ["历史"], "text_regex": "中国近代历史|中国共产党",
+    },
+    {
+        "id": "one-cn-history-world", "side": "中国", "domain": "文化", "group": "多元理解",
+        "concept": "世界历史与文明交流", "short": "本套中国资料单列世界古代史与世界近代史，美国侧未在本数据中形成对应簇。",
+        "subjects": ["历史"], "text_regex": "世界古代史|世界近代史",
+    },
+    {
+        "id": "one-cn-labor-cleaning", "side": "中国", "domain": "文化", "group": "文化传承",
+        "concept": "清洁与卫生劳动", "short": "本套中国资料把清洁与卫生列为劳动任务群，美国侧未在本数据中形成对应簇。",
+        "subjects": ["劳动"], "text_regex": "清洁与卫生",
+    },
+    {
+        "id": "one-cn-child-posture", "side": "中国", "domain": "儿童发展", "group": "卫生与自理",
+        "concept": "幼儿体态与姿势", "short": "本套中国资料单列幼儿正确姿势与体态要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["健康"], "text_regex": "坐直|站直|姿势|体态",
+    },
+    {
+        "id": "one-cn-child-emotion", "side": "中国", "domain": "儿童发展", "group": "常规与协作",
+        "concept": "幼儿情绪管理", "short": "本套中国资料单列幼儿情绪稳定与转换要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["健康"], "text_regex": "情绪",
+    },
+    {
+        "id": "one-cn-child-peer", "side": "中国", "domain": "儿童发展", "group": "常规与协作",
+        "concept": "幼儿同伴交往", "short": "本套中国资料单列幼儿同伴交往与分享要求，美国侧未在本数据中形成对应簇。",
+        "subjects": ["社会"], "text_regex": "人际交往|一起游戏|同伴",
+    },
+    {
+        "id": "one-cn-child-movement", "side": "中国", "domain": "儿童发展", "group": "动作与平衡",
+        "concept": "基本运动技能", "short": "本套中国资料把移动性、非移动性和操控性技能列为体育内容，美国侧未在本数据中形成对应簇。",
+        "subjects": ["体育与健康"], "text_regex": "移动性技能|非移动性技能|操控性技能",
+    },
+    {
+        "id": "one-cn-art-feel", "side": "中国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "幼儿感受与欣赏", "short": "本套中国资料把感受与欣赏列为学前艺术子领域，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "感受与欣赏|自然界",
+    },
+    {
+        "id": "one-cn-art-create", "side": "中国", "domain": "艺术", "group": "美术与创造",
+        "concept": "幼儿表现与创造", "short": "本套中国资料把表现与创造列为学前艺术子领域，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "表现与创造|涂涂画画|自哼自唱",
+    },
+    {
+        "id": "one-cn-art-content", "side": "中国", "domain": "艺术", "group": "美术与创造",
+        "concept": "艺术课程内容", "short": "本套中国资料单列艺术课程内容条目，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "content",
+    },
+    {
+        "id": "one-cn-art-academic", "side": "中国", "domain": "艺术", "group": "音乐与律动",
+        "concept": "艺术学业质量标准", "short": "本套中国资料单列艺术学业质量标准，美国侧未在本数据中形成对应簇。",
+        "subjects": ["艺术"], "text_regex": "academic",
+    },
+]
+
+ONE_SIDED_SPECS.extend(ONE_SIDED_EXTRA)
+
+
 def build_micro_rows(
     us_items: list[dict[str, Any]], cn_items: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
@@ -3117,14 +3719,132 @@ def build_micro_rows(
     return rows
 
 
+def build_one_sided_rows(
+    us_items: list[dict[str, Any]],
+    cn_items: list[dict[str, Any]],
+    used_ids: set[str],
+) -> list[dict[str, Any]]:
+    """从源资料中未被可比簇占用的主题生成单侧概念簇。"""
+    domain_counts: dict[str, int] = {}
+    rows: list[dict[str, Any]] = []
+
+    for spec in ONE_SIDED_SPECS:
+        side = spec["side"]
+        other = "中国" if side == "美国" else "美国"
+        cfg = {
+            "subjects": spec["subjects"],
+            "topic_regex": spec.get("topic_regex", ""),
+            "text_regex": spec.get("text_regex", ".*"),
+        }
+        matcher = us_matches if side == "美国" else cn_matches
+        pool = us_items if side == "美国" else cn_items
+        hits = [
+            item for item in pool
+            if item.get("status") == "展示"
+            and item.get("id") not in used_ids
+            and matcher(item, cfg)
+        ]
+        if not hits:
+            raise ValueError(f"单侧概念簇 {spec['id']} 没有命中可用证据")
+        hits.sort(key=(us_sort_key if side == "美国" else cn_sort_key))
+        for item in hits:
+            used_ids.add(item["id"])
+
+        domain = spec["domain"]
+        domain_counts[domain] = domain_counts.get(domain, 0) + 1
+        order = 200 + domain_counts[domain]
+        dist = stage_distribution(hits, side)
+        labels = display_track(dist, side)[:2]
+        first = hits[0]
+        first_label = (
+            US_GRADE_LABELS.get(first["grade"], first["grade"])
+            if side == "美国" else first["grade"]
+        )
+        subjects = sorted({item["subject"] for item in hits if item["subject"]})
+        reason = spec.get("reason", "本数据未收录对侧对应概念")
+        note = "仅指本套资料中只在该侧找到对应概念，不代表另一侧绝对缺失。"
+
+        present_side: dict[str, Any] = {
+            "是否有证据": True,
+            "首次年级": first_label,
+            "命中条目数": len(hits),
+            "涉及学科": subjects,
+            "最早证据": [evidence(item, side) for item in hits[:4]],
+            "学段分布": dist,
+            "后续学段": "不适用（单侧概念簇）",
+            "后续命中数": 0,
+            "后续代表证据": None,
+        }
+        absent_side: dict[str, Any] = {
+            "是否有证据": False,
+            "首次年级": None,
+            "命中条目数": 0,
+            "涉及学科": [],
+            "最早证据": [],
+            "学段分布": [],
+            "后续学段": "不适用（无命中）",
+            "后续命中数": 0,
+            "后续代表证据": None,
+        }
+        if side == "中国":
+            present_side["展示条目数"] = len(hits)
+            present_side["暂存条目数"] = 0
+            absent_side["展示条目数"] = 0
+            absent_side["暂存条目数"] = 0
+        else:
+            absent_side["展示条目数"] = 0
+            absent_side["暂存条目数"] = 0
+
+        short = normalize_stage_text(spec["short"])
+        row: dict[str, Any] = {
+            "id": spec["id"],
+            "领域": domain,
+            "概念簇": spec["concept"],
+            "story_order": order,
+            "分组": spec["group"],
+            "短结论": short,
+            "展示轨道": {"美国": [], "中国": [], "点型": "实心"},
+            "美国": present_side if side == "美国" else absent_side,
+            "中国": present_side if side == "中国" else absent_side,
+            "学段覆盖": {
+                "美国学段数": len(labels) if side == "美国" else 0,
+                "中国学段数": len(labels) if side == "中国" else 0,
+                "口径": "单侧概念只记录有证据一侧的展示学段。",
+                "对比": f"{side} {len(labels)} 个展示学段 / {other} 本资料未涵盖",
+            },
+            "关系": f"本数据中仅{side}有",
+            "侧重": "单侧概念簇",
+            "说明": note,
+            "深度对标": {
+                "美国": short if side == "美国" else "本资料未涵盖",
+                "中国": short if side == "中国" else "本资料未涵盖",
+                "终局关系": short,
+                "说明": note,
+            },
+            "重评关系": short,
+            "重评说明": reason + "；" + note,
+            "深度参数": [],
+            "深度解读": short,
+            "可比性": side,
+            "单侧原因": reason,
+            "类型": "单侧概念簇",
+        }
+        row["展示轨道"][side] = labels
+        rows.append(row)
+    return rows
+
+
 def build() -> None:
     us_items, cn_items = load_corpus()
     rows: list[dict[str, Any]] = []
+    all_hit_ids: set[str] = set()
     clusters = expand_clusters()
 
     for cluster in clusters:
         us_hits = [i for i in us_items if us_matches(i, cluster["us"])]
         cn_hits = [i for i in cn_items if cn_matches(i, cluster["cn"])]
+        all_hit_ids.update(item["id"] for item in us_hits if item.get("id"))
+        all_hit_ids.update(item["id"] for item in cn_hits if item.get("id"))
         us_hits.sort(key=us_sort_key)
         core_text = cluster["cn"].get("preschool_core_regex")
         if core_text:
@@ -3212,9 +3932,42 @@ def build() -> None:
 
     rows.extend(build_micro_rows(us_items, cn_items))
 
+    used_ids: set[str] = set(all_hit_ids)
+    for row in rows:
+        for side in ("美国", "中国"):
+            for ev in row[side]["最早证据"]:
+                if ev.get("来源条目"):
+                    used_ids.add(ev["来源条目"])
+            later = row[side].get("后续代表证据")
+            if later and later.get("来源条目"):
+                used_ids.add(later["来源条目"])
+    rows.extend(build_one_sided_rows(us_items, cn_items, used_ids))
+
+    for row in rows:
+        us_ok = bool(row["美国"]["是否有证据"])
+        cn_ok = bool(row["中国"]["是否有证据"])
+        if us_ok and cn_ok:
+            row["可比性"] = "可比"
+            row["单侧原因"] = ""
+        elif us_ok:
+            row["可比性"] = "仅美国"
+            if "文件类型差异" in str(row.get("单侧标记") or ""):
+                row["单侧原因"] = "文件类型差异"
+            else:
+                row["单侧原因"] = row.get("单侧原因") or "内容仅一侧出现"
+        elif cn_ok:
+            row["可比性"] = "仅中国"
+            if "文件类型差异" in str(row.get("单侧标记") or ""):
+                row["单侧原因"] = "文件类型差异"
+            else:
+                row["单侧原因"] = row.get("单侧原因") or "内容仅一侧出现"
+        else:
+            row["可比性"] = "可比"
+            row["单侧原因"] = ""
+
     dataset = {
-        "版本": "micro-claim-v6",
-        "用途": "中美课程标准对照底稿：原有五个领域的81个概念簇保持不变；新增儿童发展、艺术以及原有五个领域共44条微指标。125条均附起步／后续／差异三行简表与解读，44条微指标另有更细的深度参数。",
+        "版本": "one-sided-v7",
+        "用途": f"中美课程标准对照底稿：81个原有概念簇 + 44条微指标 + {len(ONE_SIDED_SPECS)}条单侧概念簇。页面可按可比项/仅中国/仅美国/全部筛选。",
         "年级对应": {
             "美国幼儿园前班": "中国幼儿园小班、中班",
             "美国K": "中国幼儿园大班",
@@ -3236,6 +3989,8 @@ def build() -> None:
             "语言与读写、文化两个领域按功能对标：美国 ELA/Language and Literacy 对 中国语文/学前语言；不把中国“英语/日语/俄语”等外语学科当作母语能力对标。",
             "文化领域按“国家认同、文化传承、多元理解”等功能对照，不按具体节日、人物、符号的字面对应；具体对象不同不代表功能不同。",
             "“本数据中仅美国有/仅中国有”只代表这两套数据，不代表绝对意义上的课程有无。",
+            "“仅美国/仅中国”表示本数据集中只在该侧找到对应概念；单侧原因区分文件类型差异、内容仅一侧出现与本数据未收录对侧对应概念，均不做能力高低判断。",
+            "单侧概念簇只绘制有证据一侧的轨道，另一侧显示本资料未涵盖；可比项仍保留双侧轨道与差异表。",
             "微指标层是人工挑选、可直接核对原文的能力点，证据按来源条目 ID 定位；每条最多指定两个展示学段，仍统一为实心点。",
             "微指标的深度按量化阈值、年级递进、场景条件、输出或动作形式等参数逐项列出，不合并成单一深/浅判断。",
             "微指标单侧项（如睡眠时长、屏幕时长）标注文件类型差异，只说明两套文件管辖范围不同，不做能力高低判断。",
@@ -3289,6 +4044,8 @@ def build() -> None:
                 "美国展示轨道",
                 "中国展示轨道",
                 "类型",
+                "可比性",
+                "单侧原因",
                 "单侧标记",
                 "深度参数",
                 "深度解读",
@@ -3333,6 +4090,8 @@ def build() -> None:
                     "、".join(row["展示轨道"]["美国"]),
                     "、".join(row["展示轨道"]["中国"]),
                     row.get("类型", "概念簇"),
+                    row.get("可比性", "可比"),
+                    row.get("单侧原因", ""),
                     row.get("单侧标记") or "",
                     "；".join(
                         f"{axis[0]}：美国 {axis[1]} / 中国 {axis[2]}"
@@ -3350,7 +4109,8 @@ def build() -> None:
         "- 数据底稿同时保留页面展示条目和被筛选隐藏的暂存条目用于核对；面向展示的字段不带暂存状态。",
         "- 除首次年级外，本版同时列出后续学段、学段覆盖、后续代表证据与深度对标，避免只看首次出现造成误判。",
         "- 原有数学、科学、地理、语言与读写、文化五个领域的81个概念簇保持不变。",
-        "- 全部125条均附逐条解读与“起步／后续／差异”三行简表；其中44条微指标另按可核对的深度参数逐项列出。",
+        f"- 共 {len(rows)} 条：81 个原有概念簇 + 44 条微指标 + {len(ONE_SIDED_SPECS)} 条单侧概念簇；逐条解读与“起步／后续／差异”三行简表保留。",
+        "- 页面筛选：可比项（默认）／仅中国／仅美国／全部；“仅”只表示本套资料中只在该侧找到对应概念，不代表另一侧绝对缺失。",
         "- 微指标单侧项标注文件类型差异，不做能力高低判断。",
         "- 这里只整理数据，没有网页。",
         "",
