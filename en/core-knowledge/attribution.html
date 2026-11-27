@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credits · Core Knowledge Explorer</title>
+<style>
+:root{
+  --primary:#1B5E20;
+  --bg:#F5F7FA;
+  --text:#2C3E50;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.7;
+  padding:20px;
+}
+.card{
+  max-width:720px;
+  margin:0 auto;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:28px 24px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+a{color:var(--primary)}
+.back{display:inline-block;margin-bottom:16px;font-size:14px;text-decoration:none}
+h1{font-size:1.5rem;margin:0 0 8px;color:var(--primary)}
+.sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+h2{font-size:1.05rem;margin:24px 0 8px;color:var(--primary)}
+p,li{font-size:14px}
+blockquote{
+  margin:12px 0;
+  padding:12px 14px;
+  background:#f7f9f7;
+  border-left:4px solid var(--primary);
+  border-radius:0 8px 8px 0;
+  font-size:14px;
+}
+code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:13px}
+.footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="card">
+  <a class="back" href="index.html">← Back to the explorer</a>
+  <h1>Credits and licensing</h1>
+  <div class="sub">Core Knowledge Explorer · Unofficial study aid</div>
+
+  <h2>1. Source material and license</h2>
+  <p>The knowledge-point structure, original English text, and source page numbers in this tool are derived from the 2023 edition of <em>Core Knowledge Sequence</em> (Preschool and K–8) published by the Core Knowledge® Foundation. The source material is released under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.</p>
+  <blockquote>
+    This work is based on an original work of the Core Knowledge® Foundation made available through licensing under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. This does not in any way imply that the Core Knowledge Foundation endorses this work.
+  </blockquote>
+  <p>License: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">https://creativecommons.org/licenses/by-nc-sa/4.0/</a><br>
+  Source: <a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener">Core Knowledge Sequence</a></p>
+
+  <h2>2. What this tool changes</h2>
+  <ul>
+    <li>Re-parses and structures the PDFs into Preschool / K–8, grade, subject, topic, subtopic, and type.</li>
+    <li>The source dataset includes Chinese translations; this English view shows English text only.</li>
+    <li>Adds subject / topic / type filters, search, saved items, and an outline navigator.</li>
+    <li>Exports JSON / CSV / XLSX data and uses a small number of concrete noun or action emoji as visual cues.</li>
+    <li>Adds Google search links for named works so readers can find introductions and age-appropriate resources.</li>
+  </ul>
+  <p>The structured data and page presentation in this tool are therefore an adaptation of the source material and are shared under <strong>CC BY-NC-SA 4.0</strong> as well.</p>
+
+  <h2>3. Usage limits</h2>
+  <p>This site is free, ad-free, and has no paywall; it is for non-commercial study and sharing only. Commercial use, sublicensing, or reuse that removes attribution or license notices is outside the granted license.</p>
+
+  <h2>4. Images, emoji, and external links</h2>
+  <p>The public version does not include images extracted from the original PDFs. Emoji in items are Unicode characters used only as cues; 272 items have images from Wikimedia Commons, limited to files explicitly marked <strong>Public Domain or CC0</strong> and checked manually.</p>
+  <p>Images are hot-linked, not copied into this site. Click one to view it full-screen; the file, artist, and license are shown below it. If a source link stops working, the image is hidden and a link to Commons is shown. Copyright status follows the Commons page.</p>
+  <p>Some items include an auto-generated "Related resources ↗" Google search link, useful only for finding introductions. This site does not host or endorse search results, whose copyright belongs to their respective owners.</p>
+
+  <h2>5. Code license versus data license</h2>
+  <p>HTML / CSS / JavaScript program code in this directory follows the repository-root <a href="../../LICENSE" target="_blank" rel="noopener">CC BY-NC 4.0</a> license. The knowledge-point data, its translations, and derived tables in <code>data/</code> use the stricter <strong>CC BY-NC-SA 4.0</strong>. If the two conflict, the data-directory license governs.</p>
+
+  <div class="footer">
+    © 2025 GrowyAI · Core Knowledge® is a trademark of the Core Knowledge Foundation. This site is not endorsed by the Core Knowledge Foundation.
+  </div>
+</div>
+</body>
+</html>

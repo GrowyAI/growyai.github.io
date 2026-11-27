@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Knowledge Curriculum Outline</title>
+<style>
+  :root {
+    --bg: #f6f8fb; --surface: #fff; --border: #e2e8f0; --text: #0f172a;
+    --muted: #64748b; --accent: #42657d; --accent-soft: #eef3f6;
+    --amber: #b45309; --amber-soft: #fffbeb; --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 16px 14px; }
+  .top { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 { margin: 0; font-size: 20px; }
+  h1 a { color: inherit; text-decoration: none; }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .link-btn, .ghost-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--accent); font-size: 13px;
+    text-decoration: none; cursor: pointer; white-space: nowrap;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 18px 16px 40px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--muted); }
+  .stat b { display: block; font-size: 17px; color: var(--text); }
+  h2 { font-size: 15px; margin: 22px 0 10px; }
+  .matrix-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; }
+  th, td { border-bottom: 1px solid var(--border); padding: 8px; text-align: left; vertical-align: top; }
+  th { background: #fafbfc; font-size: 12px; color: var(--muted); font-weight: 600; position: sticky; top: 0; }
+  th:first-child, td:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; font-weight: 600; font-size: 13px; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  .cell {
+    display: block; width: 100%; min-width: 108px; text-align: left;
+    border: 1px solid var(--border); border-radius: 10px; background: #fff;
+    padding: 9px 10px; cursor: pointer; color: var(--text);
+  }
+  .cell:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .cell.core { border-color: var(--sc, #c6d6e0); background: #f7fafb; }
+  .cell-name { font-size: 13px; font-weight: 600; color: var(--sc, var(--text)); }
+  .cell-name .star { color: var(--sc, var(--accent)); }
+  .cell-en { font-size: 10px; color: var(--muted); margin: 2px 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-counts { font-size: 11px; color: var(--muted); display: flex; gap: 8px; }
+  .bar { height: 3px; border-radius: 2px; background: #dce6ec; margin-top: 7px; }
+  .bar span { display: block; height: 100%; background: var(--sc, var(--accent)); border-radius: 2px; }
+  .preschool { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+  .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.35); z-index: 20; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 94vw);
+    background: var(--surface); z-index: 21; overflow-y: auto;
+    box-shadow: -12px 0 32px rgba(15,23,42,.12); padding: 18px;
+  }
+  .drawer-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .drawer h3 { margin: 0; font-size: 18px; }
+  .drawer .crumb { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .drawer .meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .close { border: none; background: #f1f5f9; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; color: var(--muted); }
+  .topic { border: 1px solid var(--border); border-radius: 10px; margin-top: 8px; background: #fff; }
+  .topic summary { cursor: pointer; padding: 10px 12px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; }
+  .topic summary .n { color: var(--muted); font-weight: 400; font-size: 11px; white-space: nowrap; }
+  .topic-body { border-top: 1px solid var(--border); padding: 8px 12px 12px; }
+  .preview { margin: 0 0 8px; padding-left: 16px; font-size: 12px; color: var(--muted); }
+  .preview li { margin: 4px 0; }
+  .preview .p-en { color: var(--text); }
+  .sub-links { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 0 0 8px; }
+  .sub-links a { font-size: 12px; color: var(--accent); text-decoration: none; }
+  .sub-links a:hover { text-decoration: underline; }
+  .view-all { display: inline-block; font-size: 12px; color: var(--accent); text-decoration: none; }
+  .all-link { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--accent); }
+  .empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
+  @media (max-width: 640px) {
+    header { padding: 14px 12px 12px; }
+    main { padding: 14px 12px 32px; }
+    h1 { font-size: 18px; }
+    .top { align-items: flex-start; }
+    .drawer { padding: 14px; }
+  }
+  .site-foot {
+    max-width: 980px; margin: 0 auto; padding: 18px 16px 32px;
+    font-size: 12px; color: #94a3b8; text-align: center;
+  }
+  .site-foot a { color: var(--accent); }
+  .nav-links { display: flex; flex-wrap: wrap; gap: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1><a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge</a> Curriculum Outline</h1>
+      <div class="sub">Pick a grade and subject to see the core knowledge points in each cell. Open a topic to preview it, or go to the full explorer.</div>
+    </div>
+    <div class="nav-links">
+      <a class="link-btn" href="../index.html">Growy home</a>
+      <a class="link-btn" href="index.html">Open the explorer →</a>
+      <a class="link-btn" href="attribution.html">Credits</a>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="stats" id="stats"></div>
+
+  <h2>Preschool · Developmental domains</h2>
+  <div class="preschool" id="preschool"></div>
+
+  <h2>K–8 · Grade × Subject</h2>
+  <div class="matrix-wrap">
+    <table id="matrix">
+      <thead><tr><th>Grade</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+
+<footer class="site-foot">
+  Source: <a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge Sequence 2023</a> · Unofficial summary, not endorsed by the Core Knowledge Foundation ·
+  <a href="attribution.html">Credits</a> · Original PDFs:
+  <a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_PreSchool_W2.pdf" target="_blank" rel="noopener noreferrer">Preschool</a> /
+  <a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_GK8_W3.pdf" target="_blank" rel="noopener noreferrer">K–8</a>
+</footer>
+
+<div class="overlay" id="overlay" hidden></div>
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-head">
+    <div>
+      <div class="crumb" id="drawerCrumb"></div>
+      <h3 id="drawerTitle"></h3>
+      <div class="meta" id="drawerMeta"></div>
+    </div>
+    <button class="close" id="drawerClose" title="Close">×</button>
+  </div>
+  <div id="drawerBody"></div>
+</aside>
+
+<script src="data/knowledge-inline.js"></script>
+<script>
+(function () {
+  var DATA = window.KNOWLEDGE;
+  var items = DATA.items;
+  var GRADES = ["K", "1", "2", "3", "4", "5", "6", "7", "8"];
+  var SUBJECT_ORDER = [
+    "Language and Literacy", "English Language Arts", "Mathematics",
+    "History and Geography", "Science", "Movement and Coordination",
+    "Social and Emotional Development", "Music", "Visual Arts"
+  ];
+  function subjectRank(s) {
+    var i = SUBJECT_ORDER.indexOf(s);
+    return i === -1 ? SUBJECT_ORDER.length : i;
+  }
+  var SUBJECTS = DATA.taxonomy.k8_subjects.slice().sort(function (a, b) {
+    return subjectRank(a) - subjectRank(b);
+  });
+  var CORE = {
+    "English Language Arts": 1, "Mathematics": 1, "Science": 1, "History and Geography": 1,
+    "Language and Literacy": 1, "Mathematical Reasoning and Number Sense": 1
+  };
+  var ZH = {};
+  var SUBJECT_COLORS = {
+    "History and Geography": "#9A6B3F",
+    "English Language Arts": "#4F6FA8",
+    "Science": "#2F7D6E",
+    "Mathematics": "#6B5CA5",
+    "Visual Arts": "#B0556B",
+    "Music": "#8A5AA8",
+    "Language and Literacy": "#3F7E96",
+    "Social and Emotional Development": "#B06A3B",
+    "Movement and Coordination": "#5C8A4A"
+  };
+  function subjectColor(s) {
+    s = s || "";
+    if (SUBJECT_COLORS[s]) return SUBJECT_COLORS[s];
+    var keys = Object.keys(SUBJECT_COLORS);
+    for (var k = 0; k < keys.length; k++) {
+      if (s.indexOf(keys[k]) === 0) return SUBJECT_COLORS[keys[k]];
+    }
+    return "#42657d";
+  }
+  function zh(s) { return ""; }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function gradeLabel(g) { return g === "K" ? "K" : "G" + g; }
+  function gradeItems(g) { return items.filter(function (i) { return i.grade === g; }); }
+  function subjectItems(g, s) {
+    return items.filter(function (i) { return i.grade === g && i.subject === s; });
+  }
+  function topicList(g, s) {
+    var seen = {}, out = [];
+    subjectItems(g, s).forEach(function (i) {
+      if (!seen[i.topic]) {
+        seen[i.topic] = { title: i.topic, items: [], subtopics: {} };
+        out.push(seen[i.topic]);
+      }
+      seen[i.topic].items.push(i);
+      if (i.subtopic) seen[i.topic].subtopics[i.subtopic] = 1;
+    });
+    return out;
+  }
+  function viewerUrl(g, s, topic, subtopic) {
+    var q = "index.html?grade=" + encodeURIComponent(g) + "&subject=" + encodeURIComponent(s);
+    if (topic) q += "&topic=" + encodeURIComponent(topic);
+    if (subtopic) q += "&subtopic=" + encodeURIComponent(subtopic);
+    return q;
+  }
+
+  function buildStats() {
+    var grades = GRADES.length + 1;
+    var subjects = new Set(items.map(function (i) { return i.grade + "|" + i.subject; })).size;
+    var topics = new Set(items.map(function (i) { return i.grade + "|" + i.subject + "|" + i.topic; })).size;
+    document.getElementById("stats").innerHTML = [
+      ["Grades", grades], ["Grade-subject pairs", subjects], ["Topics", topics], ["Items", items.length]
+    ].map(function (p) {
+      return '<div class="stat"><b>' + p[1] + "</b>" + p[0] + "</div>";
+    }).join("");
+  }
+
+  function buildPreschool() {
+    var counts = {};
+    gradeItems("Preschool").forEach(function (i) { counts[i.subject] = (counts[i.subject] || 0) + 1; });
+    var names = Object.keys(counts).sort(function (a, b) { return subjectRank(a) - subjectRank(b); });
+    document.getElementById("preschool").innerHTML = names.map(function (s) {
+      return '<a class="cell' + (CORE[s] ? " core" : "") + '" style="--sc:' + subjectColor(s) + '" href="' + esc(viewerUrl("Preschool", s)) + '">' +
+        '<div class="cell-name">' + (CORE[s] ? '<span class="star">★ </span>' : "") + esc(zh(s) || s) + "</div>" +
+        '<div class="cell-en">' + esc(s) + "</div>" +
+        '<div class="cell-counts"><span>' + counts[s] + " items</span></div></a>";
+    }).join("");
+  }
+
+  function buildMatrix() {
+    var table = document.getElementById("matrix");
+    var head = table.querySelector("thead tr");
+    SUBJECTS.forEach(function (s) {
+      var th = document.createElement("th");
+      th.textContent = (CORE[s] ? "★ " : "") + (zh(s) || s);
+      head.appendChild(th);
+    });
+    var max = 0;
+    var cells = {};
+    GRADES.forEach(function (g) {
+      SUBJECTS.forEach(function (s) {
+        cells[g + "|" + s] = subjectItems(g, s);
+        max = Math.max(max, cells[g + "|" + s].length);
+      });
+    });
+    var body = table.querySelector("tbody");
+    body.innerHTML = GRADES.map(function (g) {
+      var tds = SUBJECTS.map(function (s) {
+        var arr = cells[g + "|" + s];
+        var ts = topicList(g, s).length;
+        var pct = max ? Math.max(6, Math.round(arr.length / max * 100)) : 0;
+        return "<td><button class=\"cell" + (CORE[s] ? " core" : "") + "\" style=\"--sc:" + subjectColor(s) + "\" data-grade=\"" + esc(g) + "\" data-subject=\"" + esc(s) + "\">" +
+          '<div class="cell-name">' + (CORE[s] ? '<span class="star">★ </span>' : "") + esc(zh(s) || s) + "</div>" +
+          '<div class="cell-en">' + esc(s) + "</div>" +
+          '<div class="cell-counts"><span>' + ts + " topics</span><span>" + arr.length + " items</span></div>" +
+          '<div class="bar"><span style="width:' + pct + '%"></span></div></button></td>';
+      }).join("");
+      return "<tr><td>" + gradeLabel(g) + "</td>" + tds + "</tr>";
+    }).join("");
+    Array.prototype.forEach.call(body.querySelectorAll(".cell"), function (btn) {
+      btn.addEventListener("click", function () { openDrawer(btn.dataset.grade, btn.dataset.subject); });
+    });
+  }
+
+  function openDrawer(g, s) {
+    var arr = subjectItems(g, s);
+    var topics = topicList(g, s);
+    document.getElementById("drawerCrumb").textContent = "Outline / " + (g === "K" ? "K" : "G" + g);
+    var drawerTitle = document.getElementById("drawerTitle");
+    drawerTitle.textContent = (CORE[s] ? "★ " : "") + (zh(s) || s);
+    drawerTitle.style.color = subjectColor(s);
+    document.getElementById("drawerMeta").textContent = s + " · " + topics.length + " topics · " + arr.length + " items";
+    document.getElementById("drawerBody").innerHTML = topics.length ? topics.map(function (t, idx) {
+      var preview = t.items.slice(0, 3).map(function (i) {
+        return "<li><span class=\"p-en\">" + esc(i.en) + "</span>" +
+          "</li>";
+      }).join("");
+      var subNames = Object.keys(t.subtopics);
+      var subHtml = subNames.length
+        ? '<div class="sub-links">' + subNames.map(function (sub) {
+            return '<a href="' + esc(viewerUrl(g, s, t.title, sub)) + '">↳ ' + esc(sub) + "</a>";
+          }).join("") + "</div>"
+        : "";
+      return '<details class="topic"' + (idx < 3 ? " open" : "") + ">" +
+        "<summary><span>" + esc(t.title) + "</span><span class=\"n\">" +
+        subNames.length + " subtopics · " + t.items.length + " items</span></summary>" +
+        '<div class="topic-body">' + subHtml + '<ul class="preview">' + preview + "</ul>" +
+        '<a class="view-all" href="' + esc(viewerUrl(g, s, t.title)) + '">View all ' + t.items.length + " items →</a>" +
+        "</div></details>";
+    }).join("") + '<a class="all-link" href="' + esc(viewerUrl(g, s)) + '">Open all ' + gradeLabel(g) + " · " + esc(zh(s) || s) + " content →</a>"
+      : '<div class="empty">No content in this cell yet.</div>';
+    document.getElementById("overlay").hidden = false;
+    document.getElementById("drawer").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDrawer() {
+    document.getElementById("overlay").hidden = true;
+    document.getElementById("drawer").hidden = true;
+    document.body.style.overflow = "";
+  }
+  document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+  document.getElementById("overlay").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+
+  buildStats();
+  buildPreschool();
+  buildMatrix();
+})();
+</script>
+</body>
+</html>

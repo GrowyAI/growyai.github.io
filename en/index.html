@@ -11,6 +11,7 @@
             --about: #546E7A;
             --priority: #6B5B95;
             --orange: #E2703A;
+            --knowledge: #5B7C99;
             --bg: #F5F7FA;
             --text: #2C3E50;
             --gray: #6b7280;
@@ -132,6 +133,7 @@
         .card.gray::before { background: linear-gradient(to right, #C5D3DC, var(--about)); }
         .card.purple::before { background: linear-gradient(to right, #9C7BB8, var(--priority)); }
         .card.orange::before { background: linear-gradient(to right, #FFA06B, var(--orange)); }
+        .card.knowledge::before { background: linear-gradient(to right, #8CA9BF, var(--knowledge)); }
 
         .icon {
             width: 56px;
@@ -154,6 +156,8 @@
         .card.purple:hover .icon { background: var(--priority); color: white; }
         .card.orange .icon { background: rgba(226,112,58,0.12); color: var(--orange); }
         .card.orange:hover .icon { background: var(--orange); color: white; }
+        .card.knowledge .icon { background: rgba(91,124,153,0.12); color: var(--knowledge); }
+        .card.knowledge:hover .icon { background: var(--knowledge); color: white; }
 
         .card h3 {
             font-size: 1.25rem;
@@ -167,6 +171,7 @@
         .card.gray:hover h3 { color: var(--about); }
         .card.purple:hover h3 { color: var(--priority); }
         .card.orange:hover h3 { color: var(--orange); }
+        .card.knowledge:hover h3 { color: var(--knowledge); }
 
         .card p {
             font-size: 0.875rem;
@@ -188,6 +193,7 @@
         .card.gray .action { color: var(--about); }
         .card.purple .action { color: var(--priority); }
         .card.orange .action { color: var(--orange); }
+        .card.knowledge .action { color: var(--knowledge); }
 
         /* Footer */
         footer {
@@ -286,6 +292,17 @@
                 <h3>Stuck in a Parenting Moment?</h3>
                 <p>When something happens and you don’t know how to respond, Growy helps you think it through—based on your child, your family, and your values.</p>
                 <div class="action">Chat with Growy →</div>
+            </a>
+
+            <a href="core-knowledge/index.html" class="card knowledge">
+                <div class="icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h3>What Should My Child Learn at Each Age?</h3>
+                <p>Browse and search the US PreK-G8 Core Knowledge sequence by grade and subject.</p>
+                <div class="action">Start Exploring →</div>
             </a>
 
             <a href="priority.html" class="card purple">

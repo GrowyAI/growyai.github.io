@@ -215,6 +215,25 @@
         .card.knowledge .action { color: var(--knowledge); }
         .card.china .action { color: #8B4C4C; }
 
+        /* 三合一入口卡片：同一问题下的多个资料视角 */
+        .card.hub { cursor: default; }
+        .card.hub:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card.hub:hover h3 { color: #1f2937; }
+        .card.hub:hover .icon { background: rgba(91,124,153,0.12); color: var(--knowledge); }
+        .sublinks { display: grid; gap: 6px; margin-top: 10px; }
+        .sublinks a {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 10px;
+            text-decoration: none; color: var(--text); font-size: 0.9rem; font-weight: 600;
+            background: white; transition: all 0.2s ease;
+        }
+        .sublinks a:hover { border-color: var(--knowledge); background: rgba(91,124,153,0.06); transform: translateY(-1px); }
+        .subdot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+        .subdot.us { background: #5B7C99; }
+        .subdot.cn { background: #8B4C4C; }
+        .subdot.cmp { background: #6B5B95; }
+        .subarrow { margin-left: auto; color: var(--gray); font-weight: 400; }
+
         /* Footer */
         footer {
             padding: 1.5rem 1rem;
@@ -331,29 +350,22 @@
                 <p>0–18 岁育儿知识闯关，看看你能得多少分？<span class="action">开始闯关 →</span></p>
             </a>
 
-            <a href="core-knowledge/index.html" class="card knowledge">
+            <div class="card knowledge hub">
                 <div class="card-head">
                     <div class="icon">
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    <h3>美国PreK-G8 核心知识点</h3>
+                    <h3>每个年龄段该学什么？</h3>
                 </div>
-                <p>快速了解美国各阶段 Core Knowledge 核心知识点，按年级、学科和主题分类查找，中英对照。<span class="action">开始查询 →</span></p>
-            </a>
-
-            <a href="china-curriculum/index.html" class="card china">
-                <div class="card-head">
-                    <div class="icon">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <h3>中国幼儿园 / 小学 / 初中课程标准</h3>
+                <p>基于官方资料，快速筛选和查询孩子各阶段的核心知识范围</p>
+                <div class="sublinks">
+                    <a href="core-knowledge/index.html"><span class="subdot us"></span><span>美国 PreK-G8 核心知识点</span><span class="subarrow">→</span></a>
+                    <a href="china-curriculum/index.html"><span class="subdot cn"></span><span>中国幼儿园 / 小学 / 初中课程标准</span><span class="subarrow">→</span></a>
+                    <a href="curriculum-compare/data/index.html"><span class="subdot cmp"></span><span>中美课程标准，有什么区别？</span><span class="subarrow">→</span></a>
                 </div>
-                <p>快速了解中国各阶段教育部指南与课程标准知识点。按年级、领域和主题，分类查找。<span class="action">开始查询 →</span></p>
-            </a>
+            </div>
 
             <a href="priority.html" class="card purple">
                 <div class="card-head">

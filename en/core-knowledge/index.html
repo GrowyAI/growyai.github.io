@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PreK-G8 Core Knowledge Explorer</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #f1f4f8;
+    --border: #dfe4ea;
+    --text: #1f2933;
+    --muted: #64748b;
+    --accent: #42657d;
+    --accent-soft: #e9eff3;
+    --amber: #b45309;
+    --amber-soft: #fef3c7;
+    --green: #15803d;
+    --green-soft: #dcfce7;
+    --purple: #7e22ce;
+    --purple-soft: #f3e8ff;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px calc(10px + env(safe-area-inset-top));
+  }
+  .title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 17px; margin: 0; font-weight: 650; min-width: 0; }
+  .title-info { font-size: 12px; color: var(--muted); text-decoration: none; opacity: 0.75; margin-left: 5px; vertical-align: 1px; }
+  .title-info:hover { color: var(--accent); opacity: 1; }
+  .count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .controls { display: grid; gap: 8px; min-width: 0; }
+  .controls > * { min-width: 0; max-width: 100%; }
+  .search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .search:focus { outline: 2px solid var(--accent); background: var(--surface); }
+  .grade-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .chip {
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
+  select {
+    flex: 1 1 130px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+  }
+  .filter-row > select { flex: 1 1 calc(50% - 4px); }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+  main { padding: 12px 14px 80px; max-width: 900px; margin: 0 auto; }
+  details.subject {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  details.subject > summary {
+    padding: 12px 14px;
+    font-weight: 620;
+    font-size: 15px;
+    cursor: pointer;
+    background: var(--surface-2);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--subject-color, var(--accent));
+  }
+  .subject-core { color: var(--subject-color, var(--accent)); }
+  details.subject > summary::-webkit-details-marker { display: none; }
+  details.subject > summary::after { content: "+"; color: var(--muted); font-size: 18px; }
+  details.subject[open] > summary::after { content: "−"; }
+  .topic-group { border-top: 1px solid var(--border); }
+  .topic-title {
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 14px;
+    background: #fafbfc;
+    color: var(--subject-color, #334155);
+  }
+  .subtopic-title {
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--subject-color, var(--accent));
+    background: var(--accent-soft);
+  }
+  .section-title {
+    list-style: none; margin: 8px 12px 2px; padding: 4px 8px;
+    border-left: 3px solid var(--subject-color, var(--accent)); background: #f8fafc;
+    font-size: 12px; font-weight: 600; color: #475569;
+  }
+  .section-zh { font-weight: 400; color: var(--muted); margin-left: 6px; }
+  ul.items { list-style: none; margin: 0; padding: 0; }
+  li.item {
+    position: relative;
+    padding: 10px 14px;
+    border-top: 1px solid #eef1f5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .item-body { flex: 1; min-width: 0; }
+  .badges { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-bottom: 4px; padding-right: 28px; }
+  .badge {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .type-question { background: var(--amber-soft); color: var(--amber); }
+  .type-work { background: var(--purple-soft); color: var(--purple); }
+  .type-skill, .type-objective { background: var(--green-soft); color: var(--green); }
+  .type-note { background: #f1f5f9; color: #475569; }
+  /* Line rhythm stays 1.2 / 1.3; padding adds a slightly looser paragraph gap (~1.4 / 1.5). */
+  .en { font-size: 15px; color: var(--text); line-height: 1.2; padding-bottom: 0.2em; }
+  .en a { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); }
+  .en a:hover { background: var(--accent-soft); }
+  .zh { font-size: 13px; color: var(--muted); line-height: 1.3; padding-bottom: 0.2em; }
+  .en + .zh { margin-top: 5px; }
+  .en.dialogue-text, .zh.dialogue-text { white-space: pre-line; }
+  .subject-cn { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+  .subject-core { color: var(--subject-color, var(--accent)); }
+  .meta { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .meta a { color: var(--accent); text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
+  .icon-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 34px;
+    line-height: 1.1;
+    margin-top: 7px;
+  }
+  /* A small thumbnail sits in the same slot as the curated icon row.
+     Max height ~3 lines of English text (15px * 1.2 * 3). */
+  .image-row { margin-top: 7px; }
+  .image-row img {
+    display: block;
+    width: auto;
+    max-width: 160px;
+    max-height: 96px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: zoom-in;
+  }
+  .image-error {
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .image-error a { color: var(--accent); text-decoration: none; }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(15, 23, 42, .94);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px; padding: 58px 14px calc(20px + env(safe-area-inset-bottom));
+  }
+  .lightbox img {
+    max-width: 100%; max-height: calc(100vh - 160px);
+    object-fit: contain; background: #fff; border-radius: 6px;
+  }
+  .lightbox .caption {
+    max-width: 720px; color: #e2e8f0; font-size: 13px; line-height: 1.5; text-align: center;
+  }
+  .lightbox .caption a { color: #b6cad6; }
+  .lightbox-close {
+    position: absolute; top: calc(14px + env(safe-area-inset-top)); right: 16px;
+    width: 38px; height: 38px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1);
+    color: #fff; font-size: 20px; line-height: 1; cursor: pointer;
+  }
+  body.lightbox-open { overflow: hidden; }
+  .details { margin: 5px 0 0; padding-left: 16px; color: var(--muted); font-size: 13px; }
+  .details li { margin: 2px 0; }
+  .item.collapsed .full-only { display: none; }
+  .item:not(.collapsed) .preview-only { display: none; }
+  .expand-btn {
+    border: none; background: transparent; color: var(--accent);
+    font-size: 12px; padding: 3px 0 0; cursor: pointer;
+  }
+  .fav {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+  }
+  .fav.on { color: #f59e0b; }
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 48px 16px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+  .more {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .footer-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 24px; }
+  .footer-note a { color: var(--accent); }
+  .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .nav-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px 11px; border: 1px solid var(--border); border-radius: 999px;
+    background: var(--surface); color: var(--accent); font-size: 13px;
+    text-decoration: none; cursor: pointer;
+  }
+  .topic-bar {
+    margin-top: 10px; padding: 8px 10px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent); font-size: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .topic-bar button { border: none; background: transparent; color: var(--accent); font-size: 12px; cursor: pointer; }
+  .filter-toggle {
+    display: none;
+    border: 1px solid var(--border); background: var(--surface); color: var(--accent);
+    border-radius: 999px; width: 34px; height: 34px; padding: 0;
+    font-size: 18px; line-height: 1; cursor: pointer; flex: 0 0 auto;
+  }
+  @media (max-width: 640px) {
+    header { padding: 8px 12px calc(8px + env(safe-area-inset-top)); }
+    h1 { font-size: 16px; }
+    .title-row { margin-bottom: 6px; }
+    .filter-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .controls { overflow: hidden; transition: max-height .22s ease, opacity .18s ease; }
+    .controls.filters-collapsed { opacity: 0; pointer-events: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title-row">
+    <h1>PreK-G8 Core Knowledge<a class="title-info" href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer" title="Core Knowledge Sequence 2023">ⓘ</a> Explorer</h1>
+    <div class="header-actions">
+      <a class="nav-btn" href="roadmap.html">Outline</a>
+      <a class="nav-btn" href="attribution.html">Credits</a>
+      <a class="nav-btn" href="../index.html">Home</a>
+      <span class="count" id="count"></span>
+      <button class="filter-toggle" id="filterToggle" aria-expanded="true" aria-label="Collapse filters">▴</button>
+    </div>
+  </div>
+  <div class="topic-bar" id="topicBar" hidden></div>
+  <div class="controls">
+    <input id="search" class="search" type="search" placeholder="Search English topics and skills…" autocomplete="off">
+    <div class="grade-row" id="grades"></div>
+    <div class="filter-row">
+      <select id="subject" aria-label="Subject"></select>
+      <select id="topic" aria-label="Topic"></select>
+      <select id="type" aria-label="Type"></select>
+      <label class="toggle"><input type="checkbox" id="questionsOnly">Questions only</label>
+      <label class="toggle"><input type="checkbox" id="favOnly">Saved</label>
+    </div>
+  </div>
+</header>
+<main>
+  <div id="content"></div>
+  <button class="more" id="more" hidden>Show more</button>
+  <p class="footer-note" id="footer"></p>
+</main>
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">×</button>
+  <img id="lightboxImg" alt="">
+  <div class="caption" id="lightboxCaption"></div>
+</div>
+<script src="data/knowledge-inline.js"></script>
+<script src="data/image-pilot-inline.js"></script>
+<script>
+(function () {
+  var DATA = window.KNOWLEDGE;
+  var items = DATA.items;
+  var favs = {};
+  try { favs = JSON.parse(localStorage.getItem("ck-favs") || "{}"); } catch (e) { favs = {}; }
+  var state = { grade: "K", subject: "", topic: "", subtopic: "", type: "", q: "", questionsOnly: false, favOnly: false, limit: 600 };
+  var COLLAPSE_EN = 300;
+  var COLLAPSE_ZH = 200;
+  var PREVIEW_EN = 200;
+  var PREVIEW_ZH = 100;
+  var SUBJECT_ORDER = DATA.taxonomy.k8_subjects.concat(DATA.taxonomy.preschool_subjects);
+  var GRADES = ["Preschool", "K", "1", "2", "3", "4", "5", "6", "7", "8"];
+  var TYPE_ORDER = ["objective", "skill", "question", "work", "vocabulary", "dialogue", "note"];
+  var SUBJECT_ZH = {};
+  var CORE_SUBJECTS = {
+    "English Language Arts": 1, "Mathematics": 1, "Science": 1, "History and Geography": 1,
+    "Language and Literacy": 1, "Mathematical Reasoning and Number Sense": 1
+  };
+  var SUBJECT_COLORS = {
+    "History and Geography": "#9A6B3F",
+    "English Language Arts": "#4F6FA8",
+    "Science": "#2F7D6E",
+    "Mathematics": "#6B5CA5",
+    "Visual Arts": "#B0556B",
+    "Music": "#8A5AA8",
+    "Language and Literacy": "#3F7E96",
+    "Social and Emotional Development": "#B06A3B",
+    "Movement and Coordination": "#5C8A4A"
+  };
+  function isCore(subject) { return !!CORE_SUBJECTS[subject]; }
+  function subjectZh(subject) { return ""; }
+  function subjectColor(subject) {
+    subject = subject || "";
+    if (SUBJECT_COLORS[subject]) return SUBJECT_COLORS[subject];
+    var keys = Object.keys(SUBJECT_COLORS);
+    for (var k = 0; k < keys.length; k++) {
+      if (subject.indexOf(keys[k]) === 0) return SUBJECT_COLORS[keys[k]];
+    }
+    return "#42657d";
+  }
+  function topicLabel(topic) {
+    topic = topic || "(General)";
+    return topic.length > 44 ? topic.slice(0, 41) + "…" : topic;
+  }
+
+  function readParams() {
+    var p = new URLSearchParams(location.search);
+    var g = p.get("grade");
+    if (g && GRADES.indexOf(g) >= 0) state.grade = g;
+    state.subject = p.get("subject") || "";
+    state.topic = p.get("topic") || "";
+    state.subtopic = p.get("subtopic") || "";
+    if (state.subject && !items.some(function (i) { return i.grade === state.grade && i.subject === state.subject; })) state.subject = "";
+    if (state.topic && !items.some(function (i) {
+      return i.grade === state.grade && i.subject === state.subject && i.topic === state.topic;
+    })) state.topic = "";
+    if (state.subtopic && !items.some(function (i) {
+      return i.grade === state.grade && i.subject === state.subject &&
+        i.topic === state.topic && i.subtopic === state.subtopic;
+    })) state.subtopic = "";
+  }
+
+  function syncUrl() {
+    try {
+      var p = new URLSearchParams();
+      p.set("grade", state.grade);
+      if (state.subject) p.set("subject", state.subject);
+      if (state.topic) p.set("topic", state.topic);
+      if (state.subtopic) p.set("subtopic", state.subtopic);
+      history.replaceState(null, "", location.href.split("?")[0] + "?" + p.toString());
+    } catch (e) {}
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function gradeLabel(g) {
+    if (g === "Preschool") return "Pre-K";
+    if (g === "K") return "K";
+    return "G" + g;
+  }
+
+  function typeLabel(t) {
+    return {
+      objective: "Objective", skill: "Skill", question: "Question", work: "Work",
+      vocabulary: "Vocabulary", dialogue: "Dialogue", note: "Note"
+    }[t] || t;
+  }
+
+  function renderTopicBar() {
+    var bar = document.getElementById("topicBar");
+    if (!state.topic) { bar.hidden = true; bar.innerHTML = ""; return; }
+    var label = gradeLabel(state.grade) + " · " + state.subject +
+      " · " + topicLabel(state.topic) + (state.subtopic ? " · " + state.subtopic : "");
+    bar.hidden = false;
+    bar.innerHTML = "<span>Current topic: <b>" + esc(label) + "</b></span><button id=\"clearTopic\">Clear topic</button>";
+    document.getElementById("clearTopic").addEventListener("click", function () {
+      state.topic = "";
+      state.subtopic = "";
+      refreshFilters();
+    });
+  }
+
+  function applyNav(nav) {
+    nav = nav || {};
+    if (nav.grade) state.grade = nav.grade;
+    state.subject = nav.subject || "";
+    state.topic = nav.topic || "";
+    state.subtopic = nav.subtopic || "";
+    state.type = "";
+    state.q = "";
+    state.questionsOnly = false;
+    state.favOnly = false;
+    state.limit = 600;
+    document.getElementById("search").value = "";
+    document.getElementById("questionsOnly").checked = false;
+    document.getElementById("favOnly").checked = false;
+    buildGradeChips();
+    refreshFilters();
+  }
+
+  function buildGradeChips() {
+    var box = document.getElementById("grades");
+    box.innerHTML = GRADES.map(function (g) {
+      return '<button class="chip' + (g === state.grade ? ' active' : '') + '" data-grade="' + g + '">' + gradeLabel(g) + "</button>";
+    }).join("");
+    Array.prototype.forEach.call(box.querySelectorAll(".chip"), function (chip) {
+      chip.addEventListener("click", function () {
+        applyNav({ grade: chip.dataset.grade });
+      });
+    });
+  }
+
+  function commonFiltered(skip) {
+    skip = skip || {};
+    var q = state.q.trim().toLowerCase();
+    return items.filter(function (i) {
+      if (!skip.grade && i.grade !== state.grade) return false;
+      if (!skip.subject && state.subject && i.subject !== state.subject) return false;
+      if (!skip.topic && state.topic && i.topic !== state.topic) return false;
+      if (!skip.subtopic && state.subtopic && i.subtopic !== state.subtopic) return false;
+      if (!skip.type && state.type && i.type !== state.type) return false;
+      if (!skip.questionsOnly && state.questionsOnly && i.type !== "question" && i.type !== "dialogue") return false;
+      if (!skip.favOnly && state.favOnly && !favs[i.id]) return false;
+      if (!skip.q && q) {
+        var hay = (i.en + " " + i.topic + " " + i.subtopic +
+          " " + (i.section || "")).toLowerCase();
+        if (hay.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function filteredItems() { return commonFiltered({}); }
+
+  function buildSubjects() {
+    var counts = {};
+    commonFiltered({subject: true, topic: true, subtopic: true}).forEach(function (i) {
+      counts[i.subject] = (counts[i.subject] || 0) + 1;
+    });
+    if (state.subject && !counts[state.subject]) {
+      state.subject = "";
+      state.topic = "";
+      state.subtopic = "";
+    }
+    var list = Object.keys(counts);
+    list.sort(function (a, b) {
+      var ac = isCore(a) ? 0 : 1, bc = isCore(b) ? 0 : 1;
+      if (ac !== bc) return ac - bc;
+      var ai = SUBJECT_ORDER.indexOf(a), bi = SUBJECT_ORDER.indexOf(b);
+      return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+    });
+    var sel = document.getElementById("subject");
+    sel.innerHTML = '<option value="">All subjects (' + list.length + ')</option>' + list.map(function (s) {
+      var label = (isCore(s) ? "★ " : "") + esc(s) + " (" + counts[s] + ")";
+      return '<option value="' + esc(s) + '">' + label + "</option>";
+    }).join("");
+    sel.value = state.subject;
+  }
+
+  function buildTopics() {
+    var counts = {};
+    var order = [];
+    commonFiltered({topic: true, subtopic: true}).forEach(function (i) {
+      var t = i.topic || "(General)";
+      if (!counts[t]) order.push(t);
+      counts[t] = (counts[t] || 0) + 1;
+    });
+    if (state.topic && !counts[state.topic]) {
+      state.topic = "";
+      state.subtopic = "";
+    }
+    if (!state.topic) state.subtopic = "";
+    var sel = document.getElementById("topic");
+    sel.innerHTML = '<option value="">All topics (' + order.length + ')</option>' + order.map(function (t) {
+      return '<option value="' + esc(t) + '">' + esc(topicLabel(t)) + " (" + counts[t] + ")</option>";
+    }).join("");
+    sel.value = state.topic;
+  }
+
+  function buildTypes() {
+    var counts = {};
+    commonFiltered({type: true}).forEach(function (i) {
+      counts[i.type] = (counts[i.type] || 0) + 1;
+    });
+    if (state.type && !counts[state.type]) state.type = "";
+    var sel = document.getElementById("type");
+    var total = 0;
+    Object.keys(counts).forEach(function (t) { total += counts[t]; });
+    var html = '<option value="">All types (' + total + ')</option>';
+    TYPE_ORDER.forEach(function (t) {
+      if (counts[t]) html += '<option value="' + t + '">' + esc(typeLabel(t)) + " (" + counts[t] + ")</option>";
+    });
+    Object.keys(counts).forEach(function (t) {
+      if (TYPE_ORDER.indexOf(t) < 0) {
+        html += '<option value="' + esc(t) + '">' + esc(typeLabel(t)) + " (" + counts[t] + ")</option>";
+      }
+    });
+    sel.innerHTML = html;
+    sel.value = state.type;
+  }
+
+  function previewText(text, n) {
+    text = text || "";
+    if (text.length <= n) return text;
+    var cut = text.slice(0, n);
+    var space = cut.lastIndexOf(" ");
+    if (space > n * 0.6) cut = cut.slice(0, space);
+    return cut + "…";
+  }
+
+  function workAnchor(i) {
+    if (!i.link) return "";
+    var a = i.work_en || "";
+    if (a && (i.en || "").indexOf(a) >= 0) return a;
+    if (i.work && (i.en || "").indexOf(i.work) >= 0) return i.work;
+    return "";
+  }
+
+  function linkedEnHtml(i, text, anchor) {
+    if (!i.link) return esc(text);
+    if (i.type === "work") {
+      return '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "Search on Google") + '">' + esc(text) + " ↗</a>";
+    }
+    if (!anchor) return esc(text);
+    var idx = text.indexOf(anchor);
+    if (idx < 0) return esc(text);
+    return esc(text.slice(0, idx)) +
+      '<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "Search on Google") + '">' +
+      esc(text.slice(idx, idx + anchor.length)) + " ↗</a>" +
+      esc(text.slice(idx + anchor.length));
+  }
+
+  function itemHtml(i) {
+    var dialogClass = i.type === "dialogue" ? " dialogue-text" : "";
+    var collapsed = (i.en || "").length > COLLAPSE_EN;
+    var anchor = workAnchor(i);
+    var inlineLinked = !!(i.link && (i.type === "work" || anchor));
+    var enHtml = '<div class="en' + dialogClass + (collapsed ? " preview-only" : "") + '">' +
+      linkedEnHtml(i, collapsed ? previewText(i.en, PREVIEW_EN) : i.en, anchor) + "</div>" +
+      (collapsed ? '<div class="en' + dialogClass + ' full-only">' + linkedEnHtml(i, i.en, anchor) + "</div>" : "");
+    var details = (i.details || []).map(function (d) { return "<li>" + esc(d) + "</li>"; }).join("");
+    var meta = [];
+    if (i.subtopic) meta.push(esc(i.subtopic));
+    if (i.level) meta.push(esc(i.level));
+    if (i.link && !inlineLinked) {
+      meta.push('<a href="' + esc(i.link) + '" target="_blank" rel="noopener noreferrer" title="' + esc(i.work || "Related resources") + '">Related resources ↗</a>');
+    }
+    meta.push("p." + i.source.page);
+    var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[i.uid];
+    var icons = (i.emojis || []).slice(0, 3);
+    // Keep the emoji row in the DOM even when a photo is present, so a dead
+    // Commons URL can fall back to it instead of showing a broken image.
+    var iconHtml = icons.length
+      ? '<div class="icon-row"' + (pic ? " hidden" : "") + ">" +
+        icons.map(function (e) { return "<span>" + esc(e) + "</span>"; }).join("") + "</div>"
+      : "";
+    var imageHtml = pic && pic.thumb
+      ? '<div class="image-row"><img src="' + esc(pic.thumb) + '" alt="' + esc(i.en) +
+        '" loading="lazy" referrerpolicy="no-referrer" data-uid="' + esc(i.uid) + '"></div>'
+      : "";
+    var expandHtml = collapsed ? '<button class="expand-btn">Expand</button>' : "";
+    return '<li class="item' + (collapsed ? " collapsed" : "") + '" data-id="' + i.id + '">' +
+      '<button class="fav' + (favs[i.id] ? " on" : "") + '" title="Save">' + (favs[i.id] ? "★" : "☆") + "</button>" +
+      '<div class="item-body">' +
+      '<div class="badges"><span class="badge type-' + i.type + '">' + typeLabel(i.type) + "</span>" +
+      (i.subtopic ? '<span class="badge">' + esc(i.subtopic) + "</span>" : "") + "</div>" +
+      enHtml +
+      (details ? '<ul class="details' + (collapsed ? " full-only" : "") + '">' + details + "</ul>" : "") +
+      iconHtml + imageHtml +
+      expandHtml +
+      '<div class="meta">' + meta.join(" · ") + "</div></div></li>";
+  }
+
+  function render() {
+    var list = filteredItems();
+    var shown = list.slice(0, state.limit);
+    var box = document.getElementById("content");
+    document.getElementById("count").textContent = list.length + " of " + items.length + " items";
+    var moreBtn = document.getElementById("more");
+    moreBtn.hidden = list.length <= shown.length;
+    if (!moreBtn.hidden) {
+      moreBtn.textContent = "Show more (" + (list.length - shown.length) + " remaining)";
+    }
+    if (!shown.length) {
+      box.innerHTML = '<div class="empty">No matches. Try changing your filters.</div>';
+      return;
+    }
+    var bySubject = {};
+    shown.forEach(function (i) {
+      bySubject[i.subject] = bySubject[i.subject] || {};
+      bySubject[i.subject][i.topic || "(General)"] = bySubject[i.subject][i.topic || "(General)"] || [];
+      bySubject[i.subject][i.topic || "(General)"].push(i);
+    });
+    var html = "";
+    Object.keys(bySubject).forEach(function (subject) {
+      var topicHtml = "";
+      Object.keys(bySubject[subject]).forEach(function (topic) {
+        var arr = bySubject[subject][topic];
+        var subGroups = {};
+        arr.forEach(function (i) {
+          var key = i.subtopic || "";
+          subGroups[key] = subGroups[key] || [];
+          subGroups[key].push(i);
+        });
+        var inner = "";
+        Object.keys(subGroups).forEach(function (sub) {
+          if (sub) inner += '<div class="subtopic-title">' + esc(sub) + "</div>";
+          var groupHtml = "";
+          var prevSection = "";
+          subGroups[sub].forEach(function (entry) {
+            var sec = entry.section || "";
+            if (sec && sec !== prevSection) {
+              groupHtml += '<li class="section-title">' + esc(sec) + "</li>";
+            }
+            prevSection = sec;
+            groupHtml += itemHtml(entry);
+          });
+          inner += '<ul class="items">' + groupHtml + "</ul>";
+        });
+        topicHtml += '<div class="topic-group"><div class="topic-title">' + esc(topicLabel(topic)) +
+          ' <span style="color:#94a3b8;font-weight:400">(' + arr.length + ")</span></div>" + inner + "</div>";
+      });
+      var summaryLabel = (isCore(subject) ? '<span class="subject-core">★ </span>' : "") + esc(subject);
+      html += '<details class="subject" open style="--subject-color:' + subjectColor(subject) + '"><summary>' +
+        summaryLabel + "</summary>" + topicHtml + "</details>";
+    });
+    box.innerHTML = html;
+    Array.prototype.forEach.call(box.querySelectorAll(".fav"), function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.closest("li").dataset.id;
+        if (favs[id]) { delete favs[id]; btn.classList.remove("on"); btn.textContent = "☆"; }
+        else { favs[id] = 1; btn.classList.add("on"); btn.textContent = "★"; }
+        localStorage.setItem("ck-favs", JSON.stringify(favs));
+        if (state.favOnly) refreshFilters();
+      });
+    });
+    Array.prototype.forEach.call(box.querySelectorAll(".expand-btn"), function (btn) {
+      btn.addEventListener("click", function () {
+        var li = btn.closest("li.item");
+        var isCollapsed = li.classList.toggle("collapsed");
+        btn.textContent = isCollapsed ? "Expand" : "Collapse";
+      });
+    });
+    document.getElementById("footer").innerHTML =
+      'Source: <a href="https://www.coreknowledge.org/free-resource/core-knowledge-sequence/" target="_blank" rel="noopener noreferrer">Core Knowledge Sequence 2023</a> · ' +
+      DATA.meta.item_count + " items · icons and public-domain images are added only for the most specific entries · click an image to view it full-screen · named works link to external search · saved items stay in this browser · " +
+      '<a href="attribution.html">Credits</a> · Original PDFs: ' +
+      '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_PreSchool_W2.pdf" target="_blank" rel="noopener noreferrer">Preschool</a> / ' +
+      '<a href="https://www.coreknowledge.org/wp-content/uploads/2023/03/CK_Sequence2023_GK8_W3.pdf" target="_blank" rel="noopener noreferrer">K–8</a>';
+  }
+
+  function refreshFilters() {
+    state.limit = 600;
+    buildSubjects();
+    buildTopics();
+    buildTypes();
+    render();
+    renderTopicBar();
+    syncUrl();
+  }
+
+  var timer;
+  document.getElementById("search").addEventListener("input", function (e) {
+    clearTimeout(timer);
+    timer = setTimeout(function () { state.q = e.target.value; refreshFilters(); }, 180);
+  });
+  document.getElementById("subject").addEventListener("change", function (e) {
+    state.subject = e.target.value;
+    state.topic = "";
+    state.subtopic = "";
+    refreshFilters();
+  });
+  document.getElementById("topic").addEventListener("change", function (e) {
+    state.topic = e.target.value;
+    state.subtopic = "";
+    refreshFilters();
+  });
+  document.getElementById("type").addEventListener("change", function (e) {
+    state.type = e.target.value; refreshFilters();
+  });
+  document.getElementById("questionsOnly").addEventListener("change", function (e) {
+    state.questionsOnly = e.target.checked; refreshFilters();
+  });
+  document.getElementById("favOnly").addEventListener("change", function (e) {
+    state.favOnly = e.target.checked; refreshFilters();
+  });
+  document.getElementById("more").addEventListener("click", function () {
+    state.limit += 600; render();
+  });
+
+  var controls = document.querySelector(".controls");
+  var filterToggle = document.getElementById("filterToggle");
+  var mobileQuery = window.matchMedia("(max-width: 640px)");
+  var filtersExpanded = true;
+  var manualExpanded = false;
+  var lastY = window.scrollY;
+  var collapseTimer = null;
+  var heightTimer = null;
+
+  function cancelCollapse() {
+    if (collapseTimer) { clearTimeout(collapseTimer); collapseTimer = null; }
+  }
+
+  function applyFilterState() {
+    filterToggle.textContent = filtersExpanded ? "▴" : "▾";
+    filterToggle.setAttribute("aria-expanded", filtersExpanded ? "true" : "false");
+    filterToggle.setAttribute("aria-label", filtersExpanded ? "Collapse filters" : "Expand filters");
+    controls.classList.toggle("filters-collapsed", !filtersExpanded);
+
+    if (!mobileQuery.matches) {
+      clearTimeout(heightTimer);
+      controls.style.maxHeight = "";
+      controls.inert = false;
+      return;
+    }
+
+    controls.inert = !filtersExpanded;
+    clearTimeout(heightTimer);
+    var h = controls.scrollHeight;
+    controls.style.maxHeight = h + "px";
+    if (filtersExpanded) {
+      heightTimer = setTimeout(function () {
+        if (filtersExpanded && mobileQuery.matches) controls.style.maxHeight = "none";
+      }, 240);
+    } else {
+      void controls.offsetHeight;
+      controls.style.maxHeight = "0px";
+    }
+  }
+
+  function scheduleCollapse() {
+    if (collapseTimer) return;
+    collapseTimer = setTimeout(function () {
+      collapseTimer = null;
+      if (window.scrollY > 100 && !manualExpanded && filtersExpanded) {
+        filtersExpanded = false;
+        applyFilterState();
+      }
+    }, 120);
+  }
+
+  filterToggle.addEventListener("click", function () {
+    cancelCollapse();
+    filtersExpanded = !filtersExpanded;
+    manualExpanded = filtersExpanded;
+    applyFilterState();
+  });
+
+  window.addEventListener("scroll", function () {
+    var y = window.scrollY;
+    var scrollingDown = y > lastY;
+    lastY = y;
+    if (y <= 10) {
+      cancelCollapse();
+      if (!filtersExpanded || manualExpanded) {
+        filtersExpanded = true;
+        manualExpanded = false;
+        applyFilterState();
+      }
+    } else if (scrollingDown && y > 100 && !manualExpanded && filtersExpanded) {
+      scheduleCollapse();
+    } else if (!scrollingDown) {
+      cancelCollapse();
+    }
+  }, { passive: true });
+
+  if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", applyFilterState);
+  else mobileQuery.addListener(applyFilterState);
+
+  var lightbox = document.getElementById("lightbox");
+  var lightboxImg = document.getElementById("lightboxImg");
+  var lightboxCaption = document.getElementById("lightboxCaption");
+  var lightboxClose = document.getElementById("lightboxClose");
+  var currentPic = null;
+
+  // A dead Commons URL should never leave a broken image in the list.
+  // Error events do not bubble, so listen in the capture phase.
+  document.getElementById("content").addEventListener("error", function (e) {
+    var img = e.target;
+    if (!img || !img.matches || !img.matches(".image-row img")) return;
+    var row = img.parentNode;
+    if (row) row.hidden = true;
+    var item = img.closest(".item");
+    if (!item || item.querySelector(".image-error")) return;
+    var icons = item.querySelector(".icon-row");
+    if (icons) icons.hidden = false;
+    var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[img.dataset.uid];
+    var note = document.createElement("div");
+    note.className = "image-error";
+    note.textContent = "Image unavailable";
+    if (pic && pic.page) {
+      var link = document.createElement("a");
+      link.href = pic.page;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = " · Commons original ↗";
+      note.appendChild(link);
+    }
+    var body = item.querySelector(".item-body");
+    if (body) body.appendChild(note);
+  }, true);
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    document.body.classList.remove("lightbox-open");
+    currentPic = null;
+    lightboxImg.removeAttribute("src");
+  }
+  function openLightbox(uid) {
+    var pic = window.IMAGE_PILOT && window.IMAGE_PILOT[uid];
+    if (!pic) return;
+    currentPic = pic;
+    lightboxImg.style.display = "";
+    lightboxImg.src = pic.full || pic.thumb;
+    lightboxImg.alt = pic.en || uid;
+    var license = pic.license ? " · " + esc(pic.license) : "";
+    var artist = pic.artist ? " · " + esc(pic.artist) : "";
+    var source = pic.page
+      ? ' · <a href="' + esc(pic.page) + '" target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a>'
+      : "";
+    lightboxCaption.innerHTML = esc(pic.en || "") +
+      '<br><span style="color:#94a3b8">' + license + artist + source + "</span>";
+    lightbox.hidden = false;
+    document.body.classList.add("lightbox-open");
+    lightboxClose.focus();
+  }
+  lightboxImg.addEventListener("error", function () {
+    if (lightbox.hidden || !currentPic) return;
+    lightboxImg.style.display = "none";
+    var source = currentPic.page
+      ? ' · <a href="' + esc(currentPic.page) + '" target="_blank" rel="noopener noreferrer">Wikimedia Commons ↗</a>'
+      : "";
+    lightboxCaption.innerHTML = "Image unavailable. Open the source page to view it." + source;
+  });
+  document.getElementById("content").addEventListener("click", function (e) {
+    var img = e.target && e.target.closest ? e.target.closest(".image-row img") : null;
+    if (img) openLightbox(img.dataset.uid);
+  });
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
+  });
+
+  readParams();
+  buildGradeChips();
+  refreshFilters();
+  applyFilterState();
+})();
+</script>
+</body>
+</html>
