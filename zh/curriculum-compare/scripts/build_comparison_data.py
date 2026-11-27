@@ -2665,7 +2665,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     font-size: 12px; color: var(--cn); background: var(--cn-soft);
     padding: 2px 8px; border-radius: 999px;
   }
-  .pager { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+  .pager { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); position: relative; }
+  .pager::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
+    border-radius: 2px; background: linear-gradient(to right, var(--cn) var(--pct, 0%), var(--border) var(--pct, 0%));
+  }
   .pager button {
     border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
     border-radius: 6px; padding: 1px 6px 2px; font-size: 13px; line-height: 1.2; cursor: pointer;
@@ -2701,7 +2705,6 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     border-bottom: 1px solid var(--border);
     padding: 6px 5px; text-align: left; vertical-align: top;
   }
-  .axes thead th { color: var(--muted); font-weight: 500; font-size: 11px; }
   .axes tbody th { width: 52px; color: var(--muted); font-weight: 500; }
   .axes th.us, .axes td.us { width: calc(50% - 26px); color: var(--us); }
   .axes th.cn, .axes td.cn { width: calc(50% - 26px); color: var(--cn); }
@@ -2867,7 +2870,7 @@ function axesHtml(row) {
   let html = "";
   if (row["深度参数"] && row["深度参数"].length) {
     if (row["单侧标记"]) html += "<span class=\"flag\">" + esc(row["单侧标记"]) + "</span>";
-    html += "<table class=\"axes\"><thead><tr><th>深度维度</th><th class=\"us\">美国</th><th class=\"cn\">中国</th></tr></thead><tbody>";
+    html += "<table class=\"axes\"><tbody>";
     row["深度参数"].forEach(function(axis) {
       html += "<tr><th>" + esc(axis[0]) + "</th><td class=\"us\">" + esc(axis[1]) + "</td><td class=\"cn\">" + esc(axis[2]) + "</td></tr>";
     });
@@ -2881,9 +2884,10 @@ function axesHtml(row) {
 function render() {
   const list = rowsByDomain[state.domain];
   const row = list[state.idx];
+  const pct = ((state.idx + 1) / list.length * 100).toFixed(2) + "%";
   card.innerHTML =
     "<div class=\"card-top\"><span class=\"group\">" + esc(row["分组"]) + "</span>" +
-    "<span class=\"pager\"><button id=\"prev\" aria-label=\"上一条\">←</button>" +
+    "<span class=\"pager\" style=\"--pct:" + pct + "\"><button id=\"prev\" aria-label=\"上一条\">←</button>" +
     "概念 " + (state.idx + 1) + " / " + list.length +
     "<button id=\"next\" aria-label=\"下一条\">→</button></span></div>" +
     "<h2>" + esc(row["概念簇"]) + "</h2>" +

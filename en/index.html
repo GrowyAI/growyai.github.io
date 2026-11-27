@@ -101,10 +101,10 @@
         .card {
             background: white;
             border-radius: 16px;
-            padding: 2rem;
+            padding: 1.25rem 1.5rem;
             border: 1px solid #f0f0f0;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            text-align: center;
+            text-align: left;
             position: relative;
             overflow: hidden;
             transition: all 0.3s;
@@ -112,6 +112,12 @@
             color: inherit;
             display: flex;
             flex-direction: column;
+        }
+        .card-head {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            margin-bottom: 0.55rem;
         }
         .card:hover {
             transform: translateY(-5px);
@@ -136,10 +142,11 @@
         .card.knowledge::before { background: linear-gradient(to right, #8CA9BF, var(--knowledge)); }
 
         .icon {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            margin: 0 auto 1.25rem;
+            margin: 0;
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -160,9 +167,10 @@
         .card.knowledge:hover .icon { background: var(--knowledge); color: white; }
 
         .card h3 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0;
+            line-height: 1.35;
             color: #1f2937;
             transition: color 0.3s;
         }
@@ -182,11 +190,13 @@
         }
 
         .action {
+            display: inline;
             font-weight: 600;
             font-size: 0.875rem;
             opacity: 1;
             transform: translateY(0);
-            margin-top: 1.0rem;
+            margin-left: 0.4rem;
+            white-space: nowrap;
         }
         .card.green .action { color: var(--primary); }
         .card.blue .action { color: var(--consult); }
@@ -262,69 +272,75 @@
         <div class="cards">
             
             <a href="timeline.html" class="card green">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3>Am I Focusing on the Right Things?</h3>
                 </div>
-                <h3>Am I Focusing on the Right Things?</h3>
-                <p>See what actually matters at each age—from 0 to 18. Cut through advice overload and focus on a few development priorities that are worth your time right now.</p>
-                <div class="action">Start Exploring →</div>
+                <p>See what actually matters at each age—from 0 to 18. Cut through advice overload and focus on a few development priorities that are worth your time right now.<span class="action">Start Exploring →</span></p>
             </a>
 
             <a href="games/index.html" class="card orange">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-6.857 2.143L12 21l-2.143-6.857L3 12l6.857-2.143L12 3z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-6.857 2.143L12 21l-2.143-6.857L3 12l6.857-2.143L12 3z" />
+                        </svg>
+                    </div>
+                    <h3>Learning Through Play?</h3>
                 </div>
-                <h3>Learning Through Play?</h3>
-                <p>Quiet, relaxing mini-games to help your child practice words, numbers, and math while having fun.</p>
-                <div class="action">Play Now →</div>
+                <p>Quiet, relaxing mini-games to help your child practice words, numbers, and math while having fun.<span class="action">Play Now →</span></p>
             </a>
 
             <a href="https://growyai.lovable.app" target="_blank" class="card blue">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                    </div>
+                    <h3>Stuck in a Parenting Moment?</h3>
                 </div>
-                <h3>Stuck in a Parenting Moment?</h3>
-                <p>When something happens and you don’t know how to respond, Growy helps you think it through—based on your child, your family, and your values.</p>
-                <div class="action">Chat with Growy →</div>
+                <p>When something happens and you don’t know how to respond, Growy helps you think it through—based on your child, your family, and your values.<span class="action">Chat with Growy →</span></p>
             </a>
 
             <a href="core-knowledge/index.html" class="card knowledge">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3>What Should My Child Learn at Each Age?</h3>
                 </div>
-                <h3>What Should My Child Learn at Each Age?</h3>
-                <p>Browse and search the US PreK-G8 Core Knowledge sequence by grade and subject.</p>
-                <div class="action">Start Exploring →</div>
+                <p>Browse and search the US PreK-G8 Core Knowledge sequence by grade and subject.<span class="action">Start Exploring →</span></p>
             </a>
 
             <a href="priority.html" class="card purple">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
+                    <h3>Everything Urgent Keeps Pushing Out What Matters</h3>
                 </div>
-                <h3>Everything Urgent Keeps Pushing Out What Matters</h3>
-                <p>This tool helps you protect a few important things—by placing them into your week first. No tracking. No pressure. Just a promise to yourself.</p>
-                <div class="action">Start Planning →</div>
+                <p>This tool helps you protect a few important things—by placing them into your week first. No tracking. No pressure. Just a promise to yourself.<span class="action">Start Planning →</span></p>
             </a>
 
             <a href="about.html" class="card gray">
-                <div class="icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="card-head">
+                    <div class="icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3>Why Growy Exists</h3>
                 </div>
-                <h3>Why Growy Exists</h3>
-                <p>Growy wasn’t built to tell parents what to do. It was built to help you think clearly, feel less alone, and make decisions you can stand by.</p>
-                <div class="action">Learn More →</div>
+                <p>Growy wasn’t built to tell parents what to do. It was built to help you think clearly, feel less alone, and make decisions you can stand by.<span class="action">Learn More →</span></p>
             </a>
 
         </div>
