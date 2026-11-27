@@ -528,6 +528,183 @@ CLUSTERS: list[dict[str, Any]] = [
         "relation_note": "州和省都是一级行政区，可以直接横向对照：美国从学前认识所在州，3-4年级知道50州，5-6年级记州府；中国在7-9年级识别34个省级行政区并记住简称和行政中心。",
         "emphasis": "内容可对标，阶段安排不同",
     },
+    # ---- 语言与读写：按母语功能对标，美国 ELA/Language and Literacy 对 中国语文/学前语言 ----
+    {
+        "id": "lang-listen-speak",
+        "domain": "语言与读写",
+        "concept": "倾听、理解与口语表达",
+        "us": {
+            "subjects": ["Language and Literacy", "English Language Arts"],
+            "text_only": True,
+            "topic_regex": r".*",
+            "text_regex": r"\blisten|listening|\bspeak|speaking|conversation|dialogue|discussion|discuss|oral presentation|\bdebate|retell|recount|respond|talk about",
+        },
+        "cn": {
+            "subjects": ["语言", "语文"],
+            "text_only": True,
+            "text_regex": r"注意听|听懂|倾听|交谈|对话|讲述|口语|回应|说话|普通话|大声说|礼貌用语|交流|讨论|复述|转述|演讲|发言|有自己的看法",
+        },
+        "manual_relation": "两边都有，起步接近，中国后段口语表达要求更集中",
+        "relation_note": "美国从学前口语互动到K-8课堂讨论逐年级推进；中国学前语言领域先抓倾听与日常对话，小学语文再把复述、讨论、即席讲话与主题演讲写成学段目标。",
+        "emphasis": "两边都有，功能对标",
+    },
+    {
+        "id": "lang-emergent-literacy",
+        "domain": "语言与读写",
+        "concept": "文字、图书与读写准备",
+        "us": {
+            "subjects": ["Language and Literacy", "English Language Arts"],
+            "text_only": True,
+            "topic_regex": r".*",
+            "text_regex": r"print awareness|identify.*print|letter|phoneme|phonics|blend|book.*cover|turn.*page|rhyming|decod|sight word|fluen",
+        },
+        "cn": {
+            "subjects": ["语言", "语文"],
+            "text_only": True,
+            "text_regex": r"图书|画册|标记|符号|笔画|汉字|拼音|认读|写字|翻书|涂涂|画画|识字|部首|查字典",
+        },
+        "manual_relation": "两边都有，具体文字系统不同但功能对标",
+        "relation_note": "美国从学前辨识生活中的印刷品、图书结构，到K-2年级系统学拼读解码；中国学前先建立图书与符号兴趣，小学低段集中识字、写字、拼音，两套文字系统不同但都是读写准备。",
+        "emphasis": "功能对标，文字系统不同",
+    },
+    {
+        "id": "lang-reading",
+        "domain": "语言与读写",
+        "concept": "阅读理解与文本分析",
+        "us": {
+            "subjects": ["English Language Arts", "Language and Literacy"],
+            "text_only": True,
+            "topic_regex": r".*",
+            "text_regex": r"\bretell|read aloud|comprehension|describe characters|understand.*text|infer|summariz|main idea|text evidence|analyz|interpret|evaluate|author.*purpose|point of view",
+        },
+        "cn": {
+            "subjects": ["语言", "语文"],
+            "text_only": True,
+            "text_regex": r"朗读|默读|课文|词句|阅读|理解.*内容|复述|概括|分析|体会|评价|揣摩|品味|梳理|思想感情|表达效果",
+        },
+        "manual_relation": "两边都有，起步接近，深度持续推进",
+        "relation_note": "美国K年级起朗读、复述故事，3-8年级逐步加入推断、概括、文本证据与作者意图；中国小学低段先朗读理解词句，中高段到初中转入概括、分析与评价。",
+        "emphasis": "两边都有，功能对标",
+    },
+    {
+        "id": "lang-writing",
+        "domain": "语言与读写",
+        "concept": "写作与书面表达",
+        "us": {
+            "subjects": ["Language and Literacy", "English Language Arts"],
+            "text_only": True,
+            "topic_regex": r".*",
+            "text_regex": r"dictate|caption|draw.*represent|write.*letter|label.*picture|copy.*letter|narrative|essay|draft|revise|paragraph|composition|write.*story|persuasive|expository",
+        },
+        "cn": {
+            "subjects": ["语言", "语文"],
+            "text_only": True,
+            "text_regex": r"写自己的|愿意写|写话|涂涂|画画|口述|画.*表示|写写画画|习作|作文|记实|想象作文|读书笔记|应用文|修改.*习作|分段表述",
+        },
+        "manual_relation": "两边都有，中国低段写话更早明确",
+        "relation_note": "美国学前先口述、画图、听写，再到K-8的叙事、说明与议论文写作；中国学前以涂画表达起步，小学低段明确“写话”，中高段到初中完成记实、想象作文与应用文。",
+        "emphasis": "两边都有，功能对标",
+    },
+    {
+        "id": "lang-literature",
+        "domain": "语言与读写",
+        "concept": "文学体裁、诗歌与故事",
+        "us": {
+            "subjects": ["Language and Literacy", "English Language Arts"],
+            "text_only": True,
+            "topic_regex": r".*",
+            "text_regex": r"nursery rhyme|fairy tale|poem|rhyming|storybook|\bpoetry|fiction|myth|legend|literary|drama|novel|fable",
+        },
+        "cn": {
+            "subjects": ["语言", "语文"],
+            "text_only": True,
+            "text_regex": r"儿歌|童谣|古诗|童话|故事|寓言|复述|诗文|神话|小说|散文|背诵|文学|叙事性作品",
+        },
+        "manual_relation": "两边都有，起步接近，体裁逐步扩展",
+        "relation_note": "美国学前以儿歌、韵诗、童话故事入门，K-8扩展到诗歌、神话、戏剧与小说；中国学前从儿歌童谣、听故事起步，小学到初中加入古诗文诵读、寓言神话、小说散文等体裁。",
+        "emphasis": "两边都有，功能对标",
+    },
+    # ---- 文化：功能对标，不硬套同一人物或节日 ----
+    {
+        "id": "culture-symbols",
+        "domain": "文化",
+        "concept": "国家符号与共同记忆",
+        "us": {
+            "subjects": ["History and Geography", "English Language Arts", "Visual Arts", "Music"],
+            "text_only": True,
+            "exclude_regex": r"Teachers:|Note:|Sayings and Phrases|Discuss with students:|𝆏|\bpiano\b|\bforte\b|capital letters|proper nouns",
+            "topic_regex": r".*",
+            "text_regex": r"American flag|Statue of Liberty|national anthem|national symbol|Stars and Stripes|bald eagle|Pledge of Allegiance",
+        },
+        "cn": {
+            "subjects": ["社会", "语文", "道德与法治", "历史", "英语"],
+            "text_only": True,
+            "text_regex": r"国旗|国歌|国徽|国家象征|红领巾|升旗|中国.*象征",
+        },
+        "manual_relation": "两边都有，具体符号不同，功能对标",
+        "relation_note": "美国低年级认识国旗、自由女神像、国歌等国家符号；中国学前与小学低段认识国旗、国歌、国徽并在升旗仪式中实践。具体符号不同，但都是国家认同的共同记忆教育。",
+        "emphasis": "功能对标，符号不同",
+    },
+    {
+        "id": "culture-holiday-heritage",
+        "domain": "文化",
+        "concept": "节日、风俗与文化传承",
+        "us": {
+            "subjects": ["History and Geography", "English Language Arts", "Visual Arts", "Music"],
+            "text_only": True,
+            "exclude_regex": r"Teachers:|Note:|Sayings and Phrases|Discuss with students:|𝆏|\bpiano\b|\bforte\b|capital letters|proper nouns",
+            "topic_regex": r".*",
+            "text_regex": r"Thanksgiving|Independence Day|Columbus Day|holiday|celebrat|festival|heritage|tradition",
+        },
+        "cn": {
+            "subjects": ["社会", "语文", "道德与法治", "历史", "英语"],
+            "text_only": True,
+            "text_regex": r"传统节日|节日|风俗|文化体验|风土人情|中华优秀传统文化|习俗",
+        },
+        "manual_relation": "两边都有，具体节日不同，功能对标",
+        "relation_note": "美国在感恩节、独立日等节日与庆典中建立文化记忆；中国从身边的传统节日、风俗体验到“中华优秀传统文化”的系统传承。节日不同，但都是文化传承的载体。",
+        "emphasis": "功能对标，内容不同",
+    },
+    {
+        "id": "culture-heritage-stories",
+        "domain": "文化",
+        "concept": "神话、传说与传统故事",
+        "us": {
+            "subjects": ["History and Geography", "English Language Arts", "Visual Arts", "Music"],
+            "text_only": True,
+            "exclude_regex": r"Teachers:|Note:|Sayings and Phrases|Discuss with students:|𝆏|\bpiano\b|\bforte\b|capital letters|proper nouns",
+            "topic_regex": r".*",
+            "text_regex": r"folktale|fairy tale|\bfable|legend|myth|Paul Bunyan|John Henry|\bhero",
+        },
+        "cn": {
+            "subjects": ["社会", "语文", "道德与法治", "历史", "英语"],
+            "text_only": True,
+            "text_regex": r"神话|传说|成语故事|民间故事|寓言|传统美德|历史故事|智慧",
+        },
+        "manual_relation": "两边都有，具体故事不同，功能对标",
+        "relation_note": "美国用民间故事、传说、神话与英雄人物传递文化价值；中国用神话传说、成语故事、寓言与历史故事传递传统美德与思维方法。故事不同，功能相近。",
+        "emphasis": "功能对标，内容不同",
+    },
+    {
+        "id": "culture-diversity",
+        "domain": "文化",
+        "concept": "多元文化与世界理解",
+        "us": {
+            "subjects": ["History and Geography", "English Language Arts", "Visual Arts", "Music"],
+            "text_only": True,
+            "exclude_regex": r"Teachers:|Note:|Sayings and Phrases|Discuss with students:|𝆏|\bpiano\b|\bforte\b|capital letters|proper nouns",
+            "topic_regex": r".*",
+            "text_regex": r"Native American|ways of life|culture|diversity|multicultural|world culture|immigrant|heritage|other countries|different cultures",
+        },
+        "cn": {
+            "subjects": ["社会", "语文", "道德与法治", "历史", "英语"],
+            "text_only": True,
+            "text_regex": r"自己的民族|多民族|各民族|互相尊重|不同.*民族|世界主要国家|文化多样|中外文化|文化习俗|国际理解|各国",
+        },
+        "manual_relation": "两边都有，起步接近，中国后段更集中表述",
+        "relation_note": "美国从认识本土部落与多元文化人群，到高年级的世界文化与移民内容；中国学前先建立多民族大家庭意识，英语与文化课在小学高段到初中明确世界主要国家与文化多样性。",
+        "emphasis": "两边都有，功能对标",
+    },
 ]
 
 # 人工复核的“后续覆盖 + 内容深度”判断。仅使用面向读者的年级/学段措辞。
@@ -688,6 +865,60 @@ DEPTH_REVIEW: dict[str, dict[str, str]] = {
         "终局关系": "起步美国早，终局都是一级行政区的记识，中国更集中。",
         "说明": "这一组可以直接对标：州和省都是一级行政区；美国从学前铺垫到5年级记州府，中国在7-9年级一次完成省级行政区、简称和行政中心。",
     },
+    "lang-listen-speak": {
+        "美国": "从学前口语互动、课堂讨论到幼儿园大班到初中的讨论规则、口头报告，逐年级连续覆盖。",
+        "中国": "学前先抓倾听与日常对话，小学各学段把复述、转述、讨论、即席讲话与主题演讲写成明确目标。",
+        "终局关系": "起步接近，双方后段都深但中国表达目标更成文。",
+        "说明": "听说两边都贯穿全学段；美国的推进更依赖课堂实践，中国把口语交际写成学段目标，终局可对照。",
+    },
+    "lang-emergent-literacy": {
+        "美国": "从学前印刷品与图书结构意识到K-2年级拼读、解码与朗读流利度，形成系统读写准备。",
+        "中国": "学前建立图书与符号兴趣，1-2年级集中识字、写字、拼音与查字典，后段转向独立识字。",
+        "终局关系": "功能对标，各自文字系统不同，后段都走向独立读写。",
+        "说明": "美国学的是字母拼读，中国学的是汉字与拼音；不能按字面比对，但都是读写入门的核心能力。",
+    },
+    "lang-reading": {
+        "美国": "K年级起朗读复述，3-5年级进入推断、概括与文本证据，6-8年级分析作者意图与观点。",
+        "中国": "小学低段朗读理解词句，中段到高段概括、分析、体会表达效果，初中评价与梳理成体系。",
+        "终局关系": "起步接近，双方后段都走向文本分析，深度相当。",
+        "说明": "阅读理解是两边最可比的能力链：低段都是朗读与复述，高段都是推断、概括与分析评价。",
+    },
+    "lang-writing": {
+        "美国": "学前口述、画图、听写起步，小学到初中完成叙事、说明、议论文与修订。",
+        "中国": "学前涂画表达，1-2年级明确写话，中高段到初中完成记实、想象作文、应用文与修改。",
+        "终局关系": "中国低段写话更早明确，双方后段都形成完整写作体系。",
+        "说明": "写作是功能对标最好的一块：两边都从非文字表达过渡到篇章写作，并在后段加入体裁与修订。",
+    },
+    "lang-literature": {
+        "美国": "从儿歌、韵诗、童话入门，K-8逐步加入诗歌、神话、戏剧、小说与文学术语。",
+        "中国": "学前儿歌童谣与听故事，小学到初中加入古诗文背诵、寓言神话、小说散文等体裁。",
+        "终局关系": "起步接近，后段体裁都扩展，中国古诗文背诵更突出。",
+        "说明": "文学体裁两边都逐学段扩展；中国尤其强调古诗文积累，美国更强调诗歌与小说的读析。",
+    },
+    "culture-symbols": {
+        "美国": "低年级认识国旗、自由女神像与国歌等国家符号，并在历史与音乐单元反复出现。",
+        "中国": "学前认识国旗国歌，小学低段在升旗、少先队活动中实践国家象征认知。",
+        "终局关系": "功能对标，具体符号不同，起步都早。",
+        "说明": "国家符号不宜按具体对象比对，应按“国家认同的共同记忆”功能对照；两边都从低龄开始。",
+    },
+    "culture-holiday-heritage": {
+        "美国": "感恩节、独立日等节日贯穿K-8的历史与文化单元。",
+        "中国": "从身边传统节日与风俗体验，到小学“中华优秀传统文化”与初中的文化传承要求。",
+        "终局关系": "功能对标，中国后段文化传承更成体系。",
+        "说明": "节日内容两边差异很大，应看“借节日做文化传承”这个功能；中国在后段把它写成明确主题。",
+    },
+    "culture-heritage-stories": {
+        "美国": "民间故事、传说、神话与英雄人物在低中段密集出现，作为文化价值载体。",
+        "中国": "神话传说、成语故事、寓言与历史故事贯穿小学到初中，传递传统美德与思维方法。",
+        "终局关系": "功能对标，中国更强调传统美德与价值观传递。",
+        "说明": "故事人物不可直接对照，但“用传统故事传递文化价值”的功能高度可比。",
+    },
+    "culture-diversity": {
+        "美国": "从认识本土部落与多元文化人群，到高年级世界文化与移民、不同信仰的内容。",
+        "中国": "学前建立多民族大家庭意识，小学高段到初中由英语与文化课明确世界主要国家与文化多样性。",
+        "终局关系": "起步接近，中国后段表述更集中，双方功能可比。",
+        "说明": "多元文化理解两边都从低龄起步；美国偏社会文化实景，中国偏文化知识与多民族意识。",
+    },
 }
 
 # 面向展示的阅读顺序、分组与一句话结论。
@@ -823,6 +1054,51 @@ STORY_META: dict[str, dict[str, Any]] = {
         "order": 6,
         "group": "区域对照",
         "short": "州与省都是一级行政区：美国从学前认识州，中国7-9年级集中学省级行政区与行政中心。",
+    },
+    "lang-listen-speak": {
+        "order": 1,
+        "group": "听说与口语",
+        "short": "两边都从学前听说起步；美国靠课堂讨论推进，中国把口语交际写成学段目标。",
+    },
+    "lang-emergent-literacy": {
+        "order": 2,
+        "group": "识字与读写准备",
+        "short": "美国学字母拼读，中国学汉字拼音；文字不同，读写准备的功能一致。",
+    },
+    "lang-reading": {
+        "order": 3,
+        "group": "阅读理解",
+        "short": "低段都朗读复述，高段都走向推断、概括与分析评价，最容易对标。",
+    },
+    "lang-writing": {
+        "order": 4,
+        "group": "写作与表达",
+        "short": "都从非文字表达起步；中国低段写话更早明确，后段都形成完整写作体系。",
+    },
+    "lang-literature": {
+        "order": 5,
+        "group": "文学与诗歌",
+        "short": "体裁都逐学段扩展；中国突出古诗文背诵，美国侧重诗歌小说读析。",
+    },
+    "culture-symbols": {
+        "order": 1,
+        "group": "国家认同",
+        "short": "国旗国歌功能相同、对象不同；两边都从低龄建立国家共同记忆。",
+    },
+    "culture-holiday-heritage": {
+        "order": 2,
+        "group": "文化传承",
+        "short": "节日内容不同，但都借节日做文化传承；中国后段更成体系。",
+    },
+    "culture-heritage-stories": {
+        "order": 3,
+        "group": "文化传承",
+        "short": "传统故事人物不同，都在传递文化价值；中国更强调传统美德。",
+    },
+    "culture-diversity": {
+        "order": 4,
+        "group": "多元理解",
+        "short": "都从低龄起步；美国偏社会实景，中国偏文化知识与多民族意识。",
     },
 }
 
@@ -1128,13 +1404,16 @@ def load_corpus() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 def us_matches(item: dict[str, Any], cfg: dict[str, Any]) -> bool:
     if item["subject"] not in cfg["subjects"]:
         return False
-    haystack = item["haystack"]
+    # 语言/文化类簇用 text_only，只匹配条目正文，避免 topic/subtopic 的主题词污染。
+    haystack = str(item["text"]) if cfg.get("text_only") else item["haystack"]
     if re.match(r"^(Overview|Teachers):", str(item["text"]).strip(), re.I):
         return False
     if cfg.get("exclude_regex") and re.search(cfg["exclude_regex"], haystack, re.I):
         return False
     if "bands" in cfg and us_band(item) not in cfg["bands"]:
         return False
+    if cfg.get("text_only"):
+        return bool(re.search(cfg["text_regex"], haystack, re.I))
     topic_ok = bool(re.search(cfg["topic_regex"], item["topic"] + " " + item["subtopic"], re.I))
     text_ok = bool(re.search(cfg["text_regex"], haystack, re.I))
     return topic_ok and text_ok
@@ -1152,7 +1431,8 @@ def cn_matches(item: dict[str, Any], cfg: dict[str, Any]) -> bool:
     subjects = cfg["subjects"]
     if subjects and item["subject"] not in subjects and not preschool_math:
         return False
-    haystack = item["haystack"]
+    # 语言/文化类簇用 text_only，只匹配条目正文，避免 topic/aspect/domain 的主题词污染。
+    haystack = str(item.get("text", "")) if cfg.get("text_only") else item["haystack"]
     if cfg.get("exclude_regex") and re.search(cfg["exclude_regex"], haystack):
         return False
     if "bands" in cfg and cn_band(item) not in cfg["bands"]:
@@ -1310,7 +1590,1011 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
         {"id": "geo-admin-basic", "concept": "州与省：层级识别", "group": "区域对照", "short": "美国学前和1-2年级认识所在州，中国7-9年级识别省级行政区。", "us_bands": [0, 1], "cn_bands": [4]},
         {"id": "geo-admin-capitals", "concept": "州府与省会：名称与行政中心", "group": "区域对照", "short": "美国5-6年级记50州及州府，中国7-9年级记省级行政区简称和行政中心。", "us_bands": [3], "cn_bands": [4]},
     ],
+    "lang-listen-speak": [
+        {"id": "lang-listen-early", "concept": "听懂日常语言与对话", "group": "听说与口语", "short": "中美学前都从听懂指令、日常对话与礼貌表达起步。", "us_bands": [0, 1], "cn_bands": [0, 1],
+         "us_text_regex": r"\blisten|listening|\bspeak|speaking|conversation|dialogue|oral language|respond|talk about",
+         "cn_text_regex": r"注意听|听懂|倾听|交谈|对话|讲述|口语|回应|说话|普通话|大声说|礼貌用语"},
+        {"id": "lang-listen-mid", "concept": "课堂讨论与复述转述", "group": "听说与口语", "short": "小学中高段，双方都要求课堂讨论、复述与转述。", "us_bands": [2, 3], "cn_bands": [2, 3],
+         "us_text_regex": r"discussion|discuss|retell|recount|summarize.*oral|respond",
+         "cn_text_regex": r"交流|讨论|复述|转述|讲述.*见闻|朗读|发言"},
+        {"id": "lang-listen-late", "concept": "演讲、辩论与观点表达", "group": "听说与口语", "short": "初中阶段，双方都要求即席讲话、主题演讲与有观点的表达。", "us_bands": [4], "cn_bands": [4],
+         "us_text_regex": r"\bdebate|oral presentation|defend.*position|state.*view|speech",
+         "cn_text_regex": r"演讲|即席讲话|有准备.*发言|讨论问题|发表自己的看法|观点"},
+    ],
+    "lang-emergent-literacy": [
+        {"id": "lang-literacy-early", "concept": "图书、符号与书写准备", "group": "识字与读写准备", "short": "学前到1-2年级，双方建立图书、符号意识与书写准备。", "us_bands": [0, 1], "cn_bands": [0, 1],
+         "us_text_regex": r"print awareness|identify.*print|letter|phoneme|phonics|blend|book.*cover|turn.*page|rhyming",
+         "cn_text_regex": r"图书|画册|标记|符号|笔画|汉字|拼音|认读|写字|翻书|涂涂|画画"},
+        {"id": "lang-decode-characters", "concept": "拼读解码与识字写字", "group": "识字与读写准备", "short": "小学低中段，美国练拼读解码，中国练识字写字与查字典。", "us_bands": [1, 2], "cn_bands": [1, 2],
+         "us_text_regex": r"decod|sight word|blend.*sound|read.*word|fluen",
+         "cn_text_regex": r"识字|写字|拼音|汉字|笔画|部首|查字典|认识常用汉字"},
+    ],
+    "lang-reading": [
+        {"id": "lang-reading-basic", "concept": "朗读、理解与复述", "group": "阅读理解", "short": "小学低中段，双方都从朗读、理解内容到复述故事。", "us_bands": [1, 2], "cn_bands": [1, 2],
+         "us_text_regex": r"\bretell|read aloud|comprehension|describe characters|understand.*text",
+         "cn_text_regex": r"朗读|默读|课文|词句|阅读|理解.*内容|复述"},
+        {"id": "lang-reading-analysis", "concept": "推断、概括与文本分析", "group": "阅读理解", "short": "小学高段到初中，双方都进入推断、概括、证据与评价。", "us_bands": [3, 4], "cn_bands": [3, 4],
+         "us_text_regex": r"infer|summariz|main idea|text evidence|analyz|interpret|evaluate|author.*purpose|point of view",
+         "cn_text_regex": r"概括.*内容|分析主要内容|推想.*词句|思想感情|评价.*作品|揣摩|品味.*语言|领悟.*表达方法|区分观点与材料|作出自己的判断|理清思路"},
+    ],
+    "lang-writing": [
+        {"id": "lang-writing-early", "concept": "涂画、口述与写话起步", "group": "写作与表达", "short": "学前到1-2年级，双方从涂画口述过渡到写话与短句。", "us_bands": [0, 1], "cn_bands": [0, 1],
+         "us_text_regex": r"dictate|caption|draw.*represent|write.*letter|label.*picture|copy.*letter",
+         "cn_text_regex": r"写自己的|愿意写|写话|涂涂|画画|口述|画.*表示|写写画画"},
+        {"id": "lang-writing-composition", "concept": "篇章写作、体裁与修改", "group": "写作与表达", "short": "小学高段到初中，双方完成叙事、说明、议论文与修订。", "us_bands": [3, 4], "cn_bands": [3, 4],
+         "us_text_regex": r"narrative|essay|draft|revise|paragraph|composition|write.*story|persuasive|expository",
+         "cn_text_regex": r"习作|作文|记实|想象作文|读书笔记|应用文|修改.*习作|分段表述"},
+    ],
+    "lang-literature": [
+        {"id": "lang-poetry-early", "concept": "儿歌、童谣与故事入门", "group": "文学与诗歌", "short": "学前到1-2年级，双方用儿歌、韵诗、童话与故事入门。", "us_bands": [0, 1], "cn_bands": [0, 1],
+         "us_text_regex": r"nursery rhyme|fairy tale|poem|rhyming|storybook",
+         "cn_text_regex": r"儿歌|童谣|古诗|童话|故事|寓言|复述"},
+        {"id": "lang-genre-study", "concept": "诗歌、神话与小说戏剧", "group": "文学与诗歌", "short": "小学中高段，体裁扩展到诗歌、神话、小说、散文与戏剧。", "us_bands": [2, 3], "cn_bands": [2, 3],
+         "us_text_regex": r"\bpoetry|fiction|myth|legend|literary|drama|novel|fable",
+         "cn_text_regex": r"古诗|诗文|寓言|神话|小说|散文|背诵|文学|叙事性作品"},
+    ],
+    "culture-symbols": [
+        {"id": "culture-symbols-early", "concept": "国旗、国歌与国家象征", "group": "国家认同", "short": "低龄认识国旗国歌等国家符号，中国还结合升旗仪式实践。", "us_bands": [0, 1], "cn_bands": [0, 1],
+         "us_text_regex": r"American flag|Statue of Liberty|national anthem|national symbol|Stars and Stripes|bald eagle",
+         "cn_text_regex": r"国旗|国歌|国徽|国家象征|红领巾|升旗"},
+    ],
+    "culture-holiday-heritage": [
+        {"id": "culture-holiday-mid", "concept": "节日、庆典与风俗体验", "group": "文化传承", "short": "小学中高段，美国记节日庆典，中国体验传统节日与风俗。", "us_bands": [2, 4], "cn_bands": [2, 4],
+         "us_text_regex": r"Thanksgiving|Independence Day|Columbus Day|Christmas|holiday|celebration|festival|National holiday",
+         "cn_text_regex": r"传统节日|节日|风俗|文化体验|风土人情|中华优秀传统文化|习俗"},
+    ],
+    "culture-heritage-stories": [
+        {"id": "culture-stories-mid", "concept": "神话、传说与传统故事", "group": "文化传承", "short": "小学低中段，双方用民间故事、神话传说传递文化价值。", "us_bands": [1, 2], "cn_bands": [1, 2],
+         "us_text_regex": r"folktale|fairy tale|\bfable|legend|myth|Paul Bunyan|John Henry|\bhero",
+         "cn_text_regex": r"神话|传说|成语故事|民间故事|寓言|传统美德|历史故事|智慧"},
+        {"id": "culture-heritage-late", "concept": "英雄、传统与文化传承", "group": "文化传承", "short": "小学高段到初中，美国讲英雄与遗产，中国强调传统文化与自信。", "us_bands": [3, 4], "cn_bands": [3, 4],
+         "us_text_regex": r"\bhero|ancient civilization|heritage|tradition|\bmyth|folk hero|cultural heritage",
+         "cn_text_regex": r"传统文化|文化遗产|传统美德|中华优秀|文化自信|感悟.*文化"},
+    ],
+    "culture-diversity": [
+        {"id": "culture-diversity-early", "concept": "本民族与多元人群", "group": "多元理解", "short": "低龄认识本土部落、多民族大家庭与相互尊重。", "us_bands": [0, 1], "cn_bands": [0, 1],
+         "us_text_regex": r"Native American|ways of life|cultural diversity|different Native American|tribe or nation|different faiths",
+         "cn_text_regex": r"自己的民族|多民族|各民族|互相尊重|不同.*民族"},
+        {"id": "culture-diversity-world", "concept": "世界文化与中外差异", "group": "多元理解", "short": "小学高段到初中，双方扩展到世界主要国家与文化多样性。", "us_bands": [3, 4], "cn_bands": [3, 4],
+         "us_text_regex": r"multicultural|world culture|immigrant|heritage|other countries|different cultures",
+         "cn_text_regex": r"世界主要国家|文化多样|中外文化|文化习俗|国际理解|各国"},
+    ],
 }
+
+# 微指标层：人工挑选、可直接核对原文的能力点。
+# 证据按来源条目 ID 定位；展示轨道仍按现有口径最多两个学段，深度按参数逐项列出。
+MICRO_CLAIMS: list[dict[str, Any]] = [
+    {
+        "id": "micro-motor-hop", "domain": "儿童发展", "order": 1,
+        "concept": "单脚连续向前跳", "group": "动作与平衡",
+        "short": "中国写成小班2米、中班5米、大班8米的递进，美国只列动作形式，不设距离。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00006"],
+        "cn_evidence": ["ps-h-a2-g2-x-03", "ps-h-a2-g2-z-03", "ps-h-a2-g2-d-03"],
+        "axes": [
+            ["量化阈值", "无距离要求", "2米 → 5米 → 8米"],
+            ["年级递进", "学前一条目标", "小班 / 中班 / 大班三级"],
+            ["场景条件", "有或无障碍物，避免碰撞", "向前连续跳（直线）"],
+            ["动作形式", "单脚跳或双脚交替", "单脚连续"],
+        ],
+        "emphasis": "中国有量化递进",
+        "note": "两边都在学前出现单脚跳；差别不在“有没有”，而在中国把距离写成可测的小中大递进，美国只描述动作方式。",
+    },
+    {
+        "id": "micro-motor-signal", "domain": "儿童发展", "order": 2,
+        "concept": "按信号停止或开始动作", "group": "动作与平衡",
+        "short": "同为听信号做动作，美国放在学前运动目标，中国放到小学体育的反应能力训练。",
+        "us_bands": [0], "cn_bands": [2, 4],
+        "us_evidence": ["n00001"],
+        "cn_evidence": ["pe-x2-con-33c71382", "pe-x3-con-4df653fd", "pe-j1-con-784b5c3a"],
+        "axes": [
+            ["首次年级", "幼儿园前班", "小学中段（3-4年级）"],
+            ["信号类型", "开始 / 停止", "正反口令、变向口令"],
+            ["年级递进", "学前一条", "3-4 → 5-6 → 7-9 年级逐级"],
+            ["动作难度", "走跑跳等基本动作", "变向跑、起动与制动、追逐跑"],
+        ],
+        "emphasis": "美国更早，中国后段成体系",
+        "note": "中国学前的“听从长辈要求”属于社会性服从，不是同一功能，另列在“执行单步口头指令”；这里只比对运动信号反应。",
+    },
+    {
+        "id": "micro-motor-stairs", "domain": "儿童发展", "order": 3,
+        "concept": "双脚交替上下楼梯", "group": "动作与平衡",
+        "short": "两边都写在学前，中国额外要求“灵活”，美国只要求交替。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00002"],
+        "cn_evidence": ["ps-h-a2-g1-x-02"],
+        "axes": [
+            ["动作要求", "上、下楼梯交替双脚", "双脚灵活交替上下楼梯"],
+            ["流畅度", "无明确要求", "明确要求“灵活”"],
+            ["递进", "学前一条", "小班一条，后段未单列"],
+            ["量化", "无", "无"],
+        ],
+        "emphasis": "中国多一项流畅度要求",
+        "note": "这是同一动作的近距离对照：功能相同，主要差别在中国把“灵活”写进目标措辞。",
+    },
+    {
+        "id": "micro-motor-balance", "domain": "儿童发展", "order": 4,
+        "concept": "平衡：变换姿势与窄道行走", "group": "动作与平衡",
+        "short": "美国停在原地与宽平衡木，中国从直线走到斜坡、荡桥和间隔物体。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00003", "n00004"],
+        "cn_evidence": ["ps-h-a2-g1-x-01", "ps-h-a2-g1-z-01", "ps-h-a2-g1-d-01"],
+        "axes": [
+            ["条件递进", "原地变换姿势 → 宽平衡木", "地面直线 → 窄低物体 → 斜坡荡桥"],
+            ["表面宽度", "宽 bench / beam", "较窄、有一定间隔"],
+            ["量化", "无距离", "均为“一段距离”，无米数"],
+            ["进阶层级", "两条学前目标", "小 / 中 / 大班三级"],
+        ],
+        "emphasis": "中国场景递进更清楚",
+        "note": "同属学前平衡能力；差别在中国把支撑面从宽到窄逐级收紧，美国只给出两个并列条件。",
+    },
+    {
+        "id": "micro-motor-throw", "domain": "儿童发展", "order": 5,
+        "concept": "定向投掷与投准", "group": "投掷与协调",
+        "short": "中国给出2米、4米、5米的投掷距离，美国强调按指示方向和逐渐提高的准确度。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00008", "n07200"],
+        "cn_evidence": ["ps-h-a2-g2-x-02", "ps-h-a2-g2-z-02", "ps-h-a2-g2-d-02"],
+        "axes": [
+            ["量化阈值", "无距离", "2米 → 4米 → 5米"],
+            ["精度要求", "“increasing accuracy”", "以距离为指标"],
+            ["目标设置", "高度和距离不同的靶", "向前投掷沙包"],
+            ["年级递进", "两条学前目标", "小班 / 中班 / 大班三级"],
+        ],
+        "emphasis": "两边深度维度不同",
+        "note": "不能只说“都练投掷”：美国写的是按指示方向与靶位准确度，中国写的是可测距离递进。",
+    },
+    {
+        "id": "micro-motor-catch", "domain": "儿童发展", "order": 6,
+        "concept": "抛接球与接物", "group": "投掷与协调",
+        "short": "美国把双人接豆袋的距离写成1.5英尺，中国写成自抛自接、连续拍球的递进。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00009"],
+        "cn_evidence": ["ps-h-a2-g1-x-05", "ps-h-a2-g1-z-05", "ps-h-a2-g1-d-05"],
+        "axes": [
+            ["互动形式", "成人与幼儿对接", "向上抛球 → 自抛自接 → 连续拍球"],
+            ["量化", "相距1.5英尺", "无距离，以连续性要求递进"],
+            ["递进", "学前一条", "小 / 中 / 大班三级"],
+            ["对象", "豆袋", "球"],
+        ],
+        "emphasis": "美国有距离，中国有连续性递进",
+        "note": "两边都从学前做接物，但深度写在不同参数上：美国量化空间，中国量化动作连续性。",
+    },
+    {
+        "id": "micro-motor-rules", "domain": "儿童发展", "order": 7,
+        "concept": "遵守游戏规则与轮流", "group": "常规与协作",
+        "short": "美国从遵守简单游戏规则起步，中国从提醒下遵守写到理解并共同制定规则。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00035", "n00031", "n00011"],
+        "cn_evidence": ["ps-s-a2-g2-x-01", "ps-s-a2-g2-z-01", "ps-s-a2-g2-d-01"],
+        "axes": [
+            ["规则来源", "既有简单游戏规则", "遵守 → 理解意义 → 与同伴协商制定"],
+            ["递进", "学前并列目标", "小班 / 中班 / 大班三级"],
+            ["成人提示", "未分层", "提醒下 → 基本遵守 → 自主协商"],
+            ["轮流要求", "wait turn to speak", "对大家都喜欢的东西能轮流、分享"],
+        ],
+        "emphasis": "中国有规则内化递进",
+        "note": "中国的目标从“他律”走向“共制规则”，美国在学前阶段主要列遵守与轮流行为。",
+    },
+    {
+        "id": "micro-motor-calm", "domain": "儿童发展", "order": 8,
+        "concept": "从兴奋转为平静", "group": "常规与协作",
+        "short": "美国把它写成身体放松动作，中国写成情绪识别与缓解的三级递进。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00007"],
+        "cn_evidence": ["ps-h-a1-g2-x-02", "ps-h-a1-g2-z-02", "ps-h-a1-g2-d-01", "ps-h-a1-g2-d-02"],
+        "axes": [
+            ["机制", "放松肌肉，从高活动转安静专注", "识别情绪原因并努力缓解"],
+            ["成人支持", "未分层", "安抚 → 提醒 → 自主缓解"],
+            ["递进", "学前一条", "小 / 中 / 大班三级"],
+            ["输出", "身体状态", "情绪表达适度、随活动需要转换"],
+        ],
+        "emphasis": "功能接近，机制不同",
+        "note": "这是跨领域的近似对标：同是“从激动到平静”，美国落在身体调节策略，中国落在情绪认知与社会性。",
+    },
+    {
+        "id": "micro-routine-sleep", "domain": "儿童发展", "order": 1,
+        "concept": "每天睡眠时长与午睡", "group": "睡眠与照护",
+        "short": "中国明确每天11-12小时、午睡约2小时；美国文件不规定作息。",
+        "us_bands": [], "cn_bands": [0],
+        "us_evidence": [],
+        "cn_evidence": ["ps-h-a1-g1-s-02", "ps-h-a3-g1-x-01", "ps-h-a3-g1-z-01"],
+        "axes": [
+            ["量化阈值", "无对应条目", "每天11～12小时，午睡约2小时"],
+            ["起始年级", "—", "小班：提醒下按时睡起并坚持午睡"],
+            ["递进", "—", "中班：每天按时睡觉起床并坚持午睡"],
+            ["文件口径", "学科内容序列", "发展指标 + 教育建议"],
+        ],
+        "emphasis": "仅中国有，属文件类型差异",
+        "flag": "仅中国有 · 文件类型差异，不做能力高低判断",
+        "note": "不能解释成美国不要求午睡；两套文件管的事不同，一份列学科内容，一份列发展与生活指标。",
+    },
+    {
+        "id": "micro-routine-hygiene", "domain": "儿童发展", "order": 2,
+        "concept": "洗手、刷牙与餐桌礼仪", "group": "卫生与自理",
+        "short": "美国把洗手和餐桌礼仪并列成一条，中国把洗手刷牙写成三级递进。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00025"],
+        "cn_evidence": ["ps-h-a3-g1-x-06", "ps-h-a3-g1-z-06", "ps-h-a3-g1-d-06"],
+        "axes": [
+            ["频次", "未量化", "每天早晚刷牙、饭前便后洗手"],
+            ["递进", "学前一条综合目标", "提醒下 → 方法基本正确 → 主动且正确"],
+            ["范围", "如厕、洗手、餐具与餐巾", "刷牙、洗手"],
+            ["自主性", "independent / appropriate", "在提醒下 → 主动"],
+        ],
+        "emphasis": "中国有频次与主动性递进",
+        "note": "两边都从学前要求个人卫生；美国的条目把如厕、洗手、餐具使用放在同一条，中国则按年龄细化方法与主动性。",
+    },
+    {
+        "id": "micro-routine-screen", "domain": "儿童发展", "order": 3,
+        "concept": "连续看电视的时长上限", "group": "睡眠与照护",
+        "short": "中国给出15、20、30分钟的年龄上限，美国文件没有屏幕时长条目。",
+        "us_bands": [], "cn_bands": [0],
+        "us_evidence": [],
+        "cn_evidence": ["ps-h-a3-g1-x-05", "ps-h-a3-g1-z-05", "ps-h-a3-g1-d-05"],
+        "axes": [
+            ["量化阈值", "无对应条目", "小班15 / 中班20 / 大班30分钟"],
+            ["递进", "—", "年龄越大上限越高"],
+            ["配套要求", "—", "不在光线过强或过暗处看书"],
+            ["文件口径", "学科内容序列", "发展指标 + 教育建议"],
+        ],
+        "emphasis": "仅中国有，属文件类型差异",
+        "flag": "仅中国有 · 文件类型差异，不做能力高低判断",
+        "note": "与睡眠条目同类：这是照护指标而非学科知识点，单列是为了呈现文件管辖范围不同。",
+    },
+    {
+        "id": "micro-routine-selfcare", "domain": "儿童发展", "order": 4,
+        "concept": "穿脱衣物与物品归位", "group": "卫生与自理",
+        "short": "美国只要求用后归位，中国从穿脱鞋袜写到系鞋带和按类别整理。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00041"],
+        "cn_evidence": ["ps-h-a3-g2-x-01", "ps-h-a3-g2-z-01", "ps-h-a3-g2-d-02", "ps-h-a3-g2-x-02", "ps-h-a3-g2-z-02", "ps-h-a3-g2-d-03"],
+        "axes": [
+            ["穿衣技能", "无", "帮助下穿脱 → 自己穿脱扣钮扣 → 系鞋带"],
+            ["整理技能", "玩具与材料用后归位", "放回原处 → 整理物品 → 按类别整理"],
+            ["递进", "学前一条", "小 / 中 / 大班三级"],
+            ["自主性", "after use", "在帮助下 → 自己 → 按类别"],
+        ],
+        "emphasis": "中国自理技能链更完整",
+        "note": "两边都有“用后归位”；中国另把穿衣与整理拆成可观察的分龄技能，美国只在学前工作习惯中列一条。",
+    },
+    {
+        "id": "micro-routine-safety", "domain": "儿童发展", "order": 5,
+        "concept": "不跟陌生人走与求助信息", "group": "安全与求助",
+        "short": "美国要求记住姓名、地址和电话，中国把行为规则、求助方式和防灾知识分层写出。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n07203"],
+        "cn_evidence": ["ps-h-a3-g3-x-01", "ps-h-a3-g3-x-03", "ps-h-a3-g3-z-04", "ps-h-a3-g3-d-01"],
+        "axes": [
+            ["能力类型", "记忆个人信息", "行为规则 + 求助方式 + 防灾知识"],
+            ["递进", "一条 Level II 目标", "小班 → 中班 → 大班三级"],
+            ["信息内容", "地址、电话、出生日期", "自己和家长的名字、电话号码"],
+            ["情境", "未限定", "陌生人、公共场所走失、开门、防灾"],
+        ],
+        "emphasis": "中国情境更具体",
+        "note": "两边都涉及“走失时能说出信息”，但中国把它嵌在陌生人、走失和开门等具体情境中。",
+    },
+    {
+        "id": "micro-arts-movement", "domain": "艺术", "order": 1,
+        "concept": "随音乐做动作与节奏精度", "group": "音乐与律动",
+        "short": "美国K-2三年重复同一条动作目标，中国从跟随动作走到基本准确的节奏与音调。",
+        "us_bands": [0, 1], "cn_bands": [0],
+        "us_evidence": ["n00497", "n01001", "n01559"],
+        "cn_evidence": ["ps-a-a2-g2-x-02", "ps-a-a2-g2-z-03", "ps-a-a2-g2-d-01"],
+        "axes": [
+            ["年级递进", "K / 1 / 2 年级目标文字相同", "小班 → 中班 → 大班，逐年提高"],
+            ["精度要求", "无准确度要求", "大班要求基本准确的节奏和音调"],
+            ["输出形式", "行进、走、单脚跳、摇摆", "身体动作、拍手踏脚、敲击、唱歌、律动"],
+            ["条件", "随音乐做相应动作", "熟悉音乐 → 基本节奏 → 表现情绪或情景"],
+        ],
+        "emphasis": "中国有精度递进",
+        "note": "同是“随音乐动起来”，差别在美国把同一目标连续三年重复，中国把它拆成动作、节拍、音准的递进。",
+    },
+    {
+        "id": "micro-arts-visual", "domain": "艺术", "order": 2,
+        "concept": "线条与色彩：名作欣赏 vs 自由表现", "group": "美术与创造",
+        "short": "美国K起认线条色彩和名家作品，中国指南强调不设范画、画自己想画的人或事物。",
+        "us_bands": [0], "cn_bands": [0],
+        "us_evidence": ["n00455", "n00465", "n00473"],
+        "cn_evidence": ["ps-a-a2-g2-x-04", "ps-a-a2-g2-s-05"],
+        "axes": [
+            ["学习目标", "识别并使用线条、色彩；认识作品", "用线条色彩画出自己想画的人或事物"],
+            ["作品角色", "名作与艺术家是教学内容", "不宜提供范画，不要求照画"],
+            ["起始年级", "幼儿园（K）", "小班（3-4岁）"],
+            ["输出", "观察、讨论、使用形式要素", "涂画、粘贴、手工表现所见所想"],
+        ],
+        "emphasis": "功能不同：欣赏知识 vs 自由表现",
+        "note": "两边都从线条色彩起步，但美国把作品与艺术家当知识内容，中国把“不设范画”当教学原则。",
+    },
+    {
+        "id": "micro-arts-singing", "domain": "艺术", "order": 3,
+        "concept": "唱短歌与音准", "group": "音乐与律动",
+        "short": "美国K-2以无伴奏、伴奏与齐唱为主，中国从模仿学唱走到基本准确的节奏和音调。",
+        "us_bands": [0, 1], "cn_bands": [0],
+        "us_evidence": ["n00506", "n01015", "n01575"],
+        "cn_evidence": ["ps-a-a2-g2-x-01", "ps-a-a2-g2-z-01", "ps-a-a2-g2-d-01"],
+        "axes": [
+            ["年级递进", "K / 1 / 2 年级同一条", "模仿学唱 → 音量适中基本准确 → 节奏音调基本准确"],
+            ["精度要求", "未写音准", "中班起出现“基本准确”"],
+            ["组织形式", "无伴奏、伴奏、齐唱", "模仿、自哼自唱、即兴编词"],
+            ["起始年级", "幼儿园（K）", "小班（3-4岁）"],
+        ],
+        "emphasis": "中国有准确度递进",
+        "note": "美国重复演唱形式，中国把“准确”作为可进阶的目标，这是同一主题下深度写法的差别。",
+    },
+    {
+        "id": "micro-arts-rhythm", "domain": "艺术", "order": 4,
+        "concept": "稳定节拍与敲打节奏", "group": "音乐与律动",
+        "short": "美国K起就认拍并尝试打拍，中国到中班才要求用身体或物品敲出基本节奏。",
+        "us_bands": [0, 1], "cn_bands": [0],
+        "us_evidence": ["n00495", "n01000", "n01558"],
+        "cn_evidence": ["ps-a-a2-g2-z-03", "ps-a-a2-g2-d-01"],
+        "axes": [
+            ["起始时间", "幼儿园（K）", "中班（4-5岁）"],
+            ["工具", "未指定，play a steady beat", "拍手、踏脚或可敲击物品"],
+            ["递进", "K 认拍并尝试 → 1-2年级延续", "敲打基本节奏 → 基本准确的节奏"],
+            ["精度", "无“准确”表述", "大班出现“基本准确”"],
+        ],
+        "emphasis": "美国更早，中国工具更具体",
+        "note": "两边都练稳定拍；美国起步早且不指定工具，中国起步稍晚但把身体动作和打击物写清楚。",
+    },
+    {
+        "id": "micro-arts-appreciation", "domain": "艺术", "order": 5,
+        "concept": "欣赏作品并表达理解", "group": "美术与创造",
+        "short": "美国让学生谈第一印象、细节和创作意图，中国要求用表情、动作、语言表达理解。",
+        "us_bands": [0, 1], "cn_bands": [0],
+        "us_evidence": ["n00473"],
+        "cn_evidence": ["ps-a-a1-g2-x-02", "ps-a-a1-g2-z-02", "ps-a-a1-g2-d-01"],
+        "axes": [
+            ["对象", "具体绘画作品与艺术家", "绘画、泥塑及多种艺术形式"],
+            ["表达方式", "语言讨论：第一印象、细节、为何这样画", "表情、动作、语言；联想与情绪反应"],
+            ["递进", "K 起观察与讨论", "小班观看 → 中班联想 → 大班表达理解"],
+            ["知识要求", "认识线条、色彩等要素", "未要求形式术语"],
+        ],
+        "emphasis": "表达通道不同",
+        "note": "同为“看懂作品并说出来”，美国偏语言化的作品分析，中国允许表情与动作，并强调联想和情绪。",
+    },
+    {
+        "id": "micro-arts-drama", "domain": "艺术", "order": 6,
+        "concept": "角色扮演与自编自演", "group": "表演与戏剧",
+        "short": "美国从简单哑剧和团体游戏入门，中国到大班要求自编自演并搭配服饰道具布景。",
+        "us_bands": [0, 1], "cn_bands": [0],
+        "us_evidence": ["n00013", "n00011", "n01029"],
+        "cn_evidence": ["ps-a-a2-g1-z-01", "ps-a-a2-g2-d-03"],
+        "axes": [
+            ["形式", "哑剧、团体游戏、歌剧概念", "歌唱律动舞蹈表演 → 自编自演故事"],
+            ["产出", "模仿动作与扮演", "选择搭配服饰、道具或布景"],
+            ["递进", "学前哑剧 → 1年级认识歌剧", "中班参与表演 → 大班自编自演"],
+            ["创作要求", "以参与和模仿为主", "明确要求自编与自主搭配"],
+        ],
+        "emphasis": "中国产出更完整",
+        "note": "两边都有表演，但中国大班把“编、演、舞美搭配”合在一条目标里，美国学前主要列模仿与集体游戏。",
+    },
+]
+
+# 原有五个领域的微指标拆解：按能力点重新组织证据，深度仍按参数逐项列出。
+DOMAIN_MICRO_CLAIMS: list[dict[str, Any]] = [
+    {
+        "id": "micro-math-count-cardinality", "domain": "数学",
+        "concept": "数数、基数与数量上限", "group": "数与运算",
+        "short": "美国从4枚硬币数到100，中国从5以内点数走到万以内认读。",
+        "us_bands": [0, 1], "cn_bands": [0, 1],
+        "us_evidence": ["n00155", "n00547", "n00549", "n00543"],
+        "cn_evidence": ["ps-c-a2-g2-x-03", "ma-x1-aca-3169de58"],
+        "axes": [
+            ["数量上限", "4枚硬币 → 数到100", "5以内点数 → 万以内认读"],
+            ["基数", "Count to tell the number of objects", "说出总数、按数取物"],
+            ["递进", "学前 / K / 1年级", "小班 / 小学1-2年级"],
+        ],
+        "emphasis": "上限与方式不同",
+        "note": "两边都从点数起步，但美国把目标写成数到100，中国把“说出总数、按数取物”与认读写大数连成主线。",
+    },
+    {
+        "id": "micro-math-add-sub-10", "domain": "数学",
+        "concept": "10以内加减与算理", "group": "数与运算",
+        "short": "美国要求K年级在10以内解题并熟练算到5，中国从合并拿取的意义走到20以内熟练口算。",
+        "us_bands": [0, 1], "cn_bands": [0, 1],
+        "us_evidence": ["n00557", "n00560", "n01046"],
+        "cn_evidence": ["ps-c-a2-g2-d-02", "ma-x1-con-3757b0ba", "ma-x1-aca-3169de58"],
+        "axes": [
+            ["数量范围", "10以内应用题，5以内熟练", "理解意义 → 20以内熟练口算"],
+            ["算式与情境", "word problems within 10", "合并、拿取等实际情境"],
+            ["算理", "properties of operations", "知道减法是加法的逆运算"],
+        ],
+        "emphasis": "中国算理表述更集中",
+        "note": "功能相同但深度写法不同：美国列解题范围与熟练度，中国把操作意义、算理和口算速度写在同一条。",
+    },
+    {
+        "id": "micro-math-fractions-intro", "domain": "数学",
+        "concept": "分数的等值分割与分数单位", "group": "数的扩展",
+        "short": "双方都在小学中段建立分数概念，美国强调等分与1/b，中国强调分数单位。",
+        "us_bands": [2], "cn_bands": [2],
+        "us_evidence": ["n02200", "n02201"],
+        "cn_evidence": ["ma-x2-con-7d214454"],
+        "axes": [
+            ["概念抓手", "整体分成b等份中的1份", "感悟分数单位"],
+            ["运算延伸", "同分母分数加减", "同分母分数与一位小数加减"],
+            ["起始年级", "3年级", "小学3-4年级"],
+        ],
+        "emphasis": "阶段相当，表述角度不同",
+        "note": "同一阶段的概念起点，美国用等分操作定义分数，中国用分数单位把分数与小数放在同一条。",
+    },
+    {
+        "id": "micro-math-shapes", "domain": "数学",
+        "concept": "图形分割与特征分类", "group": "图形与测量",
+        "short": "美国1年级用 halves、quarters 分割图形，中国3-4年级按边角特征分类三角形和四边形。",
+        "us_bands": [1, 2], "cn_bands": [2],
+        "us_evidence": ["n01084"],
+        "cn_evidence": ["ma-x2-con-0124f5b2", "ma-x2-con-cb89f248"],
+        "axes": [
+            ["任务", "把图形分成半和四分之一", "按特征分类三角形、四边形"],
+            ["属性", "形状分割", "边、角、角的大小关系"],
+            ["起始年级", "1年级", "小学3-4年级"],
+        ],
+        "emphasis": "起步不同，后段汇合到图形性质",
+        "note": "美国低年级先做图形等分，中国把边角性质集中到中段；两边最终都进入图形属性。",
+    },
+    {
+        "id": "micro-math-data", "domain": "数学",
+        "concept": "数据收集、整理与集中量数", "group": "代数与统计",
+        "short": "中国从收集整理描述一路写到平均数与百分数，美国中期跳到用集中量数概括数据。",
+        "us_bands": [2, 3], "cn_bands": [2, 3],
+        "us_evidence": ["n04329"],
+        "cn_evidence": ["ma-x2-con-892fcdb0", "ma-x3-tip-7ca9a590"],
+        "axes": [
+            ["过程", "用集中量数概括数据集", "收集 → 整理 → 描述 → 分析"],
+            ["工具", "measure of center", "统计图、平均数、百分数"],
+            ["递进", "中段到高段", "3-4年级到5-6年级连续推进"],
+        ],
+        "emphasis": "中国过程链更完整",
+        "note": "美国这条直接讲集中量数的意义，中国把数据统计的全过程写成教学主线。",
+    },
+    {
+        "id": "micro-science-observe-tools", "domain": "科学",
+        "concept": "观察、提问与工具使用", "group": "探究与工程",
+        "short": "中国从好奇提问起步并明确工具使用，美国从按属性描述物体起步。",
+        "us_bands": [0, 1], "cn_bands": [0, 1],
+        "us_evidence": ["n00181", "n03602"],
+        "cn_evidence": ["ps-c-a1-g1-x-01", "ps-c-a1-g1-x-02", "sc-x1-con-0fbd7e24"],
+        "axes": [
+            ["起点", "按可辨属性识别描述", "接触自然、提问、摆弄物品"],
+            ["工具", "未单列低龄工具", "锤子、剪刀、放大镜等"],
+            ["递进", "学前描述 → 小学调查", "小班兴趣 → 1-2年级工具体验"],
+        ],
+        "emphasis": "中国工具要求更具体",
+        "note": "两边都从观察起步，差别在中国把“好奇提问”和“工具带来的便利”写成可观察的目标。",
+    },
+    {
+        "id": "micro-science-experiment-measure", "domain": "科学",
+        "concept": "实验设计与测量器材", "group": "探究与工程",
+        "short": "美国强调计划与实施调查，中国把温度计、量筒、电子秤的使用写进中段要求。",
+        "us_bands": [2, 3], "cn_bands": [2, 3],
+        "us_evidence": ["n02238", "n03602"],
+        "cn_evidence": ["sc-x2-con-0bafd236", "sc-x2-con-63432192"],
+        "axes": [
+            ["核心动作", "planning and conducting investigations", "观察比较 + 正确使用测量工具"],
+            ["量化工具", "未列具体器材", "温度计、量筒、电子秤"],
+            ["产出", "设计与实施", "用测量数据描述物体特点"],
+        ],
+        "emphasis": "中国器材与数据更具体",
+        "note": "同属探究能力，美国写探究过程，中国把器材操作和用数据描述结果并列写出。",
+    },
+    {
+        "id": "micro-science-cells-genetics", "domain": "科学",
+        "concept": "细胞、遗传与生命现象", "group": "生命科学",
+        "short": "美国进入细胞与染色体机制，中国同期以动植物观察和分类为主。",
+        "us_bands": [3, 4], "cn_bands": [2, 3],
+        "us_evidence": ["n02913", "n04410"],
+        "cn_evidence": ["sc-x2-con-33783426", "sc-x3-con-6bfe551c"],
+        "axes": [
+            ["解释层级", "细胞是生命最小单位、染色体作用", "观察分类、自然笔记、调查关系"],
+            ["对象", "微观机制", "动植物与生态环境"],
+            ["起始年级", "4年级起", "小学3-4年级起"],
+        ],
+        "emphasis": "美国更偏机制，中国更偏观察调查",
+        "note": "同一生命主题下的深度分歧：美国下探到细胞与染色体，中国更多做外部现象与关系调查。",
+    },
+    {
+        "id": "micro-science-heat", "domain": "科学",
+        "concept": "热现象与热传递", "group": "运动与能量",
+        "short": "中国中段探究热胀冷缩，美国高段解释热如何穿过或隔绝容器壁。",
+        "us_bands": [3], "cn_bands": [2],
+        "us_evidence": ["n04356"],
+        "cn_evidence": ["sc-x2-con-04320c93"],
+        "axes": [
+            ["任务", "解释热传递与隔热", "探究热胀冷缩现象"],
+            ["深度", "机制解释", "现象观察与认识"],
+            ["起始年级", "5-6年级", "小学3-4年级"],
+        ],
+        "emphasis": "中国更早，美国更偏机制",
+        "note": "不是简单的先后：中国先做现象探究，美国在更高年级追问热传递机制。",
+    },
+    {
+        "id": "micro-science-earth-motion", "domain": "科学",
+        "concept": "地球自转与昼夜", "group": "生态与地球",
+        "short": "美国1年级用自转解释日出日落，中国在初中用模型或软件演示自转方向与周期。",
+        "us_bands": [1], "cn_bands": [4],
+        "us_evidence": ["n01093"],
+        "cn_evidence": ["ge-j1-con-459f1b15", "ge-j1-con-5f8d68c4"],
+        "axes": [
+            ["解释对象", "日出日落的原因", "自转与公转的方向、周期"],
+            ["工具", "无明确要求", "地球仪或软件演示"],
+            ["起始年级", "1年级", "初中7-9年级"],
+        ],
+        "emphasis": "起步年级差距很大",
+        "note": "同一现象在两套文件里的学段落差很大，不能只看“都讲地球运动”就判定接近。",
+    },
+    {
+        "id": "micro-geo-map-skills", "domain": "地理",
+        "concept": "地图方向、经纬度与图例", "group": "地图技能",
+        "short": "美国低年级认图例和四方向，中国到初中才系统要求经纬度、量距和空间分布描述。",
+        "us_bands": [0, 1], "cn_bands": [4],
+        "us_evidence": ["n00831", "n00832", "n02491"],
+        "cn_evidence": ["ge-j1-con-6d706eb0"],
+        "axes": [
+            ["技能", "图例与东南西北", "方向、经纬度、量距、图例、空间分布"],
+            ["复杂度", "识别与查找", "判读与描述分布特征"],
+            ["起始年级", "K-1年级", "初中7-9年级"],
+        ],
+        "emphasis": "中国更晚但维度更多",
+        "note": "同为地图技能，美国起步早，中国在初中把多项技能合并成一条综合要求。",
+    },
+    {
+        "id": "micro-geo-admin-units", "domain": "地理",
+        "concept": "州与省：层级识别", "group": "区域认知",
+        "short": "美国从社区到州逐层命名，中国初中要求识别34个省级行政区并记住简称和行政中心。",
+        "us_bands": [0, 1], "cn_bands": [4],
+        "us_evidence": ["n00414", "n00830", "n01487"],
+        "cn_evidence": ["ge-j1-con-0e9d5223"],
+        "axes": [
+            ["识别对象", "社区、城市、州、大洲、国家", "34个省级行政区"],
+            ["记忆要求", "命名与定位", "简称与行政中心"],
+            ["起始年级", "K-2年级", "初中7-9年级"],
+        ],
+        "emphasis": "中国记忆要求更具体",
+        "note": "功能对标的是行政区划层级；差别在中国把数量和简称行政中心写成明确记忆指标。",
+    },
+    {
+        "id": "micro-geo-world-levels", "domain": "地理",
+        "concept": "大洲、国家与区域分析", "group": "区域认知",
+        "short": "美国低年级先背大洲国家层级，中国初中转向分析国家自然与人文地理的联系。",
+        "us_bands": [0, 1], "cn_bands": [4],
+        "us_evidence": ["n00830", "n00834"],
+        "cn_evidence": ["ge-j1-con-95c69719", "ge-j1-con-9caeddb0"],
+        "axes": [
+            ["任务", "说出大洲、国家、州、社区", "分析某国人文特点及与自然环境的联系"],
+            ["认知层级", "识记", "联系与解释"],
+            ["起始年级", "K-2年级", "初中7-9年级"],
+        ],
+        "emphasis": "中国更偏分析",
+        "note": "同是认识世界，美国低龄做层级命名，中国后段做区域综合分析。",
+    },
+    {
+        "id": "micro-geo-earth-rotation", "domain": "地理",
+        "concept": "地球自转与公转的周期", "group": "地球运动",
+        "short": "美国1年级讲自转造成昼夜，中国初中用地球仪或软件说明自转和公转的方向与周期。",
+        "us_bands": [1], "cn_bands": [4],
+        "us_evidence": ["n01093"],
+        "cn_evidence": ["ge-j1-con-459f1b15", "ge-j1-con-5f8d68c4"],
+        "axes": [
+            ["说明对象", "日出日落的原因", "自转与公转的方向和周期"],
+            ["媒介", "叙述", "地球仪或软件演示"],
+            ["起始年级", "1年级", "初中7-9年级"],
+        ],
+        "emphasis": "中国有量化周期要求",
+        "note": "与科学领域的地球运动条目互为佐证：同一概念在两套文件中的年级跨度非常大。",
+    },
+    {
+        "id": "micro-geo-region-culture", "domain": "地理",
+        "concept": "区域自然环境与文化景观", "group": "区域认知",
+        "short": "美国低年级列区域常识，中国初中要求说明自然环境与地方文化景观的关系。",
+        "us_bands": [1, 2], "cn_bands": [4],
+        "us_evidence": ["n02038", "n03188"],
+        "cn_evidence": ["ge-j1-con-525c5cc2"],
+        "axes": [
+            ["任务", "城市与气候带常识", "野外考察或资料说明自然与文化景观关系"],
+            ["方法", "识记", "考察、资料分析、说明"],
+            ["起始年级", "1-3年级", "初中7-9年级"],
+        ],
+        "emphasis": "中国方法要求更完整",
+        "note": "同属区域认知，美国偏事实清单，中国把考察、资料与解释放在一起。",
+    },
+    {
+        "id": "micro-lang-listen-early", "domain": "语言与读写",
+        "concept": "听懂日常语言并作出回应", "group": "听说与口语",
+        "short": "美国学前强调语言互动机会，中国小班直接写听懂会话并回应。",
+        "us_bands": [0, 1], "cn_bands": [0, 1],
+        "us_evidence": ["n00049", "n00052"],
+        "cn_evidence": ["ps-l-a1-g1-x-01", "ps-l-a1-g1-x-02", "ch-x1-sta-e5f0321c"],
+        "axes": [
+            ["起点", "大量听说互动机会", "注意听并回应、听懂日常会话"],
+            ["进阶", "成人引导对话", "复述大意、完整讲述小故事"],
+            ["起始年级", "学前", "小班 / 小学1-2年级"],
+        ],
+        "emphasis": "中国目标更可观察",
+        "note": "美国写的是语言环境策略，中国写的是儿童可观察到的听与回应行为。",
+    },
+    {
+        "id": "micro-lang-decode", "domain": "语言与读写",
+        "concept": "拼读解码与识字写字", "group": "识字与书写",
+        "short": "美国练音素拼读并走向流利阅读，中国用1600/800到2500/1600的字数和查字典界定进度。",
+        "us_bands": [1, 2], "cn_bands": [1, 2],
+        "us_evidence": ["n00716", "n02472"],
+        "cn_evidence": ["ch-x1-sta-3b5f1ed2", "ch-x2-sta-835c454c"],
+        "axes": [
+            ["核心任务", "音素混合成词、流利解码", "识字、写字、偏旁笔顺、查字典"],
+            ["量化", "无字数", "1600/800 → 2500/1600字"],
+            ["递进", "1年级到4年级流利", "1-2年级到3-4年级累计"],
+        ],
+        "emphasis": "对象与量化方式都不同",
+        "note": "同为“学会阅读”的起步，美国以拼音文字解码为主线，中国以汉字数量与工具使用为主线。",
+    },
+    {
+        "id": "micro-lang-read-basic", "domain": "语言与读写",
+        "concept": "朗读、理解与复述", "group": "阅读理解",
+        "short": "美国从听读各类文本到复述细节，中国把正确流利有感情朗读和默读写进同一条。",
+        "us_bands": [1, 2], "cn_bands": [1, 2],
+        "us_evidence": ["n00664"],
+        "cn_evidence": ["ch-x1-sta-8aef276c", "ch-x2-sta-f3c0e535"],
+        "axes": [
+            ["输入方式", "听读虚构与非虚构文本", "朗读课文并学习默读"],
+            ["输出", "复述关键细节", "复述大意、体会词句作用"],
+            ["情感要求", "未写明", "正确、流利、有感情"],
+        ],
+        "emphasis": "中国朗读要求更细",
+        "note": "美国从听读理解切入，中国把朗读方式、理解词句和情感表达合并为一条阶梯目标。",
+    },
+    {
+        "id": "micro-lang-read-analysis", "domain": "语言与读写",
+        "concept": "推断、概括与观点辩护", "group": "阅读理解",
+        "short": "美国高段要求概括观点并为自己的立场辩护，中国要求联系上下文推断并质疑。",
+        "us_bands": [3, 4], "cn_bands": [3, 4],
+        "us_evidence": ["n03016", "n05393"],
+        "cn_evidence": ["ch-x3-sta-8ce0d999", "ch-j1-sta-e85ea8a4"],
+        "axes": [
+            ["核心能力", "概括要点、为新信息辩护", "推想词句、辨别感情色彩、提出看法"],
+            ["证据意识", "defend one’s own point of view", "观点与材料之间的联系"],
+            ["起始年级", "5年级起", "小学5-6年级起"],
+        ],
+        "emphasis": "阶段接近，论证表述不同",
+        "note": "两边同段进入分析性阅读；美国突出立场辩护，中国突出词句效果与材料联系。",
+    },
+    {
+        "id": "micro-lang-writing", "domain": "语言与读写",
+        "concept": "篇章写作、体裁与修改", "group": "写作与表达",
+        "short": "美国列多种体裁和结构分析，中国把记实想象作文、修改交流和每学年16次写进同一条。",
+        "us_bands": [3, 4], "cn_bands": [3, 4],
+        "us_evidence": ["n03039", "n05444"],
+        "cn_evidence": ["ch-x3-sta-f2697454", "ch-x3-sta-cd4fdb06"],
+        "axes": [
+            ["体裁", "报道、摘要、说明、研究论文等", "记实作文、想象作文、常见应用文"],
+            ["结构", "分析段落与整体关系", "分段表述、根据表达需要"],
+            ["量化要求", "无次数", "课内习作每学年16次左右"],
+        ],
+        "emphasis": "中国有频次与修改指标",
+        "note": "同是篇章写作，美国把体裁与结构铺开，中国把修改与习作次数写成可检查的指标。",
+    },
+    {
+        "id": "micro-culture-symbols", "domain": "文化",
+        "concept": "国旗、国歌与国家象征", "group": "国家认同",
+        "short": "美国低龄认识国旗与自由女神像，中国把认识国歌和升旗站好写成行为要求。",
+        "us_bands": [0, 1], "cn_bands": [0, 1],
+        "us_evidence": ["n00450", "n00451", "n01466"],
+        "cn_evidence": ["ps-s-a2-g3-x-04", "ps-s-a2-g3-z-04", "po-x1-con-fba1a414"],
+        "axes": [
+            ["对象", "国旗、自由女神像", "国旗、国歌、国徽"],
+            ["行为", "识别与了解意义", "奏国歌升国旗站好、学唱国歌"],
+            ["起始年级", "K-2年级", "小班 / 小学1-2年级"],
+        ],
+        "emphasis": "中国有仪式行为要求",
+        "note": "同是国家认同启蒙，美国以符号识别为主，中国把仪式中的身体行为写进目标。",
+    },
+    {
+        "id": "micro-culture-fable-moral", "domain": "文化",
+        "concept": "寓言、神话与寓意", "group": "文化传承",
+        "short": "美国要求识别寓言和神话的寓意，中国从阅读童话寓言到分享神话启示。",
+        "us_bands": [1, 2], "cn_bands": [1, 2],
+        "us_evidence": ["n00689"],
+        "cn_evidence": ["ch-x1-sta-49e1f5af", "ch-x2-con-93d1694f"],
+        "axes": [
+            ["任务", "identify the moral or lesson", "阅读感受 → 口头或书面分享启示"],
+            ["文本", "fable、folktale、myth", "童话、寓言、中国神话传说"],
+            ["输出", "识别", "分享交流"],
+        ],
+        "emphasis": "中国更强调表达输出",
+        "note": "两边都用传统故事传价值，美国停在识别寓意，中国要求用口头或书面表达启示。",
+    },
+    {
+        "id": "micro-culture-heritage", "domain": "文化",
+        "concept": "英雄、传统与文化传承", "group": "文化传承",
+        "short": "美国高段分析文学中的原型与主题，中国要求有理有据表达传统美德观点。",
+        "us_bands": [3, 4], "cn_bands": [3, 4],
+        "us_evidence": ["n03168", "n05452"],
+        "cn_evidence": ["ch-x3-con-d8ead4a9"],
+        "axes": [
+            ["任务", "追溯原型情节、人物类型和主题", "结合实例有理有据表达观点"],
+            ["对象", "神话传说与文学作品", "中华传统美德、社会公德短论"],
+            ["起始年级", "5年级起", "小学5-6年级起"],
+        ],
+        "emphasis": "分析对象不同",
+        "note": "同段进入文化传承，美国偏文学结构分析，中国偏现实事例中的观点表达。",
+    },
+    {
+        "id": "micro-culture-diversity-early", "domain": "文化",
+        "concept": "本民族与多元人群", "group": "多元理解",
+        "short": "美国从认识一个部落或民族入手，中国直接建立56个民族大家庭与相互尊重的意识。",
+        "us_bands": [0, 1], "cn_bands": [0, 1],
+        "us_evidence": ["n00416"],
+        "cn_evidence": ["ps-s-a2-g3-d-03", "po-x1-con-779ffc19"],
+        "axes": [
+            ["对象", "至少一个 Native American tribe or nation", "自己的民族与56个民族"],
+            ["要求", "熟悉生活方式", "知道并相互尊重、团结友爱"],
+            ["起始年级", "K-2年级", "大班 / 小学1-2年级"],
+        ],
+        "emphasis": "范围与表述不同",
+        "note": "都是多元理解启蒙；美国从具体部落切入，中国从整体民族框架切入。",
+    },
+    {
+        "id": "micro-culture-world", "domain": "文化",
+        "concept": "世界文化与中外差异", "group": "多元理解",
+        "short": "美国用移民史解释文化变化，中国以主要国家基本信息、节日和风土人情做体验。",
+        "us_bands": [3, 4], "cn_bands": [3, 4],
+        "us_evidence": ["n03350", "n03353", "n06906"],
+        "cn_evidence": ["en-x3-con-a15b8f74", "en-x3-con-db09e52c"],
+        "axes": [
+            ["路径", "移民、铁路、迁移原因", "国家基本信息、节日、文化标志物"],
+            ["深度", "因果分析", "感知与体验"],
+            ["起始年级", "5年级起", "小学5-6年级起"],
+        ],
+        "emphasis": "美国偏历史因果，中国偏文化体验",
+        "note": "同段扩展到世界文化，但一个从历史迁移切入，一个从国家文化信息切入。",
+    },
+]
+
+# 微指标逐条解读：把参数表里的差异读成一句可核对的判断，避免只给维度不给结论。
+MICRO_INTERPRETATIONS: dict[str, str] = {
+    "micro-motor-hop": "两侧都在学前出现单脚跳，但美国只把它列为移动方式，中国从小班2米、中班5米到大班8米逐年加码。美国写避障防碰撞，中国写直线连续，结论只能是这份美国文本不写距离。",
+    "micro-motor-signal": "美国学前就要求按信号开始／停止，中国最早在小学3-4年级体育用正反口令、变向跑训练反应。学前“听从长辈要求”属于社会性服从，不算同一功能。",
+    "micro-motor-stairs": "两边都写交替双脚上下楼梯，中国多一个“灵活”。没有距离或速度标准，差异只在表述精度，不能把“灵活”换算成量化门槛。",
+    "micro-motor-balance": "美国是原地换姿势和宽平衡木，中国从地面直线、窄低物体走到斜坡、荡桥，并分小中大三级。差异在情境复杂度，两边都没有米数。",
+    "micro-motor-throw": "美国先按指示方向投、再提高靶的准度，中国用沙包投2米、4米、5米作年龄刻度。两侧都练投掷，但这段文本一个以靶为准，一个以距离为标。",
+    "micro-motor-catch": "美国是两人1.5英尺对接豆袋，中国从抛接球到连续拍球逐年加难。一个控制距离，一个控制动作连续性，不能看成同一种接物训练。",
+    "micro-motor-rules": "美国要求遵守现成游戏规则，中国从提醒下遵守走到与同伴协商制定规则。差别在规则由谁定、由谁维持，不是“守规则”三个字。",
+    "micro-motor-calm": "美国的“平静”是从高活动转到身体放松、安静专注，中国是识别情绪原因并自行缓解。同在学前起步，但一个调活动强度，一个调情绪。",
+    "micro-routine-sleep": "这是单侧项：中国给出每天11-12小时、午睡约2小时并从小班坚持，Core Knowledge 是学科内容序列不写作息。两份文件功能不同，不能解读成美国不要求午睡。",
+    "micro-routine-hygiene": "中国把早晚刷牙、饭前便后洗手写成固定要求并分三级递进，美国把如厕洗手和餐具使用并列成一条自理目标。自主性都有，只有中国拆成可观察阶段。",
+    "micro-routine-screen": "中国按小班15、中班20、大班30分钟递增，并配光线要求；Core Knowledge 没有屏幕时长条目。这是文本覆盖范围差异，不能写成美国允许无限看电视。",
+    "micro-routine-selfcare": "美国只写用后归位，中国从帮助下穿脱、扣钮扣到系鞋带，从放回原处到按类别整理。两边都重自主，差别是中国把它拆成小中大三级。",
+    "micro-routine-safety": "美国是记住地址、电话和出生日期，中国把姓名电话放进走失、陌生人、开门、防灾情境并要求求助。差别是“记住信息”和“遇到情况会做”。",
+    "micro-arts-movement": "美国K／1／2三年文字相同，只要求随音乐行进、走、单脚跳、摇摆；中国小班到大班从跟随动作走到拍手踏脚、敲击和基本准确的节奏音调。一个重持续参与，一个重递进精度。",
+    "micro-arts-visual": "两边都从线条色彩入手，但美国引入作品与艺术家并要求讨论形式要素，中国要求画出自己想画的人或事、不宜提供范画。名作在美国是内容，在中国是教学禁忌。",
+    "micro-arts-singing": "美国K／1／2重复演唱形式，中国从模仿学唱走到节奏音调基本准确。美国写唱的形式，中国把唱得准写成进阶目标。",
+    "micro-arts-rhythm": "美国从K起认拍、打拍、认重音，中国从中班拍手踏脚敲基本节奏到大班基本准确。美国更早且抽象，中国稍晚但工具和精度更具体。",
+    "micro-arts-appreciation": "美国要求用语言讨论作品细节、为何这样画和形式要素，中国允许表情、动作、语言并强调联想与情绪。差别在表达通道和分析要求，不是欣赏有无。",
+    "micro-arts-drama": "美国从哑剧、团体游戏到认识歌剧，以模仿参与为主；中国从中班表演走到大班自编自演并配服饰道具。中国把编、演、舞美合成完整产出。",
+    "micro-math-count-cardinality": "美国把数数与4枚硬币、数到100绑定，中国要求点数5以内、说出总数、按数取物再认读到万以内。任务形态不同，不能按数量上限判难易。",
+    "micro-math-add-sub-10": "美国K年级做10以内应用题、5以内熟练，中国大班理解加减意义后到20以内口算。美国提运算性质，中国点明减法是加法的逆运算。",
+    "micro-math-fractions-intro": "两边都在3-4年级建立分数概念：美国用整体等分定义1/b，中国用分数单位统整分数和小数，并都接到同分母加减。进度相近，概念语言不同。",
+    "micro-math-shapes": "美国1年级把图形分成二分之一、四分之一并辨认属性，中国3-4年级按边角特征分类并用量角器画角。相差约两年，认知动作也不同。",
+    "micro-math-data": "美国直接讲集中量数和变异量数，中国从收集、整理、描述到分析走完整过程并接平均数、百分数。一个聚焦概括量，一个铺成统计流程。",
+    "micro-science-observe-tools": "美国从五感描述物体属性切入，中国从好奇提问、摆弄物品走到1-2年级用放大镜等工具并和徒手比较。两边都培养观察，抓手不同。",
+    "micro-science-experiment-measure": "美国写设计与实施调查，中国把观察比较和温度计、量筒、电子秤取数并列，并要求用数据描述物体。会不会做实验和会不会用仪器取数是两回事。",
+    "micro-science-cells-genetics": "美国4年级讲细胞是生命最小单位、6年级讲染色体，中国同期以动植物观察、分类和自然笔记为主。同一段文本选择的解释层级不同，不能说中国不讲生命科学。",
+    "micro-science-heat": "中国3-4年级探究热胀冷缩现象，美国5-6年级解释热如何穿过或隔绝容器壁。中国先做现象、美国后讲机制，年级和认知层级是两回事。",
+    "micro-science-earth-motion": "美国1年级用自转解释日出日落，中国初中要求说出自转公转方向和周期并用地球仪或软件演示。一个解释现象，一个描述天文参数。",
+    "micro-geo-map-skills": "美国低年级认图例和四方向，4年级才用经纬度读图；中国初中把方向、经纬度、量距、图例和分布描述合在一条。美国逐年加码，中国集中合成。",
+    "micro-geo-admin-units": "美国从社区、州到50州名称多年铺垫，中国初中一次完成34个省级行政区的识别、简称和行政中心。对比的是各自行政区划，不是同一张地图的难易。",
+    "micro-geo-world-levels": "美国低年级说大洲国家州社区并背诵七大洲，中国初中分析某国人文与自然联系及因地制宜发展。都叫世界地理，但一侧是名录，一侧是关系分析。",
+    "micro-geo-earth-rotation": "同一份地球运动证据：科学条看美国1年级解释昼夜、中国初中讲运动参数；地理条则看中国用模型说明自转公转。两条并排读才能看出定位差异。",
+    "micro-geo-region-culture": "美国低年级列城市、气候带等常识，中国初中通过考察或资料说明自然环境与地方文化景观的关系。差别是知道区域事实和解释区域差异成因。",
+    "micro-lang-listen-early": "美国规定环境要提供大量听说互动和成人邀请对话，中国小班直接要求注意听、回应、听懂日常会话。一个是输入条件，一个是行为指标。",
+    "micro-lang-decode": "美国练音素混合成词并走向自动解码，中国练识字、笔顺和查字典，字数从1600／800到2500／1600。文字系统不同，只能看各自把什么写成可测进度。",
+    "micro-lang-read-basic": "美国从听读虚构与非虚构文本切入，中国直接要求正确、流利、有感情地朗读并学默读。朗读在美国此段不是主线，在中国是显性目标。",
+    "micro-lang-read-analysis": "美国5年级概括推出结论、8年级为自己立场辩护并随证据调整；中国5-6年级推想词句，初中提出看法并合作探讨。论证立场与词句细读是两种深化方式。",
+    "micro-lang-writing": "美国列报道、摘要、研究论文并分析段落结构，中国列记实、想象、应用文并写每学年16次左右习作。一个偏体裁结构，一个偏频次与修改流程。",
+    "micro-culture-symbols": "美国把国旗、自由女神像作为历史与国家知识来认识，中国写国旗国歌国徽并要求奏国歌时站好、学唱。一个偏认知，一个同时是仪式行为规范。",
+    "micro-culture-fable-moral": "美国1年级直接要求识别寓言、民间故事、神话的寓意，中国先谈阅读感受，3-4年级再分享寓意和启示。一个把寓意当可识别结论，一个当交流内容。",
+    "micro-culture-heritage": "美国8年级追溯文学原型和主题源流，中国5-6年级结合实例有理有据表达传统美德观点。都讲传统，但任务是文学源流分析和观点表达。",
+    "micro-culture-diversity-early": "美国从具体部落的生活方式和多个族群切入，中国从自己的民族和56个民族大家庭意识切入。都是多元理解启蒙，一个重实景，一个重共同体框架。",
+    "micro-culture-world": "5-6年级两侧同讲世界文化，美国用宅地法、铁路、移民劳动解释文化变化，中国用国家信息、节日、文化标志物建立印象。是因果分析和体验感知的差异。",
+}
+
+# 原有概念簇逐簇解读：沿用微指标口径，把首次、后续覆盖与深度差异连起来读。
+CONCEPT_INTERPRETATIONS: dict[str, str] = {
+    "math-number-early": "两边都从学前数数起步，但中国小班就要求点数5以内、说出总数并按数取物，美国同时铺开配对、规律和比较。首次相同不等于后续组织密度相同。",
+    "math-number-place-value": "双方3-4年级建立位值和十进制意识，差别在中国5-6、7-9年级继续接有理数、实数和数轴，美国则一路铺到初中运算律。起点接近，抽象路径不同。",
+    "math-number-rational": "美国7年级把分数运算推广到有理数四则，中国7-9年级同时讲负数、数轴、相反数、绝对值和实数，还把不等式解集画在数轴。不是谁更早讲负数，而是支架不同。",
+    "math-add-sub-early": "两边学前都做数量分合，中国中班直接写“2和3合在一起是5”，美国从分物配对起步。美国小学各年级反复回返，中国大班到1-2年级集中讲算理算法。",
+    "math-multi-div": "双方中高段进入乘除与混合运算，美国用乘除within100解应用题、用符号表示未知数，中国把多位数乘除与十进制、转化思想连起来。后段中国集中，美国回返多。",
+    "math-rational-operations": "美国7年级把分数规则推广到有理数四则，中国7-9年级把数系扩张、乘方开方、代数式代入和数轴连成主线。会算有理数和把运算推广成代数结构不是一回事。",
+    "math-fractions-intro": "双方3年级附近建立分数概念：美国把1/b定义为整体等分b份中的1份，中国同时引入分数小数并点出分数单位。美国铺到初中，中国集中在小学两段。",
+    "math-fractions-operations": "美国5年级做小数乘除、小数点移动和多位数运算，中国5-6年级把整数除法与分数关系、简单分数小数四则连起来。一个贯穿后段，一个学段集中。",
+    "math-ratio-percent": "美国6年级用ratio reasoning，中国5-6年级把比、比例、按比分配、比例尺并列并加方格纸缩放。美国初中7年级继续调用，中国后段没有独立回返。",
+    "math-negative-rational": "美国6年级对应中国5-6年级的负数认识，但中国那条只是主题活动情境；真正的系统在7-9年级，美国7-8年级扩展到有理数方程和根式。见过和系统学要分开。",
+    "math-algebra-foundations": "美国从幼儿园大班用putting together等运算关系铺垫并持续到小学，中国5-6年级才用等式性质和字母表示数显式化。首次提前不等于终局深度。",
+    "math-equations-basic": "双方进入等式与一元一次方程时间接近：美国小学中段铺垫、8年级解含科学记数法的方程，中国5-6年级学等式性质、初中集中解方程和不等式。路径不同。",
+    "math-equations-advanced": "美国7年级用运算性质生成等价表达式、展开因式分解，中国7-9年级把一元一次方程、分式方程、方程组和不等式组做成工具箱。前者为代数准备，后者成体系。",
+    "math-functions": "双方初中系统学函数，美国8年级定义为输入到输出的唯一规则并用y=mx+b讲图像，中国从常量、变量、自变量、函数值到一次函数。术语顺序差异不是内容缺失。",
+    "math-shapes-early": "两边学前都从形状感知分类起步，中国初中把定义、基本事实和证明串成体系，美国走向变换、相似和勾股。早期辨认相同，后段一个走证明、一个走度量。",
+    "math-shapes-properties": "3-4年级双方进入图形性质：美国讨论不同类别共享属性，中国认识角、量角画角并按边角分类。属性辨析与边角分类是两种认知抓手，不要只比谁先提三角形。",
+    "math-geometry-proof": "美国7年级做尺规作图、图形关系和比例尺，初中接相似勾股；中国7-9年级把轴对称、平移旋转的性质、基本事实和证明连成体系。应用与证明链条不同。",
+    "math-measure-early": "两边学前都有可测量属性意识：美国描述比较长度重量，中国用大小高矮长短等词感知并一一对应。后段美国继续立体度量应用，中国转向相似图形面积比。",
+    "math-area-perimeter-volume": "双方中段学面积周长体积，美国把时间、液体体积、质量一起推进并到初中做柱锥球体积，中国按学段铺开并接几何推理。后段走向不同。",
+    "math-measure-advanced": "美国7年级用圆面积周长公式解决角度、面积、表面积和体积的实际问题，中国7-9年级把圆、弧、弦、圆周角、垂径定理放进推理链。公式应用与几何化不同。",
+    "math-data-early": "中国大班已用记录表、统计图表示数量关系，美国早期数据意识嵌在属性比较中；后段美国8年级用双向表、散点图看关联，中国初中集中讲抽样和概率。",
+    "math-data-basic": "中段双方做数据整理表达：美国低年级图表活动延续到初中关联分析，中国3-4年级走完整过程、5-6年级接平均数和百分数。统计过程完整度与关联抓手各有侧重。",
+    "math-statistics-inference": "美国8年级用双向表和散点图判断双变量关联，中国7-9年级讲扇形图、平均数、中位数、众数、加权平均数和抽样。都超出读图，但不是同一条推断路线。",
+    "science-matter-daily": "中国中班已感知溶解传热等生活性质，美国2年级从观察分类和物质定义起步；后段美国系统讲守恒与化学反应，中国初中物理化学分科深化。生活经验早不等于概念系统。",
+    "science-matter-properties": "美国5年级围绕有质量、占空间讲性质和守恒，中国3-4年级观察透光性并用温度计、量筒、电子秤取数、联系用途。操作链与概念定义是两种深度。",
+    "science-matter-reaction": "美国7年级从颜色气味温度变化判断反应、讲反应物生成物，中国7-9年级用天平、密度、酸碱度测定并推理燃烧等现象。征兆判断与定量推理路径不同。",
+    "science-atoms-bonds": "双方初中讲原子分子元素，美国给定义，中国把纯净物、混合物、单质、化合物、元素放进同一分类体系并接科学史。给出定义与建立层级不是一回事。",
+    "science-force-early": "美国幼儿园大班用push/pull定义力，中国1-2年级从开关门窗、推拉抽屉识别。美国小学各年级回返到初中定量表达，中国初中集中做摩擦力、浮力等必做实验。",
+    "science-motion-basic": "美国3年级直接说力能改变运动状态，中国3-4年级从交通事故视频、工具使用切入。后段美国用速度等于距离除以时间做定量表达，中国把比较快慢的方法定义成速度并探究。",
+    "science-force-advanced": "美国8年级给速度和力的量化表达，中国7-9年级列摩擦力、斜面、浮力、凸透镜成像、电流电压等必做实验。可操作实验清单与量化概念公式是两种写法。",
+    "science-energy-daily": "中国幼儿园已有溶解传热的生活感知，美国1年级起持续讲光和声并在4-6年级高密度展开。中国5-6年级开始实验、初中集中讲能量转化守恒。生活感知早与覆盖连续要分开。",
+    "science-energy-basic": "美国3-4年级从磁力距离、能量应用切入，中国同期做热胀冷缩实验和气象记录；美国小学多年级连续覆盖，中国初中把能量转化守恒与实验探究集中。覆盖连续不等于原理化程度。",
+    "science-energy-advanced": "美国7年级把化学反应吸放热纳入能量观、8年级延到波与声，中国7-9年级把能量转化守恒与多个实验探究并列。实验原理并重与概念接续不同。",
+    "science-life-early": "中国小班已认识常见动植物，美国1-2年级从亲代照护和多样性观察起步。中国首次更早，但美国初中7-8年级走细胞、遗传、进化证据链这条不同的深线。",
+    "science-genetics-basic": "美国4年级给出细胞是生命最小单位，中国3-4年级做动物分类、自然笔记、茎中水分运输和牙齿比较。后段美国走遗传与共同祖先证据链，中国走显微观察与建模。",
+    "science-evolution": "美国7年级从消化、细胞呼吸、葡萄糖能量谈生命并接进化证据，中国7-9年级用细胞建模、人体系统模型和显微观察深化。结构观察与遗传解释链不能合并成单一深浅。",
+    "science-ecology-early": "美国幼儿园大班讲植物从环境获取所需、人类也是动物，中国大班从环保和珍惜生命切入。后段美国5年级讲食物网物质循环，中国项目研究、调查并制作生态瓶。",
+    "science-food-chain": "美国3年级从环境对性状和生命周期的影响切入，中国5-6年级调查废水废气、微生物和生态平衡。后段美国讲食物网物质流动，中国接调查与保护设计。",
+    "science-ecology-project": "美国7年级明确物质沿食物链流动、食物网由食物链构成，中国7-9年级调查池塘森林农田海岸或校园并接富集、传染病。系统概念与调查制作是两种深化。",
+    "science-body-early": "美国幼儿园大班从视觉器官等结构讲起，中国小班用多种感官探索并把健康行为写进生活要求。后段美国3-5年级进到腺体激素，中国初中偏食品安全与健康行为。",
+    "science-body-basic": "美国3年级讲肌肉、随意与不随意肌，中国3-4年级做健康档案、肺活量和呼吸保健项目、初中聚焦食品安全。身体结构与健康管理是两种不同功能。",
+    "science-space-early": "美国幼儿园大班讲太阳是恒星、阳光温暖地表，中国1-2年级观察描述月相；美国5年级高密度天体观测、8年级讲日月食证据，中国小学持续观察、初中转地质原理。",
+    "science-earth-basic": "美国3年级把空气当混合物并一路讲到日月食观测证据，中国3-4年级测影长、做月球表面模型，初中转板块构造解释火山地震。现象观测与原理模型后段不同。",
+    "science-earth-advanced": "美国7年级从自然资源和可再生能源讲人与地球，中国7-9年级用地球仪或软件演示自转公转并用板块构造解释火山地震。资源使用与运动模型不同。",
+    "science-weather-early": "中国小班已感知天气对活动的影响、中班感知季节，美国幼儿园大班定义天气并收集温度降水风速数据。中国生活感知更早，美国数据化更早。",
+    "science-water-basic": "美国小学把天气因素与气候分类连续推进，中国3-4年级用气温计和天气符号记录并联系季节适应，初中用气温降水数据描述规律。记录工具与分类框架两种抓手。",
+    "science-climate-data": "这条几乎只有中国后段有直接证据：初中7-9年级阅读气温降水数据、绘制气温曲线和降水柱状图。不是美国不讲气候，而是这组分科文本里没写成同粒度任务。",
+    "science-observe": "双方学前都有观察提问，美国按五感属性描述，中国从好奇摆弄切入。后段中国把实验器材和项目制作写进初中，美国小学2-5年级持续做调查和工程设计。",
+    "science-experiment": "美国3年级用planning and conducting investigations组织探究，中国3-4年级用温度计、量筒、电子秤取数。中国初中把必做实验做成清单，美国持续做调查与工程设计。",
+    "science-project": "中国初中把观察、测量、实验探究和项目制作并列，器材步骤很具体；美国小学2-5年级更多以工程设计出现，初中独立项目命中少。不能说美国没有项目。",
+    "geo-direction-early": "中国小班理解上下前后里外、中班用方位词描述方向，美国幼儿园大班直接定位北美、阿拉斯加和夏威夷。后段美国在历史区域单元调用地图，中国做成独立技能链。",
+    "geo-map-basic": "小学双方学图例方向：美国1年级明确key/legend并找四方向，中国把图例方向放到1-2年级到中段连续要求。后段美国仍多在历史单元调用，中国初中系统用比例尺图例经纬。",
+    "geo-map-advanced": "中国5-6年级到初中把比例尺、等高线、经纬网做成技能链，美国5年级已用经纬度、坐标、度数和投影读图。早期读图经验与后段系统化不是一回事。",
+    "geo-continents-basic": "美国1-2年级说大洲大洋国家名称，中国学前到小学无同名独立主题；但中国初中用地图分析大洲位置、热量带、降水与人口经济。首次优势被后续深度反转。",
+    "geo-continents-analysis": "中国初中用地图说明海陆分布并把大洲位置与气候地形人口经济联系，美国初中仍把大洲大洋当区域背景知识。同叫世界地理，名词与分析变量不同。",
+    "geo-hemisphere": "美国1-2年级从生活定位认识赤道、南北半球和两极并逐步加入时区，中国5-6年级才初步接触、初中系统学经纬线定位。先给概念名和后给完整方法要分开。",
+    "geo-coordinates": "美国5年级已用经纬度、坐标、度数和时区读图，中国5-6年级到初中把经纬网定位与地球运动做成体系。早期读图经验与后段工具系统化不宜写成谁缺失。",
+    "geo-land-basic": "1-2年级双方接触地形河流和自然资源，美国多嵌在历史区域单元做背景，中国小学零散感知、初中集中学等高线地形图并接气候因素。嵌入式背景与地图原理任务不同。",
+    "geo-physical-analysis": "美国5年级讲气候带河流常识并在区域单元继续调用，中国7-9年级用等高线、分层设色图识别地形并分析气候影响因素。区域常识调用与可判读任务表现方式不同。",
+    "geo-culture-basic": "美国学前到初中把文化城市内容嵌在历史单元并接到全球化传播，中国初中把人口、聚落、区域差异和家乡调查做成独立主题。组织形式差异大于阶段差异。",
+    "geo-population": "美国3-4年级起人口移民城市内容多嵌在历史区域单元并延伸到全球化，中国把人口聚落迁移放到初中独立主题。出现频率不等于主题独立性。",
+    "geo-region-development": "美国初中用“机会之地”“熔炉与马赛克”讲移民与文化，中国7-9年级用人口聚落区域发展和因地制宜整合人文自然。历史叙事与区域框架两种综合方式。",
+    "geo-admin-basic": "州和省都是一级行政区，可直接对标：美国从说所在州、州与社区到50州名称、州府多年铺垫，中国初中一次完成34个省级行政区识别、简称和行政中心。",
+    "geo-admin-capitals": "美国5年级记50州及州府，中国7-9年级记省级行政区简称和行政中心。都是名录型要求，时间差不能写成理解深度差。",
+    "lang-listen-early": "双方学前从听懂日常语言起步：美国写大量听说互动和成人邀请对话，中国小班要求注意听、回应、听懂会话。后段美国靠讨论规则与口头报告，中国把复述、即席讲话写成学段目标。",
+    "lang-listen-mid": "3-4年级双方要求课堂讨论复述转述：美国明确讨论前阅读整理、讨论中保持注意参与，中国把朗读默读、把握内容、圈点批注、质疑连成链。讨论规则与读思说链条抓手不同。",
+    "lang-listen-late": "7-9年级双方进入有观点表达：美国要求按场合切换正式与非正式英语、演讲标准发音，中国把倾听、观点与材料联系、文明得体交流写成目标。语体形式与观点材料关系是不同维度。",
+    "lang-literacy-early": "学前到1-2年级双方建立图书符号和书写准备：美国从印刷品意识走向拼读解码和流利朗读，中国从图书兴趣走向识字写字拼音查字典。字母拼读与汉字识字不是同一任务。",
+    "lang-decode-characters": "美国1年级把音素混合成词作为解码核心、4年级转向自动解码，中国1-2年级以1600／800字和偏旁笔顺查字典为核心、3-4年级累计2500／1600。看可测进度定义，不比文字系统难易。",
+    "lang-reading-basic": "1-2年级双方从朗读理解到复述：美国从听读虚构与非虚构切入，中国直接要求正确流利有感情朗读并学默读。后段美国进入推断概括和文本证据，中国概括分析、体会表达效果。",
+    "lang-reading-analysis": "5-6年级到初中双方进入推断概括证据评价：美国把概括、推出结论、作者意图和观点连成链，中国推想词句、辨别感情色彩、初中评价成体系。论证证据意识与词句细读两种深化。",
+    "lang-writing-early": "学前到1-2年级双方从非文字表达过渡到写话：美国用口述图注、口述信件起步，中国小班涂画、中班注意写画姿势。后段美国完成叙事说明议论与修订，中国完成记实想象作文与应用文。",
+    "lang-writing-composition": "双方高段完成篇章写作修订：美国5年级分析结构、写报道摘要说明研究论文并关注统一连贯，中国5-6年级写记实想象作文和读书笔记、把交换修改与每学年16次习作写进目标。",
+    "lang-poetry-early": "学前到1-2年级双方用儿歌韵诗童话入门：美国记诵儿歌、拍节拍、手指游戏，中国说儿歌童谣、复述短故事并要求成人讲读。后段美国扩到神话戏剧小说与文学术语，中国加古诗文和寓言。",
+    "lang-genre-study": "3-4年级体裁扩到诗歌神话小说散文戏剧：美国朗读诗歌散文、独立读较长虚构作品，中国复述叙事作品、诵读诗文累计背诵50篇段、课外阅读不少于40万字。读析术语与积累量不同。",
+    "culture-symbols-early": "国家符号应按共同记忆功能对标：美国学前认识国旗、自由女神像并在历史音乐单元反复出现，中国小班认识国旗国歌、中班升旗站好并在1-2年级借少先队实践。认知与实践两种方式。",
+    "culture-holiday-mid": "节日看文化传承功能：美国感恩节、独立日贯穿K-8历史单元，中国从身边风俗体验到小学传统文化和初中文化传承。历史叙事节点与文化体验主题不宜逐项比对。",
+    "culture-stories-mid": "故事人物不可直接对照，但用传统故事传递价值高度可比：美国用民间故事、传说、神话和英雄人物，中国用神话、成语、寓言、历史故事贯穿小学初中。差别在载体和表达语言。",
+    "culture-heritage-late": "美国5年级讲神话传说与视觉多媒体手法、8年级追溯原型主题，中国5-6年级读传统美德短论并结合实例表达观点。都讲传统，但一个是文学源流分析，一个是观点表达任务。",
+    "culture-diversity-early": "双方学前起步：美国从本土部落和多元人群切入、偏社会实景，中国从自己的民族和56个民族大家庭切入、偏共同体意识。高年级美国接世界文化与移民，中国由英语文化课明确世界国家。",
+    "culture-diversity-world": "5-6年级到初中双方扩展到世界文化：美国用宅地法、横贯大陆铁路、移民劳动解释变化，中国用国家信息、节日、文化标志物做感知体验。因果分析与文化印象不是谁更深。",
+}
+
+# 概念簇简表：每条只给“起步 / 后续 / 差异”三行，避免复用父级深度文案造成重复。
+CONCEPT_AXES: dict[str, tuple[str, str]] = {
+    "math-number-early": ("配对、规律、比较等前置经验", "点数5以内、说总数、按数取物"),
+    "math-number-place-value": ("多位数运算与四舍五入", "万以上数、十进制与多位数乘除"),
+    "math-number-rational": ("分数运算推广到有理数四则", "负数、数轴、绝对值、实数与解集"),
+    "math-add-sub-early": ("分物配对后小学各年级回返", "中班2和3合5，大班10以内加减"),
+    "math-multi-div": ("乘除within100解应用题", "多位数乘除与十进制、转化"),
+    "math-rational-operations": ("运算性质生成等价式、因式分解", "方程、分式、方程组、不等式组"),
+    "math-fractions-intro": ("整体等分定义1/b", "分数单位统整分数和小数"),
+    "math-fractions-operations": ("小数乘除与小数点移动", "整数除法与分数关系、简单四则"),
+    "math-ratio-percent": ("ratio reasoning贯穿初中", "比、比例、比例尺与方格纸缩放"),
+    "math-negative-rational": ("有理数方程和根式", "负数、有理数系统到初中"),
+    "math-algebra-foundations": ("用putting together铺垫运算关系", "等式性质与字母表示数"),
+    "math-equations-basic": ("小学铺垫、8年级含科学记数法", "等式性质到方程与不等式"),
+    "math-equations-advanced": ("等价表达式与因式分解", "方程、分式、方程组工具箱"),
+    "math-functions": ("输入输出规则与y=mx+b图像", "常量、变量、自变量到一次函数"),
+    "math-shapes-early": ("走向变换、相似、勾股", "定义、基本事实与证明体系"),
+    "math-shapes-properties": ("讨论类别共享属性", "量角画角、按边角分类"),
+    "math-geometry-proof": ("尺规作图、比例尺、相似勾股", "轴对称平移旋转性质与证明"),
+    "math-measure-early": ("长度重量描述比较", "大小高矮长短与一一对应"),
+    "math-area-perimeter-volume": ("时间、液体体积、质量一并推进", "学段铺开并接几何推理"),
+    "math-measure-advanced": ("圆公式解决角度面积体积", "圆、弧、弦、圆周角推理链"),
+    "math-data-early": ("数据意识嵌入属性比较", "记录表、统计图表示数量关系"),
+    "math-data-basic": ("图表活动延续到关联分析", "完整统计过程接平均数百分数"),
+    "math-statistics-inference": ("双向表、散点图判断关联", "扇形图、集中量与抽样概率"),
+    "science-matter-daily": ("观察分类与物质定义", "溶解传热的生活感知"),
+    "science-matter-properties": ("有质量、占空间与守恒", "透光性、量具取数与用途"),
+    "science-matter-reaction": ("征兆判断与反应物生成物", "天平、密度、酸碱度定量推理"),
+    "science-atoms-bonds": ("原子分子元素定义", "物质分类层级与科学史"),
+    "science-force-early": ("push/pull定义力并回返到初中", "开关门窗、推拉抽屉到必做实验"),
+    "science-motion-basic": ("速度公式定量表达", "比较快慢的方法并探究"),
+    "science-force-advanced": ("速度与力的量化表达", "摩擦力浮力凸透镜电流等实验"),
+    "science-energy-daily": ("光和声连续覆盖到6年级", "生活感知后集中能量转化守恒"),
+    "science-energy-basic": ("磁力距离、能量应用", "热胀冷缩与气象记录后实验"),
+    "science-energy-advanced": ("吸放热纳入能量观、波与声", "转化守恒与多实验探究并列"),
+    "science-life-early": ("亲代照护与多样性观察", "认识常见动植物更早"),
+    "science-genetics-basic": ("细胞、遗传、共同祖先证据链", "显微观察与建模"),
+    "science-evolution": ("消化呼吸到进化证据", "细胞、人体系统模型与显微观察"),
+    "science-ecology-early": ("环境获取所需、食物网物质循环", "环保珍惜生命、项目制作生态瓶"),
+    "science-food-chain": ("性状与生命周期受环境影响", "废水废气微生物与生态平衡"),
+    "science-ecology-project": ("食物链食物网系统概念", "校园生态调查与富集传染病"),
+    "science-body-early": ("视觉器官结构到腺体激素", "多感官探索与健康行为"),
+    "science-body-basic": ("随意与不随意肌", "健康档案、肺活量、食品安全"),
+    "science-space-early": ("恒星与高密度天体观测", "月相观察到初中地质原理"),
+    "science-earth-basic": ("空气成分与日月食证据", "影长、月球模型到板块构造"),
+    "science-earth-advanced": ("自然资源与可再生能源", "地球仪软件演示自转公转"),
+    "science-weather-early": ("天气定义与温度降水风速数据", "天气季节对活动的影响"),
+    "science-water-basic": ("天气因素与气候分类连续推进", "气温计天气符号记录与数据分析"),
+    "science-climate-data": ("分科文本未写成同粒度任务", "气温降水数据绘曲线柱状图"),
+    "science-observe": ("五感属性描述、调查工程设计", "好奇摆弄到实验器材项目制作"),
+    "science-experiment": ("调查探究组织方式", "量具取数与必做实验清单"),
+    "science-project": ("工程设计为主", "观察测量实验制作并列"),
+    "geo-direction-early": ("定位北美、阿拉斯加、夏威夷", "上下前后里外到方位词"),
+    "geo-map-basic": ("图例四方向、历史单元调用", "图例方向连续要求到初中系统"),
+    "geo-map-advanced": ("经纬度、坐标、投影读图", "比例尺、等高线、经纬网技能链"),
+    "geo-continents-basic": ("大洲大洋国家名称", "初中大洲位置与气候人口经济"),
+    "geo-continents-analysis": ("大洲作区域背景", "地图分析大洲位置与要素联系"),
+    "geo-hemisphere": ("赤道半球两极及时区", "5-6年级初步、初中经纬线定位"),
+    "geo-coordinates": ("经纬度坐标时区读图", "经纬网定位与地球运动体系"),
+    "geo-land-basic": ("地形河流作历史背景", "等高线地形图与气候因素"),
+    "geo-physical-analysis": ("气候带河流常识调用", "等高线分层设色与气候影响因素"),
+    "geo-culture-basic": ("文化城市嵌在历史单元", "人口聚落区域差异与家乡调查"),
+    "geo-population": ("人口移民城市嵌历史单元", "人口聚落迁移独立主题"),
+    "geo-region-development": ("机会之地、熔炉与马赛克叙事", "人口聚落区域与因地制宜框架"),
+    "geo-admin-basic": ("州与州府多年铺垫", "34个省级行政区、简称、行政中心"),
+    "geo-admin-capitals": ("50州及州府", "省级行政区简称和行政中心"),
+    "lang-listen-early": ("听说互动与成人邀请对话", "注意听、回应、听懂会话"),
+    "lang-listen-mid": ("讨论前整理与讨论中参与", "朗读默读、圈点批注、质疑"),
+    "lang-listen-late": ("正式与非正式语体切换", "观点与材料联系、文明得体交流"),
+    "lang-literacy-early": ("印刷品意识到拼读解码", "图书兴趣到识字写字拼音查字典"),
+    "lang-decode-characters": ("音素混合与自动解码", "识字量、偏旁笔顺、查字典"),
+    "lang-reading-basic": ("听读虚构与非虚构、文本证据", "正确流利有感情朗读与默读"),
+    "lang-reading-analysis": ("概括结论、作者意图与观点", "推想词句、感情色彩与评价"),
+    "lang-writing-early": ("口述图注信件到结构修订", "涂画姿势到记实想象应用文"),
+    "lang-writing-composition": ("体裁结构与统一连贯", "习作频次、交换修改"),
+    "lang-poetry-early": ("儿歌拍节拍到文学术语", "童谣复述到古诗文寓言"),
+    "lang-genre-study": ("朗读诗歌散文、读析术语", "背诵50篇段、课外40万字"),
+    "culture-symbols-early": ("国旗与自由女神像的历史认知", "国旗国歌国徽与升旗仪式"),
+    "culture-holiday-mid": ("感恩节独立日历史节点", "风俗体验到文化传承主题"),
+    "culture-stories-mid": ("民间故事、传说、神话英雄", "神话成语寓言历史故事"),
+    "culture-heritage-late": ("神话传说与原型主题", "传统美德短论与观点表达"),
+    "culture-diversity-early": ("本土部落与多元人群实景", "本民族与56个民族大家庭"),
+    "culture-diversity-world": ("宅地法铁路移民解释变化", "国家信息、节日、文化标志物感知"),
+}
+
+
+def short_stage_label(value: str) -> str:
+    text = str(value or "").replace("美国", "").replace("中国", "")
+    text = re.sub(r"（[^）]*）", "", text)
+    text = text.replace("幼儿园大班K", "大班K").replace("幼儿园大班", "大班K")
+    text = text.replace("幼儿园前班", "学前")
+    text = text.replace("幼儿园小班", "小班").replace("幼儿园中班", "中班")
+    text = text.replace("幼儿园", "学前").replace("小学", "").replace("初中", "")
+    text = text.strip() or "无"
+    return "大班K" if text == "大班" else text
+
+
+def short_follow_label(value: str) -> str:
+    if not value or str(value).startswith("无") or str(value).startswith("不适用"):
+        return "无"
+    parts = re.split(r"[、,，]", str(value))
+    return "→".join(short_stage_label(part) for part in parts if part.strip())
+
+
+def concept_axes(row: dict[str, Any]) -> list[list[str]]:
+    us_diff, cn_diff = CONCEPT_AXES[row["id"]]
+    return [
+        ["起步", short_stage_label(row["美国"]["首次年级"]), short_stage_label(row["中国"]["首次年级"])],
+        ["后续", short_follow_label(row["美国"].get("后续学段")), short_follow_label(row["中国"].get("后续学段"))],
+        ["差异", us_diff, cn_diff],
+    ]
 
 
 HTML_TEMPLATE = r"""<!DOCTYPE html>
@@ -1331,6 +2615,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     --us-soft: #e9eff3;
     --cn: #8b4c4c;
     --cn-soft: #f4e7e7;
+    --warn: #8a6a35;
+    --warn-soft: #f5efe2;
     --radius: 14px;
   }
   * { box-sizing: border-box; }
@@ -1358,10 +2644,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     border-radius: 999px; padding: 2px 8px; white-space: nowrap;
   }
   .sub { margin: 1px 0 6px; font-size: 13px; color: var(--muted); }
-  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
   .tabs button {
     border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
-    border-radius: 8px; padding: 7px 0; font-size: 15px; cursor: pointer;
+    border-radius: 8px; padding: 7px 0; font-size: 11px; cursor: pointer;
   }
   .tabs button.active {
     background: var(--cn); border-color: var(--cn); color: #fff;
@@ -1379,7 +2665,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     font-size: 12px; color: var(--cn); background: var(--cn-soft);
     padding: 2px 8px; border-radius: 999px;
   }
-  .pager { font-size: 12px; color: var(--muted); }
+  .pager { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+  .pager button {
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--muted);
+    border-radius: 6px; padding: 1px 6px 2px; font-size: 13px; line-height: 1.2; cursor: pointer;
+  }
   h2 { margin: 5px 0 2px; font-size: 22px; line-height: 1.25; }
   .takeaway {
     margin: 0 0 7px; font-size: 15px; color: var(--muted);
@@ -1401,13 +2691,30 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   .dot { width: 10px; height: 10px; border-radius: 50%; display: block; }
   .dot.us { background: var(--us); }
   .dot.cn { background: var(--cn); }
-  .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-  .actions button {
-    border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
-    border-radius: 8px; padding: 8px 0; font-size: 14px; cursor: pointer;
+  .flag {
+    display: inline-block; font-size: 11px; color: var(--warn);
+    background: var(--warn-soft); border-radius: 999px;
+    padding: 2px 8px; margin-bottom: 6px;
   }
-  .actions .primary { background: var(--cn); border-color: var(--cn); color: #fff; }
+  .axes { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 2px; }
+  .axes th, .axes td {
+    border-bottom: 1px solid var(--border);
+    padding: 6px 5px; text-align: left; vertical-align: top;
+  }
+  .axes thead th { color: var(--muted); font-weight: 500; font-size: 11px; }
+  .axes tbody th { width: 52px; color: var(--muted); font-weight: 500; }
+  .axes th.us, .axes td.us { width: calc(50% - 26px); color: var(--us); }
+  .axes th.cn, .axes td.cn { width: calc(50% - 26px); color: var(--cn); }
+  .axes tr:last-child th, .axes tr:last-child td { border-bottom: 0; }
+  .reading {
+    margin: 7px 0 2px; padding: 7px 9px;
+    background: var(--surface-2); border-radius: 8px;
+    font-size: 12px; line-height: 1.55; color: var(--text);
+  }
+  .reading p { margin: 0; }
+  .reading .reading-label { color: var(--muted); font-weight: 600; }
   .evidence { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 7px; }
+  .evidence-label { margin: 0 0 5px; font-size: 11px; color: var(--muted); font-weight: 600; }
   .ev-block { margin-bottom: 7px; }
   .ev-block h3 { margin: 0 0 2px; font-size: 13px; color: var(--us); }
   .ev-block.cn h3 { color: var(--cn); }
@@ -1416,11 +2723,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     margin: 0; font-size: 13px; line-height: 1.45; color: var(--text);
     background: var(--surface-2); border-radius: 8px; padding: 5px 7px;
   }
+  .ev-source { margin: 2px 0 0; font-size: 11px; color: var(--muted); }
   footer { margin-top: 10px; font-size: 12px; color: var(--muted); text-align: center; }
   footer a { color: var(--cn); text-decoration: none; }
   @media (max-width: 360px) {
     main { padding-left: 9px; padding-right: 9px; }
     .card { padding-left: 10px; padding-right: 10px; }
+    .axes { font-size: 11px; }
   }
 </style>
 </head>
@@ -1430,19 +2739,20 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <h1>中美课程标准 · 概念对照</h1>
     <span class="badge" id="badge"></span>
   </div>
-  <p class="sub">数学 / 科学 / 地理 · 按概念顺序单条阅读</p>
+  <p class="sub">数学 / 科学 / 地理 / 语言 / 文化 / 儿童发展 / 艺术 · 按概念顺序单条阅读</p>
   <nav class="tabs" id="tabs"></nav>
 </header>
 <main>
   <section class="card" id="card"></section>
   <footer>
-    仅为数学、科学、地理的 <span id="total"></span> 个精选可比概念簇，不是课程标准全部知识点。
+    仅为本页七个领域的 <span id="total"></span> 条精选可比条目，不是课程标准全部知识点。
   </footer>
 </main>
 <script id="dataset" type="application/json">__PAYLOAD__</script>
 <script>
 const DATA = JSON.parse(document.getElementById("dataset").textContent);
-const DOMAINS = ["数学", "科学", "地理"];
+const DOMAINS = ["数学", "科学", "地理", "语言与读写", "文化", "儿童发展", "艺术"];
+const DOMAIN_LABELS = {"数学": "数学", "科学": "科学", "地理": "地理", "语言与读写": "语言", "文化": "文化", "儿童发展": "儿童发展", "艺术": "艺术"};
 const BANDS = ["学前", "1-2年级", "3-4年级", "5-6年级", "7-9年级"];
 const BAND_MAP = {
   "幼儿园前班": [0], "幼儿园大班K": [0],
@@ -1451,7 +2761,8 @@ const BAND_MAP = {
   "小学3年级": [2], "小学4年级": [2], "小学3-4年级": [2],
   "小学5年级": [3], "小学6年级": [3], "小学5-6年级": [3],
   "初中7年级": [4], "初中8年级": [4], "初中7-9年级": [4],
-  "小学1-6年级": [1, 2, 3], "全学段通用": [0, 1, 2, 3, 4]
+  "小学1-6年级": [1, 2, 3], "全学段通用": [0, 1, 2, 3, 4],
+  "学前": [0], "1-2年级": [1], "3-4年级": [2], "5-6年级": [3], "7-9年级": [4]
 };
 const rowsByDomain = {};
 DOMAINS.forEach(function(d) {
@@ -1470,12 +2781,29 @@ function esc(value) {
 function plainEvidence(value) {
   return String(value == null ? "" : value).replace(/^\[暂存\]\s*/, "");
 }
+const SOURCE_SHORT = {
+  "Core Knowledge Sequence 2023 · k8": "Core Knowledge K-8",
+  "Core Knowledge Sequence 2023 · preschool": "Core Knowledge 学前",
+  "教育部《3-6岁儿童学习与发展指南》（2012）": "《3-6岁指南》",
+  "moe-cn-2022-chinese": "《语文课标2022》",
+  "moe-cn-2022-politics": "《道法课标2022》",
+  "moe-cn-2022-english": "《英语课标2022》",
+  "moe-cn-2022-history": "《历史课标2022》",
+  "moe-cn-2022-pe": "《体育与健康课标2022》"
+};
+function sourceRef(ev) {
+  if (!ev) return "";
+  const source = SOURCE_SHORT[ev["来源"]] || String(ev["来源"] || "")
+    .replace(/^.*《/, "《").replace(/教育部/, "");
+  const page = ev["来源页"] == null ? "" : " · 第" + ev["来源页"] + "页";
+  return source + page;
+}
 function bandsFor(label) {
   return BAND_MAP[label] || [];
 }
 function renderTabs() {
   tabs.innerHTML = DOMAINS.map(function(d) {
-    return "<button data-domain=\"" + d + "\"" + (d === state.domain ? " class=\"active\"" : "") + ">" + d + "</button>";
+    return "<button data-domain=\"" + d + "\"" + (d === state.domain ? " class=\"active\"" : "") + ">" + (DOMAIN_LABELS[d] || d) + "</button>";
   }).join("");
   tabs.querySelectorAll("button").forEach(function(btn) {
     btn.addEventListener("click", function() {
@@ -1506,22 +2834,58 @@ function evidenceHtml(row) {
     let html = "<div class=\"ev-block" + (isCn ? " cn" : "") + "\"><h3>" + side + " · 最早</h3>";
     html += "<p class=\"ev-grade\">" + esc(first && first["年级"]) + "</p>";
     html += "<p class=\"ev-text\">" + esc(first && first["文本"]) + "</p>";
+    html += "<p class=\"ev-source\">" + esc(sourceRef(first)) + "</p>";
     html += "<h3>" + side + " · 后续</h3>";
     if (later) {
       html += "<p class=\"ev-grade\">" + esc(later["年级"]) + "</p>";
       html += "<p class=\"ev-text\">" + esc(plainEvidence(later["文本"])) + "</p>";
+      html += "<p class=\"ev-source\">" + esc(sourceRef(later)) + "</p>";
     } else {
       html += "<p class=\"ev-text\">无后续代表证据</p>";
     }
     return html + "</div>";
   }).join("");
 }
+function microEvidenceHtml(row) {
+  return ["美国", "中国"].map(function(side) {
+    const evs = row[side]["最早证据"] || [];
+    const isCn = side === "中国";
+    let html = "<div class=\"ev-block" + (isCn ? " cn" : "") + "\"><h3>" + side + "</h3>";
+    if (!evs.length) {
+      html += "<p class=\"ev-text\">无对应条目</p>";
+    } else {
+      evs.forEach(function(ev) {
+        html += "<p class=\"ev-grade\">" + esc(ev["年级"]) + "</p>";
+        html += "<p class=\"ev-text\">" + esc(plainEvidence(ev["文本"])) + "</p>";
+        html += "<p class=\"ev-source\">" + esc(sourceRef(ev)) + "</p>";
+      });
+    }
+    return html + "</div>";
+  }).join("");
+}
+function axesHtml(row) {
+  let html = "";
+  if (row["深度参数"] && row["深度参数"].length) {
+    if (row["单侧标记"]) html += "<span class=\"flag\">" + esc(row["单侧标记"]) + "</span>";
+    html += "<table class=\"axes\"><thead><tr><th>深度维度</th><th class=\"us\">美国</th><th class=\"cn\">中国</th></tr></thead><tbody>";
+    row["深度参数"].forEach(function(axis) {
+      html += "<tr><th>" + esc(axis[0]) + "</th><td class=\"us\">" + esc(axis[1]) + "</td><td class=\"cn\">" + esc(axis[2]) + "</td></tr>";
+    });
+    html += "</tbody></table>";
+  }
+  if (row["深度解读"]) {
+    html += "<div class=\"reading\"><p><span class=\"reading-label\">解读：</span>" + esc(row["深度解读"]) + "</p></div>";
+  }
+  return html;
+}
 function render() {
   const list = rowsByDomain[state.domain];
   const row = list[state.idx];
   card.innerHTML =
     "<div class=\"card-top\"><span class=\"group\">" + esc(row["分组"]) + "</span>" +
-    "<span class=\"pager\">概念 " + (state.idx + 1) + " / " + list.length + "</span></div>" +
+    "<span class=\"pager\"><button id=\"prev\" aria-label=\"上一条\">←</button>" +
+    "概念 " + (state.idx + 1) + " / " + list.length +
+    "<button id=\"next\" aria-label=\"下一条\">→</button></span></div>" +
     "<h2>" + esc(row["概念簇"]) + "</h2>" +
     "<p class=\"takeaway\">" + esc(row["短结论"]) + "</p>" +
     "<div class=\"track\">" +
@@ -1529,12 +2893,9 @@ function render() {
     "<div class=\"track-row\"><span class=\"side us-label\">美国</span>" + trackCells(row, "美国") + "</div>" +
     "<div class=\"track-row\"><span class=\"side cn-label\">中国</span>" + trackCells(row, "中国") + "</div>" +
     "</div>" +
-    "<div class=\"actions\">" +
-    "<button id=\"prev\">上一个</button>" +
-    "<button id=\"evidence\">看证据</button>" +
-    "<button id=\"next\" class=\"primary\">下一个</button>" +
-    "</div>" +
-    "<div class=\"evidence\" id=\"evidence-body\" hidden>" + evidenceHtml(row) + "</div>";
+    axesHtml(row) +
+    "<div class=\"evidence\"><p class=\"evidence-label\">证据</p>" +
+    (row["类型"] === "微指标" ? microEvidenceHtml(row) : evidenceHtml(row)) + "</div>";
 
   document.getElementById("prev").addEventListener("click", function() {
     state.idx = (state.idx - 1 + list.length) % list.length;
@@ -1544,19 +2905,13 @@ function render() {
     state.idx = (state.idx + 1) % list.length;
     render();
   });
-  const evidenceBtn = document.getElementById("evidence");
-  const evidenceBody = document.getElementById("evidence-body");
-  evidenceBtn.addEventListener("click", function() {
-    evidenceBody.hidden = !evidenceBody.hidden;
-    evidenceBtn.textContent = evidenceBody.hidden ? "看证据" : "收起证据";
-  });
 }
 document.addEventListener("keydown", function(e) {
   const list = rowsByDomain[state.domain];
   if (e.key === "ArrowRight") { state.idx = (state.idx + 1) % list.length; render(); }
   if (e.key === "ArrowLeft") { state.idx = (state.idx - 1 + list.length) % list.length; render(); }
 });
-document.getElementById("badge").textContent = "精选 " + DATA["概念簇"].length + " 簇";
+document.getElementById("badge").textContent = "精选 " + DATA["概念簇"].length + " 条";
 document.getElementById("total").textContent = DATA["概念簇"].length;
 renderTabs();
 render();
@@ -1604,7 +2959,7 @@ def expand_clusters() -> list[dict[str, Any]]:
                 item["us"]["topic_regex"] = spec["us_topic_regex"]
             expanded.append(item)
 
-    for domain in ("数学", "科学", "地理"):
+    for domain in ("数学", "科学", "地理", "语言与读写", "文化"):
         subset = [item for item in expanded if item["domain"] == domain]
         subset.sort(key=lambda item: item["_base_order"])
         for order, item in enumerate(subset, 1):
@@ -1635,6 +2990,127 @@ def normalize_stage_text(value: Any) -> Any:
     for old, new in STAGE_LABEL_RULES:
         value = value.replace(old, new)
     return value
+
+
+BAND_LABELS = ["学前", "1-2年级", "3-4年级", "5-6年级", "7-9年级"]
+
+
+def micro_evidence(item: dict[str, Any], side: str) -> dict[str, Any]:
+    """微指标证据沿用统一字段，但保留更长的原文，便于逐条核对。"""
+    result = evidence(item, side)
+    result["文本"] = clean_text(item["text"], 320)
+    return result
+
+
+def micro_distribution(
+    items: list[dict[str, Any]], side: str, bands: list[int]
+) -> list[dict[str, Any]]:
+    counts = {band: 0 for band in bands}
+    for item in items:
+        band = us_band(item) if side == "美国" else cn_band(item)
+        if band in counts:
+            counts[band] += 1
+    return [
+        {"年级": BAND_LABELS[band], "命中": counts[band], "展示": counts[band], "暂存": 0}
+        for band in bands
+    ]
+
+
+def build_micro_rows(
+    us_items: list[dict[str, Any]], cn_items: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """把人工挑选的微指标拼成与原有概念簇同构的数据行。"""
+    us_index = {item["id"]: item for item in us_items}
+    cn_index = {item["id"]: item for item in cn_items}
+    rows: list[dict[str, Any]] = []
+    domain_counts: dict[str, int] = {}
+    original_domains = {"数学", "科学", "地理", "语言与读写", "文化"}
+
+    for spec in MICRO_CLAIMS + DOMAIN_MICRO_CLAIMS:
+        domain = spec["domain"]
+        domain_counts[domain] = domain_counts.get(domain, 0) + 1
+        order = domain_counts[domain] + (100 if domain in original_domains else 0)
+        missing_us = [uid for uid in spec["us_evidence"] if uid not in us_index]
+        missing_cn = [uid for uid in spec["cn_evidence"] if uid not in cn_index]
+        if missing_us or missing_cn:
+            raise ValueError(
+                f"微指标 {spec['id']} 的证据 ID 找不到：美国 {missing_us} / 中国 {missing_cn}"
+            )
+        us_evs = [us_index[uid] for uid in spec["us_evidence"]]
+        cn_evs = [cn_index[uid] for uid in spec["cn_evidence"]]
+        us_labels = [BAND_LABELS[band] for band in spec["us_bands"]]
+        cn_labels = [BAND_LABELS[band] for band in spec["cn_bands"]]
+
+        if not us_evs:
+            relation = "本数据中仅中国有"
+        elif not cn_evs:
+            relation = "本数据中仅美国有"
+        else:
+            relation = "两边都有，按微指标人工比对"
+
+        row: dict[str, Any] = {
+            "id": spec["id"],
+            "领域": spec["domain"],
+            "概念簇": spec["concept"],
+            "story_order": order,
+            "分组": spec["group"],
+            "短结论": normalize_stage_text(spec["short"]),
+            "类型": "微指标",
+            "展示轨道": {
+                "美国": us_labels,
+                "中国": cn_labels,
+                "点型": "实心",
+            },
+            "美国": {
+                "是否有证据": bool(us_evs),
+                "首次年级": (
+                    US_GRADE_LABELS.get(us_evs[0]["grade"], us_evs[0]["grade"])
+                    if us_evs else None
+                ),
+                "命中条目数": len(us_evs),
+                "涉及学科": sorted({item["subject"] for item in us_evs}),
+                "最早证据": [micro_evidence(item, "美国") for item in us_evs],
+                "学段分布": micro_distribution(us_evs, "美国", spec["us_bands"]),
+                "后续学段": "不适用（微指标逐条列出）",
+                "后续命中数": 0,
+                "后续代表证据": None,
+            },
+            "中国": {
+                "是否有证据": bool(cn_evs),
+                "首次年级": cn_evs[0]["grade"] if cn_evs else None,
+                "命中条目数": len(cn_evs),
+                "展示条目数": len(cn_evs),
+                "暂存条目数": 0,
+                "涉及学科": sorted({item["subject"] for item in cn_evs}),
+                "最早证据": [micro_evidence(item, "中国") for item in cn_evs],
+                "学段分布": micro_distribution(cn_evs, "中国", spec["cn_bands"]),
+                "后续学段": "不适用（微指标逐条列出）",
+                "后续命中数": 0,
+                "后续代表证据": None,
+            },
+            "学段覆盖": {
+                "美国学段数": len(spec["us_bands"]),
+                "中国学段数": len(spec["cn_bands"]),
+                "口径": "微指标按人工指定的展示学段记录，证据按来源条目 ID 核对。",
+                "对比": f"美国 {len(spec['us_bands'])} 个展示学段 / 中国 {len(spec['cn_bands'])} 个展示学段",
+            },
+            "关系": relation,
+            "侧重": normalize_stage_text(spec["emphasis"]),
+            "说明": normalize_stage_text(spec["note"]),
+            "深度对标": {
+                "美国": normalize_stage_text("；".join(axis[1] for axis in spec["axes"])),
+                "中国": normalize_stage_text("；".join(axis[2] for axis in spec["axes"])),
+                "终局关系": normalize_stage_text(spec["short"]),
+                "说明": normalize_stage_text(spec["note"]),
+            },
+            "重评关系": normalize_stage_text(spec["short"]),
+            "重评说明": normalize_stage_text(spec["note"]),
+            "深度参数": [[normalize_stage_text(cell) for cell in axis] for axis in spec["axes"]],
+            "深度解读": MICRO_INTERPRETATIONS[spec["id"]],
+            "单侧标记": spec.get("flag"),
+        }
+        rows.append(row)
+    return rows
 
 
 def build() -> None:
@@ -1726,11 +3202,15 @@ def build() -> None:
         row["深度对标"] = {
             key: normalize_stage_text(value) for key, value in review.items()
         }
+        row["深度解读"] = CONCEPT_INTERPRETATIONS[row["id"]]
+        row["深度参数"] = concept_axes(row)
         rows.append(row)
 
+    rows.extend(build_micro_rows(us_items, cn_items))
+
     dataset = {
-        "版本": "concept-cluster-v4",
-        "用途": "中美核心知识点概念簇对照的细粒度数据底稿：每条最多覆盖2个展示学段，保留首次、后续覆盖与深度判断，未生成网页。",
+        "版本": "micro-claim-v6",
+        "用途": "中美课程标准对照底稿：原有五个领域的81个概念簇保持不变；新增儿童发展、艺术以及原有五个领域共44条微指标。125条均附起步／后续／差异三行简表与解读，44条微指标另有更细的深度参数。",
         "年级对应": {
             "美国幼儿园前班": "中国幼儿园小班、中班",
             "美国K": "中国幼儿园大班",
@@ -1749,7 +3229,14 @@ def build() -> None:
             "细粒度规则：每条概念簇在展示轨道上最多覆盖2个学段；跨学段通用项（全学段通用、小学1-6年级、幼儿园通用）不进入展示轨道，仅在底稿中保留。",
             "阅读顺序按人工校对后的概念叙事顺序（story_order）排列，不按计算出的首次年级排序；页面默认不提供排序开关。",
             "展示轨道所有点统一为实心，不区分展示/暂存，也不对首次出现做特殊标记；首次信息只保留在短结论和证据中。",
+            "语言与读写、文化两个领域按功能对标：美国 ELA/Language and Literacy 对 中国语文/学前语言；不把中国“英语/日语/俄语”等外语学科当作母语能力对标。",
+            "文化领域按“国家认同、文化传承、多元理解”等功能对照，不按具体节日、人物、符号的字面对应；具体对象不同不代表功能不同。",
             "“本数据中仅美国有/仅中国有”只代表这两套数据，不代表绝对意义上的课程有无。",
+            "微指标层是人工挑选、可直接核对原文的能力点，证据按来源条目 ID 定位；每条最多指定两个展示学段，仍统一为实心点。",
+            "微指标的深度按量化阈值、年级递进、场景条件、输出或动作形式等参数逐项列出，不合并成单一深/浅判断。",
+            "微指标单侧项（如睡眠时长、屏幕时长）标注文件类型差异，只说明两套文件管辖范围不同，不做能力高低判断。",
+            "微指标与原有81个概念簇并存，不改写原有匹配规则、首次年级计算或深度判断。",
+            "儿童发展合并原有幼儿动作与生活作息条目；AAP 按年龄指南属于另一个独立任务，不在本数据中。",
         ],
         "数据源": {
             "美国": "Core Knowledge Sequence 2023（PreSchool + K-8）",
@@ -1797,6 +3284,10 @@ def build() -> None:
                 "短结论",
                 "美国展示轨道",
                 "中国展示轨道",
+                "类型",
+                "单侧标记",
+                "深度参数",
+                "深度解读",
             ]
         )
         for row in rows:
@@ -1837,6 +3328,13 @@ def build() -> None:
                     row["短结论"],
                     "、".join(row["展示轨道"]["美国"]),
                     "、".join(row["展示轨道"]["中国"]),
+                    row.get("类型", "概念簇"),
+                    row.get("单侧标记") or "",
+                    "；".join(
+                        f"{axis[0]}：美国 {axis[1]} / 中国 {axis[2]}"
+                        for axis in row.get("深度参数", [])
+                    ),
+                    row.get("深度解读", ""),
                 ]
             )
 
@@ -1847,6 +3345,9 @@ def build() -> None:
         "- 年级按用户指定口径显示：美国幼儿园前班对应中国小班、中班；美国K对应大班；美国7-8年级对应中国初中。",
         "- 数据底稿同时保留页面展示条目和被筛选隐藏的暂存条目用于核对；面向展示的字段不带暂存状态。",
         "- 除首次年级外，本版同时列出后续学段、学段覆盖、后续代表证据与深度对标，避免只看首次出现造成误判。",
+        "- 原有数学、科学、地理、语言与读写、文化五个领域的81个概念簇保持不变。",
+        "- 全部125条均附逐条解读与“起步／后续／差异”三行简表；其中44条微指标另按可核对的深度参数逐项列出。",
+        "- 微指标单侧项标注文件类型差异，不做能力高低判断。",
         "- 这里只整理数据，没有网页。",
         "",
         "| 领域 | 概念簇 | 美国首次 | 中国首次 | 关系 | 侧重 | 命中（美 / 中展示 / 中暂存） |",
@@ -1912,6 +3413,28 @@ def build() -> None:
     lines.extend(
         [
             "",
+            "## 深度参数（概念簇三行简表 + 微指标细表）",
+            "",
+            "微指标不再把深度压成单一档位，而是把可比较的参数并排列出。",
+            "",
+            "| 领域 | 微指标 | 深度维度 | 美国 | 中国 |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for row in rows:
+        for axis in row.get("深度参数", []):
+            lines.append(
+                f"| {row['领域']} | {row['概念簇']} | {axis[0]} | {axis[1]} | {axis[2]} |"
+            )
+    lines.extend(["", "## 逐条解读", ""])
+    for row in rows:
+        lines.append(f"### {row['领域']} · {row['概念簇']}（{row.get('类型', '概念簇')}）")
+        lines.append("")
+        lines.append(row["深度解读"])
+        lines.append("")
+    lines.extend(
+        [
+            "",
             "## 口径提醒",
             "",
             "- “关系”列保留首次出现口径；“重评关系”列综合首次、后续覆盖与内容深度。",
@@ -1924,6 +3447,10 @@ def build() -> None:
             "- 美国数据止于8年级；中国数据含初中7-9年级，中国9年级没有美国对应项。",
             "- 中国课标按学段发布，本表显示为年级区间，不伪造具体年级。",
             "- “本数据中仅美国有/仅中国有”只代表这两套数据，不代表绝对意义上的课程有无。",
+            "- 微指标的证据按来源条目 ID 定位，与原有概念簇的正则匹配互不影响。",
+            "- 微指标的深度按参数逐项列出；单侧项只说明文件管辖范围不同，不代表能力高低。",
+            "- 微指标与原有81个概念簇并存，原有数据未作改写。",
+            "- 儿童发展合并原有幼儿动作与生活作息条目；AAP 按年龄指南属于另一个独立任务。",
             "",
         ]
     )
@@ -1938,7 +3465,7 @@ def build() -> None:
     print(f"wrote {csv_path.relative_to(ROOT)}")
     print(f"wrote {md_path.relative_to(ROOT)}")
     print(f"wrote {html_path.relative_to(ROOT)}")
-    print(f"concept clusters: {len(rows)}")
+    print(f"rows: {len(rows)} ({len(MICRO_CLAIMS) + len(DOMAIN_MICRO_CLAIMS)} micro claims)")
 
 
 if __name__ == "__main__":
