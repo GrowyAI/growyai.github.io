@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -967,21 +967,6 @@
       "topic": "现代服务业劳动",
       "type": "content",
       "text": "根据所参与现代服务业劳动的特征与过程，开展符合相应要求的劳动。在劳动过程中主动发现有价值的间题，并设计合理的、具有一定创意的问题解决方案。",
-      "source_page": 33,
-      "source_pdf_page": 40,
-      "source_id": "moe-cn-2022-labor"
-    },
-    {
-      "uid": "la-j1-con-6ac6528a",
-      "seq": 119,
-      "subject": "劳动",
-      "subject_key": "labor",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "公益劳动与志愿服务",
-      "type": "content",
-      "text": "利用学生已有的日常生活劳动、生产劳动经验，选择12项具有一定挑战性的学校、社区公益劳动与志愿服务项目进行实践。例如：以小组或班级为单位，在学校或社区建立移动书亭、物",
       "source_page": 33,
       "source_pdf_page": 40,
       "source_id": "moe-cn-2022-labor"

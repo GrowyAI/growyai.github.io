@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -67,51 +67,6 @@
       "topic": "content",
       "type": "content",
       "text": "音乐学科课程内容包括“欣赏”“表现”“创造”和“联系”4类艺术实践，涵盖14项具体学习内容，分学段设置不同的学习任务，并将学习内容嵌入学习任务中。整体结构如图1所示。",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-all-con-9029b855",
-      "seq": 6,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "全学段",
-      "stage_key": "all",
-      "domain": "音乐",
-      "topic": "艺术实践",
-      "type": "content",
-      "text": "欣赏表现创造督乐与社会生学习内容1~2年股",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-all-con-ab4877da",
-      "seq": 7,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "全学段",
-      "stage_key": "all",
-      "domain": "音乐",
-      "topic": "艺术实践",
-      "type": "content",
-      "text": "3~9年楼（音乐）发现身边的音乐独唱与合作演哨独卖与合作演率觉与评述",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-all-con-cec3cc47",
-      "seq": 8,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "全学段",
-      "stage_key": "all",
-      "domain": "音乐",
-      "topic": "艺术实践",
-      "type": "content",
-      "text": "与展示图1音乐学科课程内容框架通过“欣赏”，学生体验音乐的情绪与情感，了解音乐的表现要素、表现形式，感知、理解音乐的体裁与风格等，发展音乐听觉与感知能力，丰富音乐审美体验，深化音乐情感体验，提升审美感知和文",
       "source_page": 15,
       "source_pdf_page": 22,
       "source_id": "moe-cn-2022-arts"
@@ -1407,7 +1362,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-41852553",
+      "uid": "ar-x3-aca-26224d43",
       "seq": 157,
       "subject": "艺术",
       "subject_key": "arts",
@@ -1416,7 +1371,7 @@
       "domain": "音乐",
       "topic": "academic",
       "type": "academic",
-      "text": "每学年能演奏稍具复杂性的乐曲1～2首。7年级",
+      "text": "每学年能演奏稍具复杂性的乐曲1～2首。",
       "source_page": 33,
       "source_pdf_page": 40,
       "source_id": "moe-cn-2022-arts"
@@ -2307,7 +2262,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-449b188e",
+      "uid": "ar-x3-aca-afdc1379",
       "seq": 246,
       "subject": "艺术",
       "subject_key": "arts",
@@ -2316,7 +2271,7 @@
       "domain": "音乐",
       "topic": "academic",
       "type": "academic",
-      "text": "能运用各种方式搜集、听赏或表现音乐，并与人分享、交流。7年级",
+      "text": "能运用各种方式搜集、听赏或表现音乐，并与人分享、交流。",
       "source_page": 45,
       "source_pdf_page": 52,
       "source_id": "moe-cn-2022-arts"
@@ -3747,7 +3702,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-72f07fc3",
+      "uid": "ar-x3-aca-eea5a5a1",
       "seq": 390,
       "subject": "艺术",
       "subject_key": "arts",
@@ -3756,7 +3711,7 @@
       "domain": "美术",
       "topic": "academic",
       "type": "academic",
-      "text": "能根据需要设计海报、请束等。7年级",
+      "text": "能根据需要设计海报、请束等。",
       "source_page": 62,
       "source_pdf_page": 69,
       "source_id": "moe-cn-2022-arts"
@@ -4002,7 +3957,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-968902c4",
+      "uid": "ar-x3-aca-1f8c36d6",
       "seq": 408,
       "subject": "艺术",
       "subject_key": "arts",
@@ -4011,7 +3966,7 @@
       "domain": "美术",
       "topic": "academic",
       "type": "academic",
-      "text": "，能参与校园文化建设，增强团队协作意识。7年级",
+      "text": "，能参与校园文化建设，增强团队协作意识。",
       "source_page": 64,
       "source_pdf_page": 71,
       "source_id": "moe-cn-2022-arts"
@@ -4722,21 +4677,6 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-j1-tip-c6bff36a",
-      "seq": 490,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "舞蹈",
-      "topic": "艺术实践",
-      "type": "tip",
-      "text": "即兴表演提与表演敢拜剧表演图3舞蹈学科课程内容框架1～2年级主要依托唱游·音乐及体育与健康实施，学习任务为“形象捕捉与表演”，即通过观察、模仿来了解身体部位，塑造健康体",
-      "source_page": 74,
-      "source_pdf_page": 81,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
       "uid": "ar-j1-con-1cec27a2",
       "seq": 495,
       "subject": "艺术",
@@ -4977,27 +4917,12 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-j1-tip-22b07443",
-      "seq": 533,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "戏剧（含戏曲）",
-      "topic": "艺术实践",
-      "type": "tip",
-      "text": "学习内容3-7年级1~2年级8-9年级演出舞台副目记录观刷心得",
-      "source_page": 82,
-      "source_pdf_page": 89,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
       "uid": "ar-j1-tip-c0a7af55",
       "seq": 535,
       "subject": "艺术",
       "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
+      "stage": "小学低段（1-2年级）",
+      "stage_key": "x1",
       "domain": "戏剧（含戏曲）",
       "topic": "艺术实践",
       "type": "tip",
@@ -5437,21 +5362,6 @@
       "topic": "tip",
       "type": "tip",
       "text": "影视（含数字媒体艺术）学科课程内容包括“欣赏”“表现”“创造”和“融合”4类艺术实践，涵盖16项具体学习内容，通过具体的学习任务组织教学。根据义务教育阶段学生的身心发展特点和教育教学规律，影视（含数字媒体艺术）学习任务的设置具有进阶性。整体结构如图5所示。",
-      "source_page": 91,
-      "source_pdf_page": 98,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-j1-tip-68dff1c3",
-      "seq": 608,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "影视（含数字媒体艺术）",
-      "topic": "艺术实践",
-      "type": "tip",
-      "text": "记录生活重现历史提变幻的光影编导故事图5影视（含数字媒体艺术）学科课程内容框架1～2年级主要依托造型·美术及信息科技实施，学习任务包括",
       "source_page": 91,
       "source_pdf_page": 98,
       "source_id": "moe-cn-2022-arts"

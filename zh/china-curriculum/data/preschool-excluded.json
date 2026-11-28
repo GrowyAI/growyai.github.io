@@ -3,49 +3,10 @@
     "title": "幼儿园未展示教育建议（暂存）",
     "filter_version": "concrete-v1",
     "filter_rule": "发展目标全部保留；教育建议带具体举例，或建议本身给出具体行动时展示。",
-    "count": 5,
+    "count": 1,
     "notice": "这些建议没有删除，只是不符合当前「只展示干货」的筛选标准。"
   },
   "items": [
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-06",
-      "type": "suggestion",
-      "text": "帮助幼儿养成良好的个人卫生习惯。如：",
-      "examples": [],
-      "filter_reason": "suggestion-no-concrete-example"
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-10",
-      "type": "suggestion",
-      "text": "激发幼儿参加体育活动的兴趣，养成锻炼的习惯。如：",
-      "examples": [],
-      "filter_reason": "suggestion-no-concrete-example"
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-02",
-      "type": "suggestion",
-      "text": "引导幼儿学会认真倾听。如：",
-      "examples": [],
-      "filter_reason": "suggestion-no-concrete-example"
-    },
     {
       "domain": "艺术",
       "aspect": "表现与创造",
@@ -56,19 +17,6 @@
       "uid": "ps-a-a2-g2-s-01",
       "type": "suggestion",
       "text": "尊重幼儿自发的表现和创造，并给予适当的指导。如：",
-      "examples": [],
-      "filter_reason": "suggestion-no-concrete-example"
-    },
-    {
-      "domain": "艺术",
-      "aspect": "表现与创造",
-      "goal_no": 2,
-      "goal": "具有初步的艺术表现与创造能力",
-      "source_id": "moe-preschool-2012",
-      "source_page": 45,
-      "uid": "ps-a-a2-g2-s-04",
-      "type": "suggestion",
-      "text": "根据幼儿的生活经验，与幼儿共同确定艺术表达表现的主题，引导幼儿围绕主题展开想象，进行艺术表现。",
       "examples": [],
       "filter_reason": "suggestion-no-concrete-example"
     }

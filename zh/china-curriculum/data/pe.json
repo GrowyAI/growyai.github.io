@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -1437,21 +1437,6 @@
       "source_id": "moe-cn-2022-pe"
     },
     {
-      "uid": "pe-x3-con-7f6ed999",
-      "seq": 197,
-      "subject": "体育与健康",
-      "subject_key": "pe",
-      "stage": "小学高段（5-6年级）",
-      "stage_key": "x3",
-      "domain": "专项运动技能",
-      "topic": "项目具体要求",
-      "type": "content",
-      "text": "正面、外侧传球，要的基本动作技领；了解乒乓球运识和文化，以及正面抢球、捕球基础",
-      "source_page": 31,
-      "source_pdf_page": 38,
-      "source_id": "moe-cn-2022-pe"
-    },
-    {
       "uid": "pe-x3-con-9a7e72b7",
       "seq": 201,
       "subject": "体育与健康",
@@ -1554,21 +1539,6 @@
       "text": "活动内容设计应体现技战术学习的进阶性和连贯性，要让学生由易到难、循序渐进学练基本技战术，并在不同情境中加以运用，如传接球射门活动，可以由设置障碍向设置防守者过渡，进攻路线由中路向边路过渡等。每节课应安排810分钟教学比赛，培养学生的运动能力，以及团队合作和公平竞争的意识。",
       "source_page": 34,
       "source_pdf_page": 41,
-      "source_id": "moe-cn-2022-pe"
-    },
-    {
-      "uid": "pe-j1-con-ea93f1cd",
-      "seq": 251,
-      "subject": "体育与健康",
-      "subject_key": "pe",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "专项运动技能",
-      "topic": "项目具体要求",
-      "type": "content",
-      "text": "球、反弹球，脚不篮板球等基本动推挡侧身攻球等组合；理解所学球同部位推拨球、拉作技术，突破上",
-      "source_page": 35,
-      "source_pdf_page": 42,
       "source_id": "moe-cn-2022-pe"
     },
     {
@@ -1762,21 +1732,6 @@
       "topic": "项目具体要求",
       "type": "content",
       "text": "中运用各种跳跃技战球、前猎实心球过米追逐跑或间歇术运技能。",
-      "source_page": 40,
-      "source_pdf_page": 47,
-      "source_id": "moe-cn-2022-pe"
-    },
-    {
-      "uid": "pe-x2-con-3920bb62",
-      "seq": 319,
-      "subject": "体育与健康",
-      "subject_key": "pe",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "专项运动技能",
-      "topic": "项目具体要求",
-      "type": "content",
-      "text": "技能。项目具体要求内容总体要求100米跑跳远",
       "source_page": 40,
       "source_pdf_page": 47,
       "source_id": "moe-cn-2022-pe"

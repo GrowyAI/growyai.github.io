@@ -171,8 +171,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -741,7 +741,7 @@
       "domain": "阶段说明",
       "topic": "学段要求",
       "type": "note",
-      "text": "在落实以上要求过程中，注重了解中华优秀传统文化的源远流",
+      "text": "在落实以上要求过程中，注重了解中华优秀传统文化的源远流长、丰富多彩，提升自身中华优秀传统文化修养；感受先贤志士的人格魅力，感悟老一辈无产阶级革命家的英雄气概、优良作风和高尚品质，体会捍卫民族尊严、维护国家利益和世界和平的伟大精神。",
       "source_page": 13,
       "source_pdf_page": 20,
       "source_id": "moe-cn-2022-chinese"
@@ -981,7 +981,7 @@
       "domain": "阶段说明",
       "topic": "学段要求",
       "type": "note",
-      "text": "在落实以上要求过程中，注重理解中华优秀传统文化蕴含的核心",
+      "text": "在落实以上要求过程中，注重理解中华优秀传统文化蕴含的核心思想理念、中华人文精神和传统美德，表达自己作为中华民族一员的归属感和自豪感；体会中国共产党在长期奋斗历程中培育形成的崇高精神和人格风范，体认英雄模范忠于祖国和人民的优秀品质，培育民族气节和爱国主义情怀。",
       "source_page": 17,
       "source_pdf_page": 24,
       "source_id": "moe-cn-2022-chinese"
@@ -3987,21 +3987,6 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-x2-con-b617bdb8",
-      "seq": 201,
-      "subject": "英语",
-      "subject_key": "english",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "语言技能",
-      "topic": "语言技能内容要求（一级、一级+）",
-      "type": "content",
-      "text": "简单介绍自己的学校和学校生活，如学校设施、课程、活动，以及同学、老师等；语言技能",
-      "source_page": 25,
-      "source_pdf_page": 32,
-      "source_id": "moe-cn-2022-english"
-    },
-    {
       "uid": "en-x2-con-711f5cc9",
       "seq": 205,
       "subject": "英语",
@@ -4137,7 +4122,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-x3-con-6d342fa8",
+      "uid": "en-x3-con-203ea2ea",
       "seq": 218,
       "subject": "英语",
       "subject_key": "english",
@@ -4146,7 +4131,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（二级、二级+）",
       "type": "content",
-      "text": "课外阅读量累计达到4000～5000词。+阅读有配图的简单章节书，理解大意，对所读内容进行简单的口头概括与描述。语言技能",
+      "text": "课外阅读量累计达到4000～5000词。+阅读有配图的简单章节书，理解大意，对所读内容进行简单的口头概括与描述。",
       "source_page": 26,
       "source_pdf_page": 33,
       "source_id": "moe-cn-2022-english"
@@ -4332,7 +4317,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-j1-con-7ef5f264",
+      "uid": "en-j1-con-1d9f1413",
       "seq": 238,
       "subject": "英语",
       "subject_key": "english",
@@ -4341,7 +4326,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（三级一7年级）",
       "type": "content",
-      "text": "识别和判断书面语篇中句子之间的逻辑关系；语言技能",
+      "text": "识别和判断书面语篇中句子之间的逻辑关系；",
       "source_page": 27,
       "source_pdf_page": 34,
       "source_id": "moe-cn-2022-english"
@@ -4437,7 +4422,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-j1-con-349e88e2",
+      "uid": "en-j1-con-431357cc",
       "seq": 257,
       "subject": "英语",
       "subject_key": "english",
@@ -4446,7 +4431,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（三级—8年级）",
       "type": "content",
-      "text": "在收听或观看主题相关、语速较慢的广播、电视、网络节目时，识别主题，理解大意，获取主要信息；技能",
+      "text": "在收听或观看主题相关、语速较慢的广播、电视、网络节目时，识别主题，理解大意，获取主要信息；",
       "source_page": 28,
       "source_pdf_page": 35,
       "source_id": "moe-cn-2022-english"
@@ -4827,7 +4812,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-j1-con-b9bcad2d",
+      "uid": "en-j1-con-258d15b0",
       "seq": 298,
       "subject": "英语",
       "subject_key": "english",
@@ -4836,7 +4821,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（三级一9年级、三级+）",
       "type": "content",
-      "text": "为所给图表或自己创作的图片写出简单的说明；语言技能",
+      "text": "为所给图表或自己创作的图片写出简单的说明；",
       "source_page": 30,
       "source_pdf_page": 37,
       "source_id": "moe-cn-2022-english"
@@ -5391,7 +5376,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "合理制订学习和作息",
+      "text": "合理制订学习和作息计划，生活有规律。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-politics"
@@ -5451,7 +5436,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "乐于探究，在学习与",
+      "text": "乐于探究，在学习与生活中遇到问题时能够想办法解决，提高动脑动手能力。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-politics"
@@ -5502,21 +5487,6 @@
       "source_id": "moe-cn-2022-politics"
     },
     {
-      "uid": "po-x1-con-0beb7c0b",
-      "seq": 28,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学低段（1-2年级）",
-      "stage_key": "x1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "根据故事情境，进行角色扮演，认识到懂得求助，懂得感恩，人与人需要互相帮助，帮助别人也会让乐于助人。自己快乐。道德教育",
-      "source_page": 19,
-      "source_pdf_page": 26,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
       "uid": "po-x1-con-21ea23ba",
       "seq": 30,
       "subject": "道德与法治",
@@ -5541,22 +5511,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "了解家乡的风景名胜",
-      "source_page": 19,
-      "source_pdf_page": 26,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-x1-con-0baf204e",
-      "seq": 36,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学低段（1-2年级）",
-      "stage_key": "x1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "观察道路交通标志，熟悉并识记常见的掌握报警的基本常识。交通标志，识别交通信号灯。模拟生活中遐到的紧急或危险情况，掌握报警的方式、方法和基本要求。生命安全",
+      "text": "了解家乡的风景名胜和主要物产，关注家乡的发展变化。",
       "source_page": 19,
       "source_pdf_page": 26,
       "source_id": "moe-cn-2022-politics"
@@ -5571,7 +5526,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "能够识别公共环境中",
+      "text": "能够识别公共环境中的安全标识，安全有序使用和爱护公共设施。",
       "source_page": 19,
       "source_pdf_page": 26,
       "source_id": "moe-cn-2022-politics"
@@ -5631,7 +5586,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "知道学校生活有规则，",
+      "text": "知道学校生活有规则，树立规则意识。",
       "source_page": 20,
       "source_pdf_page": 27,
       "source_id": "moe-cn-2022-politics"
@@ -5677,21 +5632,6 @@
       "topic": "content",
       "type": "content",
       "text": "讲述中华民族勤俭节约的故事，感受粮约的传统美德，养成食等资源的来之不易，参与“光盘行不浪费的习惯。动”，懂得节约的重要性。",
-      "source_page": 20,
-      "source_pdf_page": 27,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-x1-con-b8bdb5ab",
-      "seq": 55,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学低段（1-2年级）",
-      "stage_key": "x1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "尊敬父母长辈，体贴，手绘家庭树，分享亲情故事，在参与家中华优秀家人，承担力所能及务劳动中感受家的温暖。传统文化的家务劳动。与革命传",
       "source_page": 20,
       "source_pdf_page": 27,
       "source_id": "moe-cn-2022-politics"
@@ -6117,21 +6057,6 @@
       "source_id": "moe-cn-2022-politics"
     },
     {
-      "uid": "po-x2-con-4259a05e",
-      "seq": 113,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "向长辈了解家庭的历史，如祖辈来道弘扬优秀家风的意义，自什么地方、家庭住址等；收集我中华优秀初步体会中国人的家庭国古往今来优秀家风的故事。传统文化观念。与革命传",
-      "source_page": 25,
-      "source_pdf_page": 32,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
       "uid": "po-x2-con-23141f5b",
       "seq": 114,
       "subject": "道德与法治",
@@ -6172,21 +6097,6 @@
       "topic": "content",
       "type": "content",
       "text": "知道中华优秀传统文化的",
-      "source_page": 26,
-      "source_pdf_page": 33,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-x2-con-24128302",
-      "seq": 119,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "列举我国古代具有代表性的科技成主要代表性成果，初步感果、文艺作品等，感受中华文化源受中华优秀传统文化的远流长、博大精深，萌发民族自豪魅力。感，树立文化自信。中华优秀",
       "source_page": 26,
       "source_pdf_page": 33,
       "source_id": "moe-cn-2022-politics"
@@ -6759,36 +6669,6 @@
       "text": "以“开天辟地大事变”为议题，观这是开天辟地的大事变，看建党题材的影视剧或专题片，例理解伟大建党精神的内举中国共产党人的精神谱系的主要涵，领悟伟大建党精神是内容，理解在党和人民伟大斗争中中国共产党的精神之源。孕育的社会主义先进文化和革命文化，积淀着中华民族最深层的精神追求，代表着中华民族独特的精神标识，坚定“四个自信”，讨论新时代青少年应该如何弘扬光荣传统、续红色基因。",
       "source_page": 39,
       "source_pdf_page": 46,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-j1-con-dc645e76",
-      "seq": 246,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "以“不忘初心，牢记使命”为议题，浴血奋战、百折不揽，创从党史展览中的某件展品说起，回造了新民主主义革命的伟顾中国共产党百年来艰苦卓绝的奋革命传统大成就，实现了从几千年斗历程，体会“幸福都是奋斗出教育封建专制政治向人民民主来的”。的伟大飞跃，理解中国人民从此站起来了，中国发展从此开启了新纪元。，了解中国共产党领导人民",
-      "source_page": 39,
-      "source_pdf_page": 46,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-j1-con-8aaae94d",
-      "seq": 249,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "以“改革开放铸就伟大改革开放精解放思想、锐意进取，创神”为议题，举办主题班会或展览，造了改革开放和社会主义了解中国特色社会主义道路的开辟现代化建设的伟大成就，过程，举例说明伟大改革开放精神实现了人民生活从温饱不的作用。足到总体小康、奔向全面小康的历史性跨越，推进了中华民族从站起来到富起来的伟大飞跃，理解中国特色社会主义道路是指引中国发展繁荣的正确道路。革命传统",
-      "source_page": 40,
-      "source_pdf_page": 47,
       "source_id": "moe-cn-2022-politics"
     },
     {
@@ -8236,12 +8116,12 @@
       "seq": 44,
       "subject": "科学",
       "subject_key": "science",
-      "stage": "全学段",
-      "stage_key": "all",
+      "stage": "小学低段（1-2年级）",
+      "stage_key": "x1",
       "domain": "生命系统的构成层次",
       "topic": "content",
       "type": "content",
-      "text": "体验12年级：通过视觉、听觉、膜觉、味觉、触觉分别感受不同的食物或物体，了解不同感觉器官的功能。",
+      "text": "体验1～2年级：通过视觉、听觉、嗅觉、味觉、触觉分别感受不同的食物或物体，了解不同感觉器官的功能。",
       "source_page": 55,
       "source_pdf_page": 62,
       "source_id": "moe-cn-2022-science"
@@ -14667,21 +14547,6 @@
       "source_id": "moe-cn-2022-pe"
     },
     {
-      "uid": "pe-x3-con-7f6ed999",
-      "seq": 197,
-      "subject": "体育与健康",
-      "subject_key": "pe",
-      "stage": "小学高段（5-6年级）",
-      "stage_key": "x3",
-      "domain": "专项运动技能",
-      "topic": "项目具体要求",
-      "type": "content",
-      "text": "正面、外侧传球，要的基本动作技领；了解乒乓球运识和文化，以及正面抢球、捕球基础",
-      "source_page": 31,
-      "source_pdf_page": 38,
-      "source_id": "moe-cn-2022-pe"
-    },
-    {
       "uid": "pe-x3-con-9a7e72b7",
       "seq": 201,
       "subject": "体育与健康",
@@ -14784,21 +14649,6 @@
       "text": "活动内容设计应体现技战术学习的进阶性和连贯性，要让学生由易到难、循序渐进学练基本技战术，并在不同情境中加以运用，如传接球射门活动，可以由设置障碍向设置防守者过渡，进攻路线由中路向边路过渡等。每节课应安排810分钟教学比赛，培养学生的运动能力，以及团队合作和公平竞争的意识。",
       "source_page": 34,
       "source_pdf_page": 41,
-      "source_id": "moe-cn-2022-pe"
-    },
-    {
-      "uid": "pe-j1-con-ea93f1cd",
-      "seq": 251,
-      "subject": "体育与健康",
-      "subject_key": "pe",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "专项运动技能",
-      "topic": "项目具体要求",
-      "type": "content",
-      "text": "球、反弹球，脚不篮板球等基本动推挡侧身攻球等组合；理解所学球同部位推拨球、拉作技术，突破上",
-      "source_page": 35,
-      "source_pdf_page": 42,
       "source_id": "moe-cn-2022-pe"
     },
     {
@@ -14992,21 +14842,6 @@
       "topic": "项目具体要求",
       "type": "content",
       "text": "中运用各种跳跃技战球、前猎实心球过米追逐跑或间歇术运技能。",
-      "source_page": 40,
-      "source_pdf_page": 47,
-      "source_id": "moe-cn-2022-pe"
-    },
-    {
-      "uid": "pe-x2-con-3920bb62",
-      "seq": 319,
-      "subject": "体育与健康",
-      "subject_key": "pe",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "专项运动技能",
-      "topic": "项目具体要求",
-      "type": "content",
-      "text": "技能。项目具体要求内容总体要求100米跑跳远",
       "source_page": 40,
       "source_pdf_page": 47,
       "source_id": "moe-cn-2022-pe"
@@ -17007,51 +16842,6 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-all-con-9029b855",
-      "seq": 6,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "全学段",
-      "stage_key": "all",
-      "domain": "音乐",
-      "topic": "艺术实践",
-      "type": "content",
-      "text": "欣赏表现创造督乐与社会生学习内容1~2年股",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-all-con-ab4877da",
-      "seq": 7,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "全学段",
-      "stage_key": "all",
-      "domain": "音乐",
-      "topic": "艺术实践",
-      "type": "content",
-      "text": "3~9年楼（音乐）发现身边的音乐独唱与合作演哨独卖与合作演率觉与评述",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-all-con-cec3cc47",
-      "seq": 8,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "全学段",
-      "stage_key": "all",
-      "domain": "音乐",
-      "topic": "艺术实践",
-      "type": "content",
-      "text": "与展示图1音乐学科课程内容框架通过“欣赏”，学生体验音乐的情绪与情感，了解音乐的表现要素、表现形式，感知、理解音乐的体裁与风格等，发展音乐听觉与感知能力，丰富音乐审美体验，深化音乐情感体验，提升审美感知和文",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
       "uid": "ar-all-con-068ec1c5",
       "seq": 9,
       "subject": "艺术",
@@ -18342,7 +18132,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-41852553",
+      "uid": "ar-x3-aca-26224d43",
       "seq": 157,
       "subject": "艺术",
       "subject_key": "arts",
@@ -18351,7 +18141,7 @@
       "domain": "音乐",
       "topic": "academic",
       "type": "academic",
-      "text": "每学年能演奏稍具复杂性的乐曲1～2首。7年级",
+      "text": "每学年能演奏稍具复杂性的乐曲1～2首。",
       "source_page": 33,
       "source_pdf_page": 40,
       "source_id": "moe-cn-2022-arts"
@@ -19242,7 +19032,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-449b188e",
+      "uid": "ar-x3-aca-afdc1379",
       "seq": 246,
       "subject": "艺术",
       "subject_key": "arts",
@@ -19251,7 +19041,7 @@
       "domain": "音乐",
       "topic": "academic",
       "type": "academic",
-      "text": "能运用各种方式搜集、听赏或表现音乐，并与人分享、交流。7年级",
+      "text": "能运用各种方式搜集、听赏或表现音乐，并与人分享、交流。",
       "source_page": 45,
       "source_pdf_page": 52,
       "source_id": "moe-cn-2022-arts"
@@ -20682,7 +20472,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-72f07fc3",
+      "uid": "ar-x3-aca-eea5a5a1",
       "seq": 390,
       "subject": "艺术",
       "subject_key": "arts",
@@ -20691,7 +20481,7 @@
       "domain": "美术",
       "topic": "academic",
       "type": "academic",
-      "text": "能根据需要设计海报、请束等。7年级",
+      "text": "能根据需要设计海报、请束等。",
       "source_page": 62,
       "source_pdf_page": 69,
       "source_id": "moe-cn-2022-arts"
@@ -20937,7 +20727,7 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-x3-aca-968902c4",
+      "uid": "ar-x3-aca-1f8c36d6",
       "seq": 408,
       "subject": "艺术",
       "subject_key": "arts",
@@ -20946,7 +20736,7 @@
       "domain": "美术",
       "topic": "academic",
       "type": "academic",
-      "text": "，能参与校园文化建设，增强团队协作意识。7年级",
+      "text": "，能参与校园文化建设，增强团队协作意识。",
       "source_page": 64,
       "source_pdf_page": 71,
       "source_id": "moe-cn-2022-arts"
@@ -21657,21 +21447,6 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-j1-tip-c6bff36a",
-      "seq": 490,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "舞蹈",
-      "topic": "艺术实践",
-      "type": "tip",
-      "text": "即兴表演提与表演敢拜剧表演图3舞蹈学科课程内容框架1～2年级主要依托唱游·音乐及体育与健康实施，学习任务为“形象捕捉与表演”，即通过观察、模仿来了解身体部位，塑造健康体",
-      "source_page": 74,
-      "source_pdf_page": 81,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
       "uid": "ar-j1-con-1cec27a2",
       "seq": 495,
       "subject": "艺术",
@@ -21912,27 +21687,12 @@
       "source_id": "moe-cn-2022-arts"
     },
     {
-      "uid": "ar-j1-tip-22b07443",
-      "seq": 533,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "戏剧（含戏曲）",
-      "topic": "艺术实践",
-      "type": "tip",
-      "text": "学习内容3-7年级1~2年级8-9年级演出舞台副目记录观刷心得",
-      "source_page": 82,
-      "source_pdf_page": 89,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
       "uid": "ar-j1-tip-c0a7af55",
       "seq": 535,
       "subject": "艺术",
       "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
+      "stage": "小学低段（1-2年级）",
+      "stage_key": "x1",
       "domain": "戏剧（含戏曲）",
       "topic": "艺术实践",
       "type": "tip",
@@ -22372,21 +22132,6 @@
       "topic": "tip",
       "type": "tip",
       "text": "影视（含数字媒体艺术）学科课程内容包括“欣赏”“表现”“创造”和“融合”4类艺术实践，涵盖16项具体学习内容，通过具体的学习任务组织教学。根据义务教育阶段学生的身心发展特点和教育教学规律，影视（含数字媒体艺术）学习任务的设置具有进阶性。整体结构如图5所示。",
-      "source_page": 91,
-      "source_pdf_page": 98,
-      "source_id": "moe-cn-2022-arts"
-    },
-    {
-      "uid": "ar-j1-tip-68dff1c3",
-      "seq": 608,
-      "subject": "艺术",
-      "subject_key": "arts",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "影视（含数字媒体艺术）",
-      "topic": "艺术实践",
-      "type": "tip",
-      "text": "记录生活重现历史提变幻的光影编导故事图5影视（含数字媒体艺术）学科课程内容框架1～2年级主要依托造型·美术及信息科技实施，学习任务包括",
       "source_page": 91,
       "source_pdf_page": 98,
       "source_id": "moe-cn-2022-arts"
@@ -23787,21 +23532,6 @@
       "source_id": "moe-cn-2022-labor"
     },
     {
-      "uid": "la-j1-con-6ac6528a",
-      "seq": 119,
-      "subject": "劳动",
-      "subject_key": "labor",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "公益劳动与志愿服务",
-      "type": "content",
-      "text": "利用学生已有的日常生活劳动、生产劳动经验，选择12项具有一定挑战性的学校、社区公益劳动与志愿服务项目进行实践。例如：以小组或班级为单位，在学校或社区建立移动书亭、物",
-      "source_page": 33,
-      "source_pdf_page": 40,
-      "source_id": "moe-cn-2022-labor"
-    },
-    {
       "uid": "ja-j1-con-b6bdc2ea",
       "seq": 3,
       "subject": "日语",
@@ -23844,21 +23574,6 @@
       "text": "学习策略是“学习能力”形成的重要支撑，贯穿于主题、语篇、文化理解、语言知识和语言技能等日语课程内容学习的全过程。",
       "source_page": 7,
       "source_pdf_page": 14,
-      "source_id": "moe-cn-2022-japanese"
-    },
-    {
-      "uid": "ja-j1-con-7d6bcd50",
-      "seq": 8,
-      "subject": "日语",
-      "subject_key": "japanese",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "日语课程内容六要素的相互关系如图1所示。语篇文化理解语言知识语言技能图1",
-      "source_page": 8,
-      "source_pdf_page": 15,
       "source_id": "moe-cn-2022-japanese"
     },
     {
@@ -25197,6 +24912,21 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
+      "uid": "ru-j1-con-1950cd89",
+      "seq": 10,
+      "subject": "俄语",
+      "subject_key": "russian",
+      "stage": "初中（7-9年级）",
+      "stage_key": "j1",
+      "domain": "话题",
+      "topic": "购物",
+      "type": "content",
+      "text": "式。语篇承载话题内容，是语言学习的内容单位。通过内容丰富、形式多样的语篇，学习语言知识、文化知识和跨学科知识，提高听、说、读、写等技能，形成综合语言运用能力。",
+      "source_page": 11,
+      "source_pdf_page": 18,
+      "source_id": "moe-cn-2022-russian"
+    },
+    {
       "uid": "ru-j1-con-0b331d38",
       "seq": 11,
       "subject": "俄语",
@@ -25332,7 +25062,7 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-a0f450f3",
+      "uid": "ru-j1-con-29b6e947",
       "seq": 30,
       "subject": "俄语",
       "subject_key": "russian",
@@ -25341,7 +25071,7 @@
       "domain": "知识",
       "topic": "内容描述",
       "type": "content",
-      "text": "初步掌握元音弱化、清辅音浊化和浊辅音清化规则。7年级",
+      "text": "初步掌握元音弱化、清辅音浊化和浊辅音清化规则。",
       "source_page": 14,
       "source_pdf_page": 21,
       "source_id": "moe-cn-2022-russian"
@@ -25362,23 +25092,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-b8581137",
+      "uid": "ru-j1-con-2820735e",
       "seq": 34,
-      "subject": "俄语",
-      "subject_key": "russian",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "知识",
-      "topic": "内容描述",
-      "type": "content",
-      "text": "理解音变规则。8年级",
-      "source_page": 14,
-      "source_pdf_page": 21,
-      "source_id": "moe-cn-2022-russian"
-    },
-    {
-      "uid": "ru-j1-con-258cb928",
-      "seq": 35,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25392,23 +25107,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-7a21440d",
-      "seq": 39,
-      "subject": "俄语",
-      "subject_key": "russian",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "知识",
-      "topic": "内容描述",
-      "type": "content",
-      "text": "掌握调型1、调型2和调型3。9年级",
-      "source_page": 14,
-      "source_pdf_page": 21,
-      "source_id": "moe-cn-2022-russian"
-    },
-    {
-      "uid": "ru-j1-con-a0b59b5b",
-      "seq": 41,
+      "uid": "ru-j1-con-9aad72c5",
+      "seq": 40,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25422,8 +25122,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-be8f4000",
-      "seq": 43,
+      "uid": "ru-j1-con-bf76b395",
+      "seq": 42,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25431,14 +25131,14 @@
       "domain": "知识",
       "topic": "内容描述",
       "type": "content",
-      "text": "了解词汇的文化含义。7年级",
+      "text": "了解词汇的文化含义。",
       "source_page": 15,
       "source_pdf_page": 22,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-a2ace37a",
-      "seq": 45,
+      "uid": "ru-j1-con-b5aa7534",
+      "seq": 44,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25452,23 +25152,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-c86e97f8",
+      "uid": "ru-j1-con-8d14a270",
       "seq": 47,
-      "subject": "俄语",
-      "subject_key": "russian",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "知识",
-      "topic": "内容描述",
-      "type": "content",
-      "text": "能辨别同义词和反义词。8年级",
-      "source_page": 15,
-      "source_pdf_page": 22,
-      "source_id": "moe-cn-2022-russian"
-    },
-    {
-      "uid": "ru-j1-con-08d83be3",
-      "seq": 48,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25482,8 +25167,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-12c4e793",
-      "seq": 50,
+      "uid": "ru-j1-con-3fbf13d9",
+      "seq": 49,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25491,14 +25176,14 @@
       "domain": "知识",
       "topic": "内容描述",
       "type": "content",
-      "text": "累计掌握817个必学词。9年级",
+      "text": "累计掌握817个必学词。",
       "source_page": 15,
       "source_pdf_page": 22,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-8b4242d8",
-      "seq": 52,
+      "uid": "ru-j1-con-b2d81d7f",
+      "seq": 51,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25512,8 +25197,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-52c08671",
-      "seq": 53,
+      "uid": "ru-j1-con-b21784bb",
+      "seq": 52,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25527,8 +25212,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-e268c0bb",
-      "seq": 54,
+      "uid": "ru-j1-con-8d4898d0",
+      "seq": 53,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25542,8 +25227,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-f89576e9",
-      "seq": 58,
+      "uid": "ru-j1-con-ea1272e4",
+      "seq": 57,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25557,8 +25242,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-3ae579b8",
-      "seq": 59,
+      "uid": "ru-j1-con-a5bc9c5e",
+      "seq": 58,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25572,8 +25257,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-850b2612",
-      "seq": 62,
+      "uid": "ru-j1-con-c04c0fed",
+      "seq": 61,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25587,8 +25272,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-d8878e1c",
-      "seq": 66,
+      "uid": "ru-j1-aca-6deae2aa",
+      "seq": 65,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25602,8 +25287,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-f47c9ab3",
-      "seq": 73,
+      "uid": "ru-j1-con-9d260b65",
+      "seq": 72,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25617,8 +25302,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-b6de1fce",
-      "seq": 74,
+      "uid": "ru-j1-con-952c725d",
+      "seq": 73,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25626,14 +25311,14 @@
       "domain": "知识",
       "topic": "内容描述",
       "type": "content",
-      "text": "了解言语礼节和交际礼仪，正确表达问候、称谓、致谢、告别等。7年级",
+      "text": "了解言语礼节和交际礼仪，正确表达问候、称谓、致谢、告别等。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-ac6ba886",
-      "seq": 76,
+      "uid": "ru-j1-con-9e88f9bc",
+      "seq": 75,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25647,8 +25332,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-c570dd10",
-      "seq": 78,
+      "uid": "ru-j1-con-2bec4af0",
+      "seq": 77,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25662,8 +25347,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-25d27672",
-      "seq": 79,
+      "uid": "ru-j1-con-9a62a478",
+      "seq": 78,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25677,8 +25362,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-fd50fcf3",
-      "seq": 80,
+      "uid": "ru-j1-con-5b68da33",
+      "seq": 79,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25686,14 +25371,14 @@
       "domain": "知识",
       "topic": "内容描述",
       "type": "content",
-      "text": "了解言语礼节和交际礼仪，正确表达请求、费同、祝贺、致款等。8年级",
+      "text": "了解言语礼节和交际礼仪，正确表达请求、费同、祝贺、致款等。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-b3587b06",
-      "seq": 82,
+      "uid": "ru-j1-con-ebfd3d6e",
+      "seq": 81,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25707,8 +25392,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-068e15af",
-      "seq": 84,
+      "uid": "ru-j1-con-6b3e5a51",
+      "seq": 83,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25722,8 +25407,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-27aa6642",
-      "seq": 85,
+      "uid": "ru-j1-con-0ac88a62",
+      "seq": 84,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25737,8 +25422,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-f99c0f49",
-      "seq": 86,
+      "uid": "ru-j1-con-827cfc7c",
+      "seq": 85,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25746,14 +25431,14 @@
       "domain": "知识",
       "topic": "内容描述",
       "type": "content",
-      "text": "了解言语礼节和交际礼仪，得体地运用祝福用语、礼貌用语等。9年级",
+      "text": "了解言语礼节和交际礼仪，得体地运用祝福用语、礼貌用语等。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-607a04e4",
-      "seq": 87,
+      "uid": "ru-j1-con-96156ede",
+      "seq": 86,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25767,8 +25452,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-53c8b01e",
-      "seq": 90,
+      "uid": "ru-j1-aca-5f5095cf",
+      "seq": 89,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25782,8 +25467,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-e3ab6e2b",
-      "seq": 92,
+      "uid": "ru-j1-aca-e699102e",
+      "seq": 91,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25797,8 +25482,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-aae74a27",
-      "seq": 93,
+      "uid": "ru-j1-aca-32dcccee",
+      "seq": 92,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25812,23 +25497,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-3cb61489",
+      "uid": "ru-j1-con-5c162898",
       "seq": 101,
-      "subject": "俄语",
-      "subject_key": "russian",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "言语技能",
-      "topic": "类别",
-      "type": "content",
-      "text": "能识别陈述句和疑问句语调。7年级",
-      "source_page": 20,
-      "source_pdf_page": 27,
-      "source_id": "moe-cn-2022-russian"
-    },
-    {
-      "uid": "ru-j1-con-2c409cb4",
-      "seq": 102,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25842,8 +25512,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-c54f72d3",
-      "seq": 103,
+      "uid": "ru-j1-con-c61da63d",
+      "seq": 102,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25857,8 +25527,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-64cf3e56",
-      "seq": 105,
+      "uid": "ru-j1-con-50a7fed7",
+      "seq": 104,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25872,8 +25542,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-32323c2f",
-      "seq": 106,
+      "uid": "ru-j1-con-0f9357d7",
+      "seq": 105,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25887,8 +25557,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-7c35b216",
-      "seq": 107,
+      "uid": "ru-j1-con-0a559efa",
+      "seq": 106,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25896,14 +25566,14 @@
       "domain": "言语技能",
       "topic": "类别",
       "type": "content",
-      "text": "能正确拼读音节和单词。7年级",
+      "text": "能正确拼读音节和单词。",
       "source_page": 21,
       "source_pdf_page": 28,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-456c8652",
-      "seq": 109,
+      "uid": "ru-j1-con-c5589d5c",
+      "seq": 108,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25917,8 +25587,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-0fed0a0a",
-      "seq": 111,
+      "uid": "ru-j1-con-640fd208",
+      "seq": 110,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25932,8 +25602,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-74d89630",
-      "seq": 113,
+      "uid": "ru-j1-con-a7020250",
+      "seq": 112,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25947,8 +25617,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-97b701d7",
-      "seq": 115,
+      "uid": "ru-j1-con-4a091105",
+      "seq": 114,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25962,8 +25632,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-8c57c48b",
-      "seq": 117,
+      "uid": "ru-j1-con-9e0e579f",
+      "seq": 116,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25977,8 +25647,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-02595b04",
-      "seq": 119,
+      "uid": "ru-j1-con-21140a36",
+      "seq": 118,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -25992,8 +25662,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-d40c425c",
-      "seq": 120,
+      "uid": "ru-j1-con-c8332335",
+      "seq": 119,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26007,8 +25677,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-51d29048",
-      "seq": 121,
+      "uid": "ru-j1-con-d0f01c16",
+      "seq": 120,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26022,8 +25692,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-c219eafc",
-      "seq": 122,
+      "uid": "ru-j1-con-9e7373fb",
+      "seq": 121,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26037,8 +25707,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-948d5821",
-      "seq": 123,
+      "uid": "ru-j1-con-134228ce",
+      "seq": 122,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26052,8 +25722,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-cb67d805",
-      "seq": 124,
+      "uid": "ru-j1-con-5c303764",
+      "seq": 123,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26067,8 +25737,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-91d35ecd",
-      "seq": 125,
+      "uid": "ru-j1-con-d7056887",
+      "seq": 124,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26082,8 +25752,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-92d67706",
-      "seq": 126,
+      "uid": "ru-j1-con-4e6217de",
+      "seq": 125,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26091,14 +25761,14 @@
       "domain": "言语技能",
       "topic": "类别",
       "type": "content",
-      "text": "能依据情境进行4个轮次以上的会话交流。9年级",
+      "text": "能依据情境进行4个轮次以上的会话交流。",
       "source_page": 21,
       "source_pdf_page": 28,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-bcccaeb4",
-      "seq": 127,
+      "uid": "ru-j1-con-3da14750",
+      "seq": 126,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26112,8 +25782,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-0a0a94ce",
-      "seq": 128,
+      "uid": "ru-j1-con-6b53f141",
+      "seq": 127,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26127,8 +25797,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-8e5bf77b",
-      "seq": 129,
+      "uid": "ru-j1-con-eacebaf8",
+      "seq": 128,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26142,8 +25812,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-52f7cd5b",
-      "seq": 130,
+      "uid": "ru-j1-con-8e4b445e",
+      "seq": 129,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26157,8 +25827,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-dec54a51",
-      "seq": 131,
+      "uid": "ru-j1-con-7dfcd4f4",
+      "seq": 130,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26172,8 +25842,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-f5ff33e6",
-      "seq": 132,
+      "uid": "ru-j1-aca-fe92343d",
+      "seq": 131,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26187,8 +25857,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-b1a52053",
-      "seq": 133,
+      "uid": "ru-j1-aca-18a60c29",
+      "seq": 132,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26202,8 +25872,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-bf26b15d",
-      "seq": 135,
+      "uid": "ru-j1-aca-eb4a8846",
+      "seq": 134,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26217,8 +25887,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-b308c46a",
-      "seq": 140,
+      "uid": "ru-j1-con-b27ae3a6",
+      "seq": 139,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26232,8 +25902,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-a14fea5e",
-      "seq": 141,
+      "uid": "ru-j1-con-d165f866",
+      "seq": 140,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26241,14 +25911,14 @@
       "domain": "学习策略",
       "topic": "内容描述",
       "type": "content",
-      "text": "在话题情境中理解词汇和语法规则，能举一反三。7年级",
+      "text": "在话题情境中理解词汇和语法规则，能举一反三。",
       "source_page": 23,
       "source_pdf_page": 30,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-c637d5bc",
-      "seq": 142,
+      "uid": "ru-j1-con-3804caeb",
+      "seq": 141,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26262,8 +25932,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-84e869e5",
-      "seq": 143,
+      "uid": "ru-j1-con-c16d8ca5",
+      "seq": 142,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26277,8 +25947,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-43880eff",
-      "seq": 144,
+      "uid": "ru-j1-con-c72decfb",
+      "seq": 143,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26292,8 +25962,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-3b532636",
-      "seq": 145,
+      "uid": "ru-j1-con-c47639f9",
+      "seq": 144,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26307,8 +25977,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-f6a4aec9",
-      "seq": 146,
+      "uid": "ru-j1-con-8f290c8f",
+      "seq": 145,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26316,14 +25986,14 @@
       "domain": "学习策略",
       "topic": "内容描述",
       "type": "content",
-      "text": "能初步理解中俄两种语言的不同表达方式及文化差异。8年级",
+      "text": "能初步理解中俄两种语言的不同表达方式及文化差异。",
       "source_page": 23,
       "source_pdf_page": 30,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-49847fb5",
-      "seq": 148,
+      "uid": "ru-j1-con-04b5de42",
+      "seq": 147,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26337,8 +26007,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-c5f1f3ab",
-      "seq": 149,
+      "uid": "ru-j1-con-fa69983a",
+      "seq": 148,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26352,8 +26022,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-b35bde8e",
-      "seq": 150,
+      "uid": "ru-j1-con-cc4d57bd",
+      "seq": 149,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26367,8 +26037,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-b948d8f0",
-      "seq": 151,
+      "uid": "ru-j1-con-29ac724a",
+      "seq": 150,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26376,14 +26046,14 @@
       "domain": "学习策略",
       "topic": "内容描述",
       "type": "content",
-      "text": "能通过对比和分析建立语言知识之间的联系，理解常用词汇的文9年级化含义。",
+      "text": "能通过对比和分析建立语言知识之间的联系，理解常用词汇的文化含义。",
       "source_page": 24,
       "source_pdf_page": 31,
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-ccf7b5c8",
-      "seq": 152,
+      "uid": "ru-j1-con-34839263",
+      "seq": 151,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26397,8 +26067,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-6bda1301",
-      "seq": 153,
+      "uid": "ru-j1-con-2eec030b",
+      "seq": 152,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26412,8 +26082,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-con-a9b89d06",
-      "seq": 154,
+      "uid": "ru-j1-con-814321c2",
+      "seq": 153,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26427,8 +26097,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-aef9875e",
-      "seq": 155,
+      "uid": "ru-j1-aca-966ac8ae",
+      "seq": 154,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26442,8 +26112,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-c44d17f3",
-      "seq": 156,
+      "uid": "ru-j1-aca-28995d86",
+      "seq": 155,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",
@@ -26457,8 +26127,8 @@
       "source_id": "moe-cn-2022-russian"
     },
     {
-      "uid": "ru-j1-aca-3ed41131",
-      "seq": 158,
+      "uid": "ru-j1-aca-38bab874",
+      "seq": 157,
       "subject": "俄语",
       "subject_key": "russian",
       "stage": "初中（7-9年级）",

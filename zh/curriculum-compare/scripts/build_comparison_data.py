@@ -172,6 +172,7 @@ CLUSTERS: list[dict[str, Any]] = [
             "subjects": ["Mathematics"],
             "topic_regex": r"The Number System|Expressions and Equations",
             "text_regex": r"\bnegative numbers?\b|positive and negative|opposite numbers|\bintegers?\b|\brational numbers?\b",
+            "exclude_ids": {"n07046"},
         },
         "cn": {
             "subjects": ["数学"],
@@ -210,6 +211,7 @@ CLUSTERS: list[dict[str, Any]] = [
             "subjects": ["数学"],
             "text_regex": r"函数|自变量|因变量|常量、变量",
             "exclude_regex": r"数与运算的教学|教学要引导学生",
+            "exclude_ids": {"ma-j1-aca-9018a320"},
         },
         "relation_note": "两边都在初中阶段系统出现；美国8年级有独立函数主题，中国在初中7-9年级统一安排函数内容。",
         "emphasis": "阶段接近，组织方式不同",
@@ -1112,6 +1114,25 @@ GENERIC_CN_LABELS = {
     "小学1-6年级",
     "幼儿园小班/中班/大班（通用）",
 }
+
+# Audit exclusions: these source items were repeatedly used as evidence for
+# unrelated concepts, or are teaching-method notes rather than content.
+AUDIT_GLOBAL_US_EXCLUDE_IDS = {
+    "n05047",  # suburban lifestyle in a Cold War unit, not a holiday item
+    "n05601",  # French vocabulary list, not speech/debate
+    "n02209", "n02210", "n02211", "n02212",  # time measurement in a geometry row
+    "n07046",  # square/cube roots in a negative-number row
+}
+AUDIT_GLOBAL_CN_EXCLUDE_IDS = {
+    "hi-j1-tip-c894baac", "hi-j1-tip-b07c731d",  # interdisciplinary pedagogy tips reused in culture rows
+    "sc-x2-con-a6f351ee",  # tool use/engineering reused in map, motion and energy rows
+    "sc-x3-con-b59a3b7c",  # solar/earth model reused in map and energy rows
+    "sc-j1-con-4beb6dd5",  # microscopy reused in geography and body rows
+}
+AUDIT_US_META_RE = re.compile(
+    r"in greater depth and detail in Grade 5|Second grade teachers should examine",
+    re.I,
+)
 US_SHORT_LABELS = {
     "美国幼儿园前班（对应中国小班、中班）": "幼儿园前班",
     "美国幼儿园大班（K）": "幼儿园大班K",
@@ -1143,9 +1164,11 @@ def load_json(path: Path) -> Any:
         return json.load(fh)
 
 
-def clean_text(text: Any, limit: int = 220) -> str:
+def clean_text(text: Any, limit: int | None = None) -> str:
     value = " ".join(str(text or "").split())
-    return value if len(value) <= limit else value[: limit - 1] + "…"
+    if limit is None or len(value) <= limit:
+        return value
+    return value[: limit - 1] + "…"
 
 
 def cn_grade_label(item: dict[str, Any]) -> str:
@@ -1326,7 +1349,7 @@ def representative_evidence(
         if side == "美国" or label not in GENERIC_CN_LABELS
     ] or list(groups)
     chosen = max(candidates_labels, key=lambda label: label_interval(label, side))
-    pattern_text = cfg.get("text_regex")
+    pattern_text = cfg.get("core_regex") or cfg.get("text_regex")
     pattern = re.compile(pattern_text, re.I) if pattern_text else None
 
     def score(item: dict[str, Any]) -> tuple[int, int, int]:
@@ -1404,6 +1427,10 @@ def load_corpus() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
 def us_matches(item: dict[str, Any], cfg: dict[str, Any]) -> bool:
     if item["subject"] not in cfg["subjects"]:
         return False
+    if item["id"] in AUDIT_GLOBAL_US_EXCLUDE_IDS or item["id"] in cfg.get("exclude_ids", ()):
+        return False
+    if AUDIT_US_META_RE.search(str(item.get("text", ""))):
+        return False
     # 语言/文化类簇用 text_only，只匹配条目正文，避免 topic/subtopic 的主题词污染。
     haystack = str(item["text"]) if cfg.get("text_only") else item["haystack"]
     if re.match(r"^(Overview|Teachers):", str(item["text"]).strip(), re.I):
@@ -1420,6 +1447,8 @@ def us_matches(item: dict[str, Any], cfg: dict[str, Any]) -> bool:
 
 
 def cn_matches(item: dict[str, Any], cfg: dict[str, Any]) -> bool:
+    if item["id"] in AUDIT_GLOBAL_CN_EXCLUDE_IDS or item["id"] in cfg.get("exclude_ids", ()):
+        return False
     # 中国幼儿园“数学认知”在《3-6 岁指南》中归在“科学”领域；
     # 早期数学簇需要用专门规则把它接进来，避免漏掉数数、分合等学前证据。
     preschool_pattern = cfg.get("preschool_regex")
@@ -1489,7 +1518,7 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
     "math-number-place": [
         {"id": "math-number-early", "concept": "数数、比较与10以内数", "group": "数与运算", "short": "中美都从学前数数起步，中国1-2年级把数的意义讲得更明确。", "us_bands": [0, 1], "cn_bands": [0, 1], "cn_preschool_regex": r"点数|数数|数词|总数|按数取物|一一对应|多少|数的意义|数概念", "cn_preschool_core_regex": r"点数|数数|数词|总数|按数取物"},
         {"id": "math-number-place-value", "concept": "万以内数、位值与十进制", "group": "数与运算", "short": "双方小学中高段建立位值概念，中国分段更明确。", "us_bands": [2, 3], "cn_bands": [2, 3]},
-        {"id": "math-number-rational", "concept": "有理数、实数与数轴", "group": "数的扩展", "short": "初中阶段中国把有理数、实数与数轴系统化。", "us_bands": [4], "cn_bands": [4]},
+        {"id": "math-number-rational", "concept": "有理数、实数与数轴", "group": "数的扩展", "short": "初中阶段中国把有理数、实数与数轴系统化。", "us_bands": [4], "cn_bands": [4], "cn_exclude_ids": ["ma-j1-con-1f1ef921"], "cn_core_regex": r"有理数|实数|数轴|负数|相反数|绝对值"},
     ],
     "math-four-operations": [
         {"id": "math-add-sub-early", "concept": "数量分合与10以内加减法", "group": "数与运算", "short": "中美学前已做数量分合，1-2年级继续10以内加减。", "us_bands": [0, 1], "cn_bands": [0, 1], "cn_preschool_regex": r"合在一起|加减运算|分成|分给|[“”]加[“”]|[“”]减[“”]|拿取", "cn_preschool_core_regex": r"合在一起|加减运算|[“”]加[“”]|[“”]减[“”]"},
@@ -1497,12 +1526,12 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
         {"id": "math-rational-operations", "concept": "有理数运算与运算律", "group": "数的扩展", "short": "初中把运算扩展到有理数并总结运算律。", "us_bands": [4], "cn_bands": [4]},
     ],
     "math-fractions-decimals": [
-        {"id": "math-fractions-intro", "concept": "分数与小数初步认识", "group": "数的扩展", "short": "双方在小学中段初步认识分数和小数。", "us_bands": [2], "cn_bands": [2]},
+        {"id": "math-fractions-intro", "concept": "分数与小数初步认识", "group": "数的扩展", "short": "双方在小学中段初步认识分数和小数。", "us_bands": [2], "cn_bands": [2], "cn_exclude_ids": ["ma-x2-aca-b84ede75"]},
         {"id": "math-fractions-operations", "concept": "分数小数运算与有理数延伸", "group": "数的扩展", "short": "美国延伸到初中，中国在小学高段集中完成运算。", "us_bands": [3, 4], "cn_bands": [3]},
     ],
     "math-equations-algebra": [
         {"id": "math-algebra-foundations", "concept": "运算关系与字母表示数", "group": "代数与统计", "short": "美国低龄用运算关系铺垫，中国在小学高段引入字母表示数。", "us_bands": [0, 1], "cn_bands": [3]},
-        {"id": "math-equations-basic", "concept": "等式性质与一元一次方程", "group": "代数与统计", "short": "小学高段到小学高年级双方都进入等式与方程。", "us_bands": [2, 3], "cn_bands": [3, 4]},
+        {"id": "math-equations-basic", "concept": "等式性质与一元一次方程", "group": "代数与统计", "short": "3-4年级到5-6年级双方都进入等式与方程。", "us_bands": [2, 3], "cn_bands": [3, 4], "us_text_regex": r"equation|unknown|symbol for the unknown|letter standing|inequality"},
         {"id": "math-equations-advanced", "concept": "方程组、不等式与代数应用", "group": "代数与统计", "short": "初中阶段中国把方程与不等式组织得更系统。", "us_bands": [4], "cn_bands": [4]},
     ],
     "math-geometry": [
@@ -1512,8 +1541,8 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
     ],
     "math-measurement": [
         {"id": "math-measure-early", "concept": "长度、质量与时间等可测量属性", "group": "图形与测量", "short": "中美学前已感知大小、长短和轻重，小学低段引入常用单位。", "us_bands": [0, 1], "cn_bands": [0, 1], "cn_preschool_regex": r"大小|高矮|长短|粗细|厚薄|轻重|量的相对性|测量|多少"},
-        {"id": "math-area-perimeter-volume", "concept": "面积、周长与体积", "group": "图形与测量", "short": "小学中高段集中学习面积、周长和体积。", "us_bands": [2, 3], "cn_bands": [2, 3]},
-        {"id": "math-measure-advanced", "concept": "立体度量与几何应用", "group": "图形与测量", "short": "初中阶段美国继续立体度量，中国更多与几何推理结合。", "us_bands": [4], "cn_bands": [4]},
+        {"id": "math-area-perimeter-volume", "concept": "面积、周长与体积", "group": "图形与测量", "short": "小学中高段集中学习面积、周长和体积。", "us_bands": [2, 3], "cn_bands": [2, 3], "us_exclude_ids": ["n02209", "n02210", "n02211", "n02212", "n02213", "n02214", "n02215", "n02216", "n02217", "n02218", "n02219"], "cn_exclude_ids": ["ma-x2-con-cb89f248", "ma-x2-con-0124f5b2"], "cn_core_regex": r"周长|面积|体积"},
+        {"id": "math-measure-advanced", "concept": "立体度量与几何应用", "group": "图形与测量", "short": "初中阶段美国继续立体度量，本套中国资料未收同粒度条目。", "us_bands": [4], "cn_bands": [4], "cn_exclude_ids": ["ma-j1-con-78d121e8"]},
     ],
     "math-statistics": [
         {"id": "math-data-early", "concept": "数据分类与简单图表", "group": "代数与统计", "short": "中国学前已有简单记录，小学低段双方继续分类和图表。", "us_bands": [0, 1], "cn_bands": [0, 1], "cn_preschool_regex": r"记录表|统计图|数量关系|记录"},
@@ -1532,13 +1561,13 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
     ],
     "science-energy-electricity": [
         {"id": "science-energy-daily", "concept": "光、声、热的生活感知", "group": "运动与能量", "short": "中国幼儿园已有感知，美国小学低段开始系统讲光声。", "us_bands": [1], "cn_bands": [0]},
-        {"id": "science-energy-basic", "concept": "能量形式与简单电路", "group": "运动与能量", "short": "小学中高段双方学习能量形式、传热和简单电路。", "us_bands": [2, 3], "cn_bands": [2, 3]},
+        {"id": "science-energy-basic", "concept": "能量形式与简单电路", "group": "运动与能量", "short": "小学中高段双方学习能量形式、传热和简单电路。", "us_bands": [2, 3], "cn_bands": [2, 3], "cn_exclude_ids": ["sc-x2-con-a10d38f0", "sc-x3-con-b59a3b7c"]},
         {"id": "science-energy-advanced", "concept": "波、能量转化与守恒", "group": "运动与能量", "short": "初中阶段中国更强调能量转化、守恒和实验。", "us_bands": [4], "cn_bands": [4]},
     ],
     "science-life-genetics": [
         {"id": "science-life-early", "concept": "常见动植物与生长变化", "group": "生命科学", "short": "中国幼儿园已有生命感知，美国小学低段观察动植物。", "us_bands": [1], "cn_bands": [0, 1]},
         {"id": "science-genetics-basic", "concept": "繁殖、遗传与细胞", "group": "生命科学", "short": "小学中高段进入繁殖、遗传和细胞初步。", "us_bands": [2, 3], "cn_bands": [2, 3]},
-        {"id": "science-evolution", "concept": "进化证据与生物分类", "group": "生命科学", "short": "初中阶段美国偏进化证据，中国偏显微观察与分类。", "us_bands": [4], "cn_bands": [4]},
+        {"id": "science-evolution", "concept": "进化证据与生物分类", "group": "生命科学", "short": "初中阶段美国偏进化证据，中国偏显微观察与分类。", "us_bands": [4], "cn_bands": [4], "us_exclude_ids": ["n05317", "n05324", "n05327"], "us_core_regex": r"evolution|common ancestor|natural selection|fossil|mutation|species"},
     ],
     "science-ecology-environment": [
         {"id": "science-ecology-early", "concept": "动植物与环境", "group": "生态与地球", "short": "低龄和小学低段认识动植物与环境的关系。", "us_bands": [0, 1], "cn_bands": [0, 1]},
@@ -1550,9 +1579,9 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
         {"id": "science-body-basic", "concept": "身体结构、食品安全与健康管理", "group": "生命科学", "short": "小学中高段到初中，美国讲结构更细，中国偏安全与管理。", "us_bands": [2, 3], "cn_bands": [2, 4]},
     ],
     "science-earth-space": [
-        {"id": "science-space-early", "concept": "天体现象观察", "group": "生态与地球", "short": "低龄和小学低段观察日、月、星等天体现象。", "us_bands": [0, 1], "cn_bands": [1]},
+        {"id": "science-space-early", "concept": "天体现象观察", "group": "生态与地球", "short": "低龄和小学低段观察日、月、星等天体现象。", "us_bands": [0, 1], "cn_bands": [1], "us_exclude_ids": ["n01708"]},
         {"id": "science-earth-basic", "concept": "太阳系与地球现象", "group": "生态与地球", "short": "小学中高段学习太阳系、地球和地表现象。", "us_bands": [2, 3], "cn_bands": [2, 3]},
-        {"id": "science-earth-advanced", "concept": "板块构造与地质解释", "group": "生态与地球", "short": "初中阶段中国用板块构造解释火山和地震。", "us_bands": [4], "cn_bands": [4]},
+        {"id": "science-earth-advanced", "concept": "板块构造与地质解释", "group": "生态与地球", "short": "初中阶段中国用板块构造解释火山和地震。", "us_bands": [4], "cn_bands": [4], "cn_core_regex": r"板块构造|火山|地震"},
     ],
     "science-weather-water": [
         {"id": "science-weather-early", "concept": "天气与季节感知", "group": "生态与地球", "short": "中国幼儿园已有天气与季节感知，美国从低龄记录天气。", "us_bands": [0], "cn_bands": [0, 1]},
@@ -1567,7 +1596,7 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
     "geo-map-skills": [
         {"id": "geo-direction-early", "concept": "方位词与位置", "group": "地图与定位", "short": "中国幼儿园从上下前后里外起步，美国低龄开始定位。", "us_bands": [0], "cn_bands": [0]},
         {"id": "geo-map-basic", "concept": "地图图例与方向", "group": "地图与定位", "short": "小学阶段双方学习图例、方向和简单地图阅读。", "us_bands": [1, 2], "cn_bands": [2]},
-        {"id": "geo-map-advanced", "concept": "比例尺与区域地图应用", "group": "地图与定位", "short": "小学高段到初中，中国把比例尺和经纬网做成技能链。", "us_bands": [3, 4], "cn_bands": [3, 4]},
+        {"id": "geo-map-advanced", "concept": "比例尺与区域地图应用", "group": "地图与定位", "short": "小学高段到初中，中国把比例尺和经纬网做成技能链。", "us_bands": [3, 4], "cn_bands": [3, 4], "cn_exclude_ids": ["sc-x3-con-bdce7510", "sc-x3-con-b59a3b7c", "ge-j1-con-459f1b15", "ge-j1-con-1e079e79", "ge-j1-con-5f8d68c4", "ge-j1-con-bd667659"], "cn_core_regex": r"比例尺|图例|经纬|量距|坐标|直线距离"},
     ],
     "geo-continents-oceans": [
         {"id": "geo-continents-basic", "concept": "大洲大洋与国家常识", "group": "世界地理", "short": "美国小学低中段以大洲大洋和国家名称为主。", "us_bands": [1, 2], "cn_bands": []},
@@ -1583,7 +1612,7 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
     ],
     "geo-human": [
         {"id": "geo-culture-basic", "concept": "文化、城市与区域常识", "group": "人文地理", "short": "美国低龄和小学低段把文化、城市内容嵌在历史单元里。", "us_bands": [0, 1], "cn_bands": []},
-        {"id": "geo-population", "concept": "人口、聚落与迁移", "group": "人文地理", "short": "小学中高段美国持续出现人口、移民和城市内容。", "us_bands": [2, 3], "cn_bands": []},
+        {"id": "geo-population", "concept": "人口、聚落与迁移", "group": "人文地理", "short": "小学5-6年级美国持续出现人口、移民和城市内容。", "us_bands": [2, 3], "cn_bands": [], "us_exclude_ids": ["n02038", "n02514", "n02579", "n03219", "n04156", "n03247"], "us_text_regex": r"population|immigrant|immigration|migration|urban|settlement|cities|city life"},
         {"id": "geo-region-development", "concept": "全球化、区域发展与家乡调查", "group": "人文地理", "short": "初中阶段中国把人口、聚落和区域发展组织成独立主题。", "us_bands": [4], "cn_bands": [4]},
     ],
     "geo-admin-divisions": [
@@ -1649,7 +1678,8 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
          "cn_text_regex": r"神话|传说|成语故事|民间故事|寓言|传统美德|历史故事|智慧"},
         {"id": "culture-heritage-late", "concept": "英雄、传统与文化传承", "group": "文化传承", "short": "小学高段到初中，美国讲英雄与遗产，中国强调传统文化与自信。", "us_bands": [3, 4], "cn_bands": [3, 4],
          "us_text_regex": r"\bhero|ancient civilization|heritage|tradition|\bmyth|folk hero|cultural heritage",
-         "cn_text_regex": r"传统文化|文化遗产|传统美德|中华优秀|文化自信|感悟.*文化"},
+         "cn_text_regex": r"传统文化|文化遗产|传统美德|中华优秀|文化自信|感悟.*文化",
+         "us_exclude_ids": ["n03055", "n03485", "n05452"]},
     ],
     "culture-diversity": [
         {"id": "culture-diversity-early", "concept": "本民族与多元人群", "group": "多元理解", "short": "低龄认识本土部落、多民族大家庭与相互尊重。", "us_bands": [0, 1], "cn_bands": [0, 1],
@@ -1657,7 +1687,8 @@ SPLIT_SPEC: dict[str, list[dict[str, Any]]] = {
          "cn_text_regex": r"自己的民族|多民族|各民族|互相尊重|不同.*民族"},
         {"id": "culture-diversity-world", "concept": "世界文化与中外差异", "group": "多元理解", "short": "小学高段到初中，双方扩展到世界主要国家与文化多样性。", "us_bands": [3, 4], "cn_bands": [3, 4],
          "us_text_regex": r"multicultural|world culture|immigrant|heritage|other countries|different cultures",
-         "cn_text_regex": r"世界主要国家|文化多样|中外文化|文化习俗|国际理解|各国"},
+         "cn_text_regex": r"世界主要国家|文化多样|中外文化|文化习俗|国际理解|各国",
+         "us_exclude_ids": ["n03350", "n03353", "n04156"]},
     ],
 }
 
@@ -2022,17 +2053,17 @@ DOMAIN_MICRO_CLAIMS: list[dict[str, Any]] = [
     {
         "id": "micro-math-shapes", "domain": "数学",
         "concept": "图形分割与特征分类", "group": "图形与测量",
-        "short": "美国1年级用 halves、quarters 分割图形，中国3-4年级按边角特征分类三角形和四边形。",
+        "short": "美国1年级辨认半圆、四分之一圆等图形并推理属性，中国3-4年级按边角特征分类三角形和四边形。",
         "us_bands": [1, 2], "cn_bands": [2],
         "us_evidence": ["n01084"],
         "cn_evidence": ["ma-x2-con-0124f5b2", "ma-x2-con-cb89f248"],
         "axes": [
-            ["任务", "把图形分成半和四分之一", "按特征分类三角形、四边形"],
-            ["属性", "形状分割", "边、角、角的大小关系"],
+            ["任务", "辨认半圆、四分之一圆等图形并推理属性", "按特征分类三角形、四边形"],
+            ["属性", "形状名称与属性", "边、角、角的大小关系"],
             ["起始年级", "1年级", "小学3-4年级"],
         ],
         "emphasis": "起步不同，后段汇合到图形性质",
-        "note": "美国低年级先做图形等分，中国把边角性质集中到中段；两边最终都进入图形属性。",
+        "note": "美国低年级先按半圆、四分之一圆等名称推理属性，中国把边角性质集中到中段；两边最终都进入图形属性。",
     },
     {
         "id": "micro-math-data", "domain": "数学",
@@ -2082,8 +2113,8 @@ DOMAIN_MICRO_CLAIMS: list[dict[str, Any]] = [
     {
         "id": "micro-science-cells-genetics", "domain": "科学",
         "concept": "细胞、遗传与生命现象", "group": "生命科学",
-        "short": "美国进入细胞与染色体机制，中国同期以动植物观察和分类为主。",
-        "us_bands": [3, 4], "cn_bands": [2, 3],
+        "short": "美国从4年级起进入细胞与染色体机制，中国同期以动植物观察和分类为主。",
+        "us_bands": [2, 3], "cn_bands": [2, 3],
         "us_evidence": ["n02913", "n04410"],
         "cn_evidence": ["sc-x2-con-33783426", "sc-x3-con-6bfe551c"],
         "axes": [
@@ -2187,14 +2218,14 @@ DOMAIN_MICRO_CLAIMS: list[dict[str, Any]] = [
     {
         "id": "micro-geo-region-culture", "domain": "地理",
         "concept": "区域自然环境与文化景观", "group": "区域认知",
-        "short": "美国低年级列区域常识，中国初中要求说明自然环境与地方文化景观的关系。",
-        "us_bands": [1, 2], "cn_bands": [4],
+        "short": "美国3-5年级列区域常识，中国初中要求说明自然环境与地方文化景观的关系。",
+        "us_bands": [2, 3], "cn_bands": [4],
         "us_evidence": ["n02038", "n03188"],
         "cn_evidence": ["ge-j1-con-525c5cc2"],
         "axes": [
             ["任务", "城市与气候带常识", "野外考察或资料说明自然与文化景观关系"],
             ["方法", "识记", "考察、资料分析、说明"],
-            ["起始年级", "1-3年级", "初中7-9年级"],
+            ["起始年级", "3-5年级", "初中7-9年级"],
         ],
         "emphasis": "中国方法要求更完整",
         "note": "同属区域认知，美国偏事实清单，中国把考察、资料与解释放在一起。",
@@ -2232,17 +2263,17 @@ DOMAIN_MICRO_CLAIMS: list[dict[str, Any]] = [
     {
         "id": "micro-lang-read-basic", "domain": "语言与读写",
         "concept": "朗读、理解与复述", "group": "阅读理解",
-        "short": "美国从听读各类文本到复述细节，中国把正确流利有感情朗读和默读写进同一条。",
+        "short": "美国此段以听读理解各类文本为主，中国把正确流利有感情朗读和默读写进同一条。",
         "us_bands": [1, 2], "cn_bands": [1, 2],
         "us_evidence": ["n00664"],
         "cn_evidence": ["ch-x1-sta-8aef276c", "ch-x2-sta-f3c0e535"],
         "axes": [
             ["输入方式", "听读虚构与非虚构文本", "朗读课文并学习默读"],
-            ["输出", "复述关键细节", "复述大意、体会词句作用"],
+            ["输出", "听读理解文本", "复述大意、体会词句作用"],
             ["情感要求", "未写明", "正确、流利、有感情"],
         ],
         "emphasis": "中国朗读要求更细",
-        "note": "美国从听读理解切入，中国把朗读方式、理解词句和情感表达合并为一条阶梯目标。",
+        "note": "美国此段以听读理解切入，中国把朗读方式、理解词句和情感表达合并为一条阶梯目标。",
     },
     {
         "id": "micro-lang-read-analysis", "domain": "语言与读写",
@@ -2262,12 +2293,12 @@ DOMAIN_MICRO_CLAIMS: list[dict[str, Any]] = [
     {
         "id": "micro-lang-writing", "domain": "语言与读写",
         "concept": "篇章写作、体裁与修改", "group": "写作与表达",
-        "short": "美国列多种体裁和结构分析，中国把记实想象作文、修改交流和每学年16次写进同一条。",
+        "short": "美国列叙事、议论文、说明文等体裁和结构分析，中国把记实想象作文、修改交流和每学年16次写进同一条。",
         "us_bands": [3, 4], "cn_bands": [3, 4],
         "us_evidence": ["n03039", "n05444"],
         "cn_evidence": ["ch-x3-sta-f2697454", "ch-x3-sta-cd4fdb06"],
         "axes": [
-            ["体裁", "报道、摘要、说明、研究论文等", "记实作文、想象作文、常见应用文"],
+            ["体裁", "叙事文、议论文、说明文等", "记实作文、想象作文、常见应用文"],
             ["结构", "分析段落与整体关系", "分段表述、根据表达需要"],
             ["量化要求", "无次数", "课内习作每学年16次左右"],
         ],
@@ -2568,6 +2599,165 @@ CONCEPT_AXES: dict[str, tuple[str, str]] = {
     "culture-diversity-early": ("本土部落与多元人群实景", "本民族与56个民族大家庭"),
     "culture-diversity-world": ("宅地法铁路移民解释变化", "国家信息、节日、文化标志物感知"),
 }
+
+# 家长视角的“差异”再提炼：只覆盖高价值条目，不做自动批量生成。
+DIFF_REFINEMENTS: dict[str, dict[str, str]] = {
+    "math-number-early": {
+        "axis": "跳数",
+        "us": "2年级明确数到1000，按5/10/100跳数",
+        "cn": "中国侧未作独立要求；相近为1-2年级认、读、写万以内数",
+        "reading": "两边都从学前数数起步；到2年级美国把跳数写成明确要求，中国侧未把按5/10/100跳数列为独立要求。",
+    },
+    "micro-math-count-cardinality": {
+        "axis": "任务形态",
+        "us": "4枚硬币→数到100；2年级按5/10/100跳数",
+        "cn": "5以内点数→万以内认读；未列跳数要求",
+        "reading": "同样叫数数，美国接上硬币和跳数，中国接上点数和数位认读；数量上限不能单独判难易。",
+    },
+    "micro-math-add-sub-10": {
+        "axis": "熟练口径",
+        "us": "K年级10以内解题，5以内熟练",
+        "cn": "大班理解意义，1-2年级20以内熟练口算",
+        "reading": "美国先要求会用在10以内情境，中国把熟练口径提到20以内并补上加减互逆。",
+    },
+    "micro-science-experiment-measure": {
+        "axis": "器材取数",
+        "us": "写设计与实施调查，未点名温度计等量具",
+        "cn": "明确温度计、量筒、电子秤取数",
+        "reading": "美国看会不会做调查，中国把用仪器拿数据写成可检查要求，家长更容易判断练习是否到位。",
+    },
+    "micro-science-cells-genetics": {
+        "axis": "解释层级",
+        "us": "4年级细胞、6年级染色体",
+        "cn": "同期以动植物观察、分类和自然笔记为主",
+        "reading": "同一段生命科学，美国更早讲机制，中国先铺现象与分类；不能简单说谁讲得多。",
+    },
+    "micro-lang-read-basic": {
+        "axis": "朗读",
+        "us": "此段以听读理解各类文本为主",
+        "cn": "正确、流利、有感情朗读并学默读",
+        "reading": "中国把朗读写成显性目标，美国此段更重听读理解，家里的练法会不同。",
+    },
+    "micro-lang-writing": {
+        "axis": "写法与频次",
+        "us": "叙事文、议论文、说明文与段落结构",
+        "cn": "记实/想象/应用文，每学年约16次习作并修改",
+        "reading": "美国偏体裁和结构分析，中国同时管写多少和修改流程，两个都是可观察的练习抓手。",
+    },
+    "micro-arts-visual": {
+        "axis": "范画",
+        "us": "K起认线条色彩、讨论名家作品",
+        "cn": "要求画自己想画的人或事，不宜提供范画",
+        "reading": "美国把名作当学习材料，中国明确不设范画；判断“像不像”之前先看各自定义的目标。",
+    },
+    "micro-motor-hop": {
+        "axis": "量化标准",
+        "us": "只列单脚跳形式，不写距离",
+        "cn": "小班2米、中班5米、大班8米",
+        "reading": "同样叫单脚跳，中国给了可测距离，美国只写动作形式；这直接影响家里怎么练。",
+    },
+}
+
+
+def apply_diff_refinements(rows: list[dict[str, Any]]) -> None:
+    """把人工提炼的家长视角差异写回原有“差异”行，不新增展示层。"""
+    for row in rows:
+        spec = DIFF_REFINEMENTS.get(row["id"])
+        if not spec:
+            continue
+        axes = row.setdefault("深度参数", [])
+        refined = ["差异：" + spec["axis"], spec["us"], spec["cn"]]
+        for idx, axis in enumerate(axes):
+            if axis and str(axis[0]).startswith("差异"):
+                axes[idx] = refined
+                break
+        else:
+            axes.append(refined)
+        if spec.get("reading"):
+            row["深度解读"] = spec["reading"]
+
+
+# Final wording corrections after the audit. Evidence-level fixes live in the
+# matchers/specs above; these patches only repair narrative fields whose old
+# wording no longer matches the corrected evidence.
+AUDIT_ROW_FIXES: dict[str, dict[str, Any]] = {
+    "geo-map-basic": {
+        "短结论": "美国小学阶段学习图例、方向和简单地图阅读，本套中国资料未收同粒度条目。",
+        "关系": "本数据中仅美国有",
+        "单侧原因": "本数据未收录对侧同粒度条目",
+        "深度解读": "美国1年级起把图例、四方向和读图写成技能；本套中国资料的3-4年级证据未落到图例方向，系统地图技能出现在后段。",
+    },
+    "geo-map-advanced": {
+        "关系": "两边都有，5-6年级到初中中国把比例尺做成技能链。",
+        "深度解读": "中国5-6年级到初中把比例尺、图例、经纬网做成技能链，美国5年级已用经纬度、坐标和投影读图。早期读图经验与后段系统化不是一回事。",
+    },
+    "science-earth-advanced": {
+        "短结论": "初中阶段中国用板块构造解释火山地震，美国此组证据偏资源与日月食。",
+        "深度解读": "中国7-9年级把自转公转模型与板块构造解释并列写出；美国同段这组证据主要讲自然资源和日月食，概念覆盖不同，不宜直接判深浅。",
+    },
+    "science-matter-properties": {
+        "短结论": "中国3-4年级先做性质观察，美国5年级系统讲性质与守恒。",
+    },
+    "science-evolution": {
+        "关系": "两边都有，阶段接近，证据侧重不同。",
+    },
+    "geo-population": {
+        "短结论": "小学5-6年级美国持续出现人口、移民和城市内容。",
+        "单侧原因": "本套资料未作独立要求",
+    },
+    "science-climate-data": {
+        "关系": "本数据中仅中国有",
+        "单侧原因": "本套资料未作独立要求",
+    },
+    "geo-direction-early": {
+        "关系": "中国小班用方位词起步，美国大班直接做大洲定位。",
+    },
+    "geo-continents-basic": {
+        "单侧原因": "本数据未收录对侧对应概念",
+        "重评说明": "本数据未收录对侧对应概念；仅指本套资料中只在该侧找到对应概念，不代表另一侧绝对缺失。",
+    },
+}
+
+# 这些单侧行的另一侧有相关内容，只是本套资料未单列同类条目；不能再写成
+# “另一侧没有形成对应簇”。
+for _soft_id in (
+    "one-us-ela-poetry", "one-us-ela-speaking", "one-us-ela-grammar",
+    "one-cn-chinese-grammar", "one-us-math-sorting", "one-us-math-ratios",
+    "one-us-math-functions", "one-us-culture-religions", "one-cn-math-estimate",
+    "one-us-science-collisions", "one-cn-chem-resources",
+):
+    AUDIT_ROW_FIXES[_soft_id] = {
+        "单侧原因": "另一侧有相关内容，本条按本侧独立成条口径列出",
+        "重评说明": "另一侧有相关内容但已归入其他簇；仅指本套资料的条目组织方式，不代表另一侧绝对缺失。",
+    }
+
+
+def apply_audit_row_fixes(rows: list[dict[str, Any]]) -> None:
+    for row in rows:
+        if row.get("类型") == "单侧概念簇":
+            for key in ("短结论", "深度解读", "重评关系", "重评说明", "说明"):
+                value = row.get(key)
+                if isinstance(value, str):
+                    row[key] = (
+                        value.replace("中国侧未在本数据中形成对应簇", "另一侧未在本数据中单列同类条目")
+                        .replace("美国侧未在本数据中形成对应簇", "另一侧未在本数据中单列同类条目")
+                    )
+            for key, value in row.get("深度对标", {}).items():
+                if isinstance(value, str):
+                    row["深度对标"][key] = (
+                        value.replace("中国侧未在本数据中形成对应簇", "另一侧未在本数据中单列同类条目")
+                        .replace("美国侧未在本数据中形成对应簇", "另一侧未在本数据中单列同类条目")
+                    )
+        fixes = AUDIT_ROW_FIXES.get(row["id"])
+        if not fixes:
+            continue
+        for key, value in fixes.items():
+            if key == "深度对标" and isinstance(value, dict):
+                row.setdefault(key, {}).update(value)
+            elif isinstance(value, str):
+                row[key] = normalize_stage_text(value)
+            else:
+                row[key] = value
 
 
 def short_stage_label(value: str) -> str:
@@ -3073,6 +3263,14 @@ def expand_clusters() -> list[dict[str, Any]]:
                 item["cn"]["preschool_regex"] = spec["cn_preschool_regex"]
             if spec.get("cn_preschool_core_regex"):
                 item["cn"]["preschool_core_regex"] = spec["cn_preschool_core_regex"]
+            if spec.get("us_exclude_ids"):
+                item["us"]["exclude_ids"] = set(spec["us_exclude_ids"])
+            if spec.get("cn_exclude_ids"):
+                item["cn"]["exclude_ids"] = set(spec["cn_exclude_ids"])
+            if spec.get("us_core_regex"):
+                item["us"]["core_regex"] = spec["us_core_regex"]
+            if spec.get("cn_core_regex"):
+                item["cn"]["core_regex"] = spec["cn_core_regex"]
             if spec.get("us_topic_regex"):
                 item["us"]["topic_regex"] = spec["us_topic_regex"]
             expanded.append(item)
@@ -3114,10 +3312,8 @@ BAND_LABELS = ["学前", "1-2年级", "3-4年级", "5-6年级", "7-9年级"]
 
 
 def micro_evidence(item: dict[str, Any], side: str) -> dict[str, Any]:
-    """微指标证据沿用统一字段，但保留更长的原文，便于逐条核对。"""
-    result = evidence(item, side)
-    result["文本"] = clean_text(item["text"], 320)
-    return result
+    """微指标证据沿用统一字段，保留完整原文，避免截断造成前后不完整。"""
+    return evidence(item, side)
 
 
 def micro_distribution(
@@ -3139,8 +3335,9 @@ def micro_distribution(
 ONE_SIDED_SPECS: list[dict[str, Any]] = [
     {
         "id": "one-us-ela-poetry", "side": "美国", "domain": "语言与读写", "group": "文学与诗歌",
-        "concept": "诗歌体裁与赏析", "short": "本套美国资料把诗歌单列为跨年级阅读线索，中国侧未在本数据中形成对应簇。",
-        "subjects": ["English Language Arts"], "topic_regex": "Poetry", "text_regex": ".*",
+        "concept": "诗歌体裁与赏析", "short": "本套美国资料把诗歌单列为跨年级阅读线索，另一侧有相关内容但未单列同类条目。",
+        "subjects": ["English Language Arts"], "topic_regex": "Poetry", "text_regex": "poem|poetry|rhyme|verse|haiku|sonnet", "text_only": True,
+        "exclude_ids": ["n00260", "n00261", "n00262"],
     },
     {
         "id": "one-us-ela-punctuation", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
@@ -3159,7 +3356,7 @@ ONE_SIDED_SPECS: list[dict[str, Any]] = [
     },
     {
         "id": "one-us-ela-grammar", "side": "美国", "domain": "语言与读写", "group": "写作与表达",
-        "concept": "语法知识", "short": "本套美国资料把语法项目单列为年级目标，中国侧未在本数据中形成对应簇。",
+        "concept": "语法知识", "short": "本套美国资料把语法项目单列为年级目标，另一侧有相关内容但未单列同类条目。",
         "subjects": ["English Language Arts"], "topic_regex": "Grammar", "text_regex": ".*",
     },
     {
@@ -3313,7 +3510,7 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     # 美国：数学
     {
         "id": "one-us-math-sorting", "side": "美国", "domain": "数学", "group": "数与运算",
-        "concept": "分类、配对与规律", "short": "本套美国资料把分类、配对与规律列为学前数学推理目标，中国侧未在本数据中形成对应簇。",
+        "concept": "分类、配对与规律", "short": "本套美国资料把分类、配对与规律列为学前数学推理目标，另一侧有相关内容但未单列同类条目。",
         "subjects": ["Mathematics"], "topic_regex": "Mathematical Reasoning and Number Sense", "text_regex": "I-MR1|I-MR2",
     },
     {
@@ -3333,12 +3530,12 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     {
         "id": "one-us-math-ratios", "side": "美国", "domain": "数学", "group": "数与运算",
-        "concept": "比与比例关系", "short": "本套美国资料单列比与比例关系，中国侧未在本数据中形成对应簇。",
+        "concept": "比与比例关系", "short": "本套美国资料单列比与比例关系，另一侧有相关内容但未单列同类条目。",
         "subjects": ["Mathematics"], "topic_regex": "Ratios and Proportional Relationships", "text_regex": ".*",
     },
     {
         "id": "one-us-math-functions", "side": "美国", "domain": "数学", "group": "代数",
-        "concept": "函数初步", "short": "本套美国资料把函数作为初中独立主题，中国侧未在本数据中形成对应簇。",
+        "concept": "函数初步", "short": "本套美国资料把函数作为初中独立主题，另一侧有相关内容但未单列同类条目。",
         "subjects": ["Mathematics"], "topic_regex": "Functions", "text_regex": ".*",
     },
     # 美国：科学
@@ -3364,7 +3561,7 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     {
         "id": "one-us-science-collisions", "side": "美国", "domain": "科学", "group": "运动与能量",
-        "concept": "碰撞与运动", "short": "本套美国资料把碰撞作为独立物理主题，中国侧未在本数据中形成对应簇。",
+        "concept": "碰撞中的能量转移", "short": "本套美国资料在碰撞主题下列能量转移，另一侧有相关内容但未单列同类条目。",
         "subjects": ["Science"], "topic_regex": "Collisions", "text_regex": ".*",
     },
     {
@@ -3395,8 +3592,9 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     {
         "id": "one-us-ela-speaking", "side": "美国", "domain": "语言与读写", "group": "听说与口语",
-        "concept": "课堂听说与讨论", "short": "本套美国资料把听说与课堂讨论按年级列出，中国侧未在本数据中形成对应簇。",
-        "subjects": ["English Language Arts"], "topic_regex": "Listening and Speaking", "text_regex": ".*",
+        "concept": "课堂听说与讨论", "short": "本套美国资料把听说与课堂讨论按年级列出，另一侧有相关内容但未单列同类条目。",
+        "subjects": ["English Language Arts"], "topic_regex": "Listening and Speaking", "text_regex": "discussion|discuss|oral presentation|speech|conversation|dialogue|ask questions|respond to questions", "text_only": True,
+        "exclude_ids": ["n00234", "n00235", "n00236"],
     },
     {
         "id": "one-us-ela-fiction", "side": "美国", "domain": "语言与读写", "group": "文学与诗歌",
@@ -3405,7 +3603,7 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     {
         "id": "one-us-culture-religions", "side": "美国", "domain": "文化", "group": "多元理解",
-        "concept": "世界宗教与多元理解", "short": "本套美国资料单列世界宗教史，中国侧未在本数据中形成对应簇。",
+        "concept": "世界宗教与多元理解", "short": "本套美国资料单列世界宗教史，另一侧有相关内容但未单列同类条目。",
         "subjects": ["History and Geography"], "topic_regex": "History of World Religions", "text_regex": ".*",
     },
     {
@@ -3471,7 +3669,7 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     {
         "id": "one-cn-math-estimate", "side": "中国", "domain": "数学", "group": "数与运算",
-        "concept": "估算方法", "short": "本套中国资料把估算作为独立要求，美国侧未在本数据中形成对应簇。",
+        "concept": "估算方法", "short": "本套中国资料把估算作为独立要求，另一侧有相关内容但未单列同类条目。",
         "subjects": ["数学"], "text_regex": "估算",
     },
     {
@@ -3507,8 +3705,8 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     {
         "id": "one-cn-chem-resources", "side": "中国", "domain": "科学", "group": "物质与化学",
-        "concept": "化学与资源环境健康", "short": "本套中国资料单列化学与资源、能源、材料、环境、健康的联系，美国侧未在本数据中形成对应簇。",
-        "subjects": ["化学"], "text_regex": "化学与资源、能源、材料、环境、健康",
+        "concept": "化学与资源环境健康", "short": "本套中国资料单列化学与资源、环境、健康、材料的联系，另一侧有相关内容但未单列同类条目。",
+        "subjects": ["化学"], "text_regex": "资源综合利用|保护环境|维护人体健康|常见的能源和资源", "exclude_ids": ["ch-j1-con-a0181ce0"],
     },
     # 中国：地理
     {
@@ -3538,19 +3736,19 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
     },
     # 中国：语言 / 文化 / 儿童发展 / 艺术
     {
-        "id": "one-cn-english-strategies", "side": "中国", "domain": "语言与读写", "group": "听说与口语",
+        "id": "one-cn-english-strategies", "side": "中国", "domain": "语言与读写", "group": "英语学习策略",
         "concept": "英语学习策略", "short": "本套中国资料把英语学习策略单列为内容要求，美国侧未在本数据中形成对应簇。",
         "subjects": ["英语"], "text_regex": "学习策略内容要求",
     },
     {
-        "id": "one-cn-english-themes", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
+        "id": "one-cn-english-themes", "side": "中国", "domain": "语言与读写", "group": "英语主题内容",
         "concept": "英语主题内容要求", "short": "本套中国资料按主题组织英语内容要求，美国侧未在本数据中形成对应簇。",
         "subjects": ["英语"], "text_regex": "主题内容要求",
     },
     {
         "id": "one-cn-chinese-grammar", "side": "中国", "domain": "语言与读写", "group": "写作与表达",
-        "concept": "语法修辞知识", "short": "本套中国资料单列语法修辞知识说明，美国侧未在本数据中形成对应簇。",
-        "subjects": ["语文"], "text_regex": "语法修辞知识",
+        "concept": "语法修辞知识", "short": "本套中国资料单列语法修辞知识说明，另一侧有相关内容但未单列同类条目。",
+        "subjects": ["语文"], "text_regex": "随文学习基本的词汇、语法知识|语法知识",
     },
     {
         "id": "one-cn-chinese-extra-reading", "side": "中国", "domain": "语言与读写", "group": "阅读理解",
@@ -3598,12 +3796,12 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
         "subjects": ["体育与健康"], "text_regex": "移动性技能|非移动性技能|操控性技能",
     },
     {
-        "id": "one-cn-art-feel", "side": "中国", "domain": "艺术", "group": "音乐与律动",
+        "id": "one-cn-art-feel", "side": "中国", "domain": "艺术", "group": "艺术感知与欣赏",
         "concept": "幼儿感受与欣赏", "short": "本套中国资料把感受与欣赏列为学前艺术子领域，美国侧未在本数据中形成对应簇。",
         "subjects": ["艺术"], "text_regex": "感受与欣赏|自然界",
     },
     {
-        "id": "one-cn-art-create", "side": "中国", "domain": "艺术", "group": "美术与创造",
+        "id": "one-cn-art-create", "side": "中国", "domain": "艺术", "group": "艺术表现与创造",
         "concept": "幼儿表现与创造", "short": "本套中国资料把表现与创造列为学前艺术子领域，美国侧未在本数据中形成对应簇。",
         "subjects": ["艺术"], "text_regex": "表现与创造|涂涂画画|自哼自唱",
     },
@@ -3613,7 +3811,7 @@ ONE_SIDED_EXTRA: list[dict[str, Any]] = [
         "subjects": ["艺术"], "text_regex": "content",
     },
     {
-        "id": "one-cn-art-academic", "side": "中国", "domain": "艺术", "group": "音乐与律动",
+        "id": "one-cn-art-academic", "side": "中国", "domain": "艺术", "group": "艺术综合",
         "concept": "艺术学业质量标准", "short": "本套中国资料单列艺术学业质量标准，美国侧未在本数据中形成对应簇。",
         "subjects": ["艺术"], "text_regex": "academic",
     },
@@ -3644,8 +3842,17 @@ def build_micro_rows(
             )
         us_evs = [us_index[uid] for uid in spec["us_evidence"]]
         cn_evs = [cn_index[uid] for uid in spec["cn_evidence"]]
-        us_labels = [BAND_LABELS[band] for band in spec["us_bands"]]
-        cn_labels = [BAND_LABELS[band] for band in spec["cn_bands"]]
+        # 展示轨道只记录证据实际命中的学段，不渲染空心/零命中点。
+        us_bands = [
+            band for band in spec["us_bands"]
+            if any(us_band(item) == band for item in us_evs)
+        ]
+        cn_bands = [
+            band for band in spec["cn_bands"]
+            if any(cn_band(item) == band for item in cn_evs)
+        ]
+        us_labels = [BAND_LABELS[band] for band in us_bands]
+        cn_labels = [BAND_LABELS[band] for band in cn_bands]
 
         if not us_evs:
             relation = "本数据中仅中国有"
@@ -3676,7 +3883,7 @@ def build_micro_rows(
                 "命中条目数": len(us_evs),
                 "涉及学科": sorted({item["subject"] for item in us_evs}),
                 "最早证据": [micro_evidence(item, "美国") for item in us_evs],
-                "学段分布": micro_distribution(us_evs, "美国", spec["us_bands"]),
+                "学段分布": micro_distribution(us_evs, "美国", us_bands),
                 "后续学段": "不适用（微指标逐条列出）",
                 "后续命中数": 0,
                 "后续代表证据": None,
@@ -3689,16 +3896,16 @@ def build_micro_rows(
                 "暂存条目数": 0,
                 "涉及学科": sorted({item["subject"] for item in cn_evs}),
                 "最早证据": [micro_evidence(item, "中国") for item in cn_evs],
-                "学段分布": micro_distribution(cn_evs, "中国", spec["cn_bands"]),
+                "学段分布": micro_distribution(cn_evs, "中国", cn_bands),
                 "后续学段": "不适用（微指标逐条列出）",
                 "后续命中数": 0,
                 "后续代表证据": None,
             },
             "学段覆盖": {
-                "美国学段数": len(spec["us_bands"]),
-                "中国学段数": len(spec["cn_bands"]),
-                "口径": "微指标按人工指定的展示学段记录，证据按来源条目 ID 核对。",
-                "对比": f"美国 {len(spec['us_bands'])} 个展示学段 / 中国 {len(spec['cn_bands'])} 个展示学段",
+                "美国学段数": len(us_bands),
+                "中国学段数": len(cn_bands),
+                "口径": "微指标展示学段由证据实际命中数反推，证据按来源条目 ID 核对。",
+                "对比": f"美国 {len(us_bands)} 个展示学段 / 中国 {len(cn_bands)} 个展示学段",
             },
             "关系": relation,
             "侧重": normalize_stage_text(spec["emphasis"]),
@@ -3735,6 +3942,8 @@ def build_one_sided_rows(
             "subjects": spec["subjects"],
             "topic_regex": spec.get("topic_regex", ""),
             "text_regex": spec.get("text_regex", ".*"),
+            "text_only": spec.get("text_only", False),
+            "exclude_ids": set(spec.get("exclude_ids", ())),
         }
         matcher = us_matches if side == "美国" else cn_matches
         pool = us_items if side == "美国" else cn_items
@@ -3845,10 +4054,20 @@ def build() -> None:
         cn_hits = [i for i in cn_items if cn_matches(i, cluster["cn"])]
         all_hit_ids.update(item["id"] for item in us_hits if item.get("id"))
         all_hit_ids.update(item["id"] for item in cn_hits if item.get("id"))
-        us_hits.sort(key=us_sort_key)
-        core_text = cluster["cn"].get("preschool_core_regex")
+        us_core_text = cluster["us"].get("core_regex")
+        if us_core_text:
+            us_core = re.compile(us_core_text, re.I)
+            us_hits.sort(
+                key=lambda i: (
+                    us_sort_key(i),
+                    0 if us_core.search(str(i.get("text", ""))) else 1,
+                )
+            )
+        else:
+            us_hits.sort(key=us_sort_key)
+        core_text = cluster["cn"].get("core_regex") or cluster["cn"].get("preschool_core_regex")
         if core_text:
-            core_pattern = re.compile(core_text)
+            core_pattern = re.compile(core_text, re.I)
             cn_hits.sort(
                 key=lambda i: (
                     cn_sort_key(i),
@@ -3965,9 +4184,12 @@ def build() -> None:
             row["可比性"] = "可比"
             row["单侧原因"] = ""
 
+    apply_diff_refinements(rows)
+    apply_audit_row_fixes(rows)
+
     dataset = {
-        "版本": "one-sided-v7",
-        "用途": f"中美课程标准对照底稿：81个原有概念簇 + 44条微指标 + {len(ONE_SIDED_SPECS)}条单侧概念簇。页面可按可比项/仅中国/仅美国/全部筛选。",
+        "版本": "audit-fixed-v9",
+        "用途": f"中美课程标准对照底稿：81个原有概念簇 + 44条微指标 + {len(ONE_SIDED_SPECS)}条单侧概念簇；其中高价值条目的差异行已按家长视角人工提炼。页面可按可比项/仅中国/仅美国/全部筛选。",
         "年级对应": {
             "美国幼儿园前班": "中国幼儿园小班、中班",
             "美国K": "中国幼儿园大班",

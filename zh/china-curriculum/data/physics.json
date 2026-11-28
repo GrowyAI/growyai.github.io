@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [

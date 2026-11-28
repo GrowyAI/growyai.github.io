@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -84,21 +84,6 @@
       "text": "学习策略是“学习能力”形成的重要支撑，贯穿于主题、语篇、文化理解、语言知识和语言技能等日语课程内容学习的全过程。",
       "source_page": 7,
       "source_pdf_page": 14,
-      "source_id": "moe-cn-2022-japanese"
-    },
-    {
-      "uid": "ja-j1-con-7d6bcd50",
-      "seq": 8,
-      "subject": "日语",
-      "subject_key": "japanese",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "日语课程内容六要素的相互关系如图1所示。语篇文化理解语言知识语言技能图1",
-      "source_page": 8,
-      "source_pdf_page": 15,
       "source_id": "moe-cn-2022-japanese"
     },
     {

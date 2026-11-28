@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -96,7 +96,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "合理制订学习和作息",
+      "text": "合理制订学习和作息计划，生活有规律。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-politics"
@@ -156,7 +156,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "乐于探究，在学习与",
+      "text": "乐于探究，在学习与生活中遇到问题时能够想办法解决，提高动脑动手能力。",
       "source_page": 18,
       "source_pdf_page": 25,
       "source_id": "moe-cn-2022-politics"
@@ -207,21 +207,6 @@
       "source_id": "moe-cn-2022-politics"
     },
     {
-      "uid": "po-x1-con-0beb7c0b",
-      "seq": 28,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学低段（1-2年级）",
-      "stage_key": "x1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "根据故事情境，进行角色扮演，认识到懂得求助，懂得感恩，人与人需要互相帮助，帮助别人也会让乐于助人。自己快乐。道德教育",
-      "source_page": 19,
-      "source_pdf_page": 26,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
       "uid": "po-x1-con-21ea23ba",
       "seq": 30,
       "subject": "道德与法治",
@@ -246,22 +231,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "了解家乡的风景名胜",
-      "source_page": 19,
-      "source_pdf_page": 26,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-x1-con-0baf204e",
-      "seq": 36,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学低段（1-2年级）",
-      "stage_key": "x1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "观察道路交通标志，熟悉并识记常见的掌握报警的基本常识。交通标志，识别交通信号灯。模拟生活中遐到的紧急或危险情况，掌握报警的方式、方法和基本要求。生命安全",
+      "text": "了解家乡的风景名胜和主要物产，关注家乡的发展变化。",
       "source_page": 19,
       "source_pdf_page": 26,
       "source_id": "moe-cn-2022-politics"
@@ -276,7 +246,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "能够识别公共环境中",
+      "text": "能够识别公共环境中的安全标识，安全有序使用和爱护公共设施。",
       "source_page": 19,
       "source_pdf_page": 26,
       "source_id": "moe-cn-2022-politics"
@@ -336,7 +306,7 @@
       "domain": "课程内容",
       "topic": "content",
       "type": "content",
-      "text": "知道学校生活有规则，",
+      "text": "知道学校生活有规则，树立规则意识。",
       "source_page": 20,
       "source_pdf_page": 27,
       "source_id": "moe-cn-2022-politics"
@@ -382,21 +352,6 @@
       "topic": "content",
       "type": "content",
       "text": "讲述中华民族勤俭节约的故事，感受粮约的传统美德，养成食等资源的来之不易，参与“光盘行不浪费的习惯。动”，懂得节约的重要性。",
-      "source_page": 20,
-      "source_pdf_page": 27,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-x1-con-b8bdb5ab",
-      "seq": 55,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学低段（1-2年级）",
-      "stage_key": "x1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "尊敬父母长辈，体贴，手绘家庭树，分享亲情故事，在参与家中华优秀家人，承担力所能及务劳动中感受家的温暖。传统文化的家务劳动。与革命传",
       "source_page": 20,
       "source_pdf_page": 27,
       "source_id": "moe-cn-2022-politics"
@@ -822,21 +777,6 @@
       "source_id": "moe-cn-2022-politics"
     },
     {
-      "uid": "po-x2-con-4259a05e",
-      "seq": 113,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "向长辈了解家庭的历史，如祖辈来道弘扬优秀家风的意义，自什么地方、家庭住址等；收集我中华优秀初步体会中国人的家庭国古往今来优秀家风的故事。传统文化观念。与革命传",
-      "source_page": 25,
-      "source_pdf_page": 32,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
       "uid": "po-x2-con-23141f5b",
       "seq": 114,
       "subject": "道德与法治",
@@ -877,21 +817,6 @@
       "topic": "content",
       "type": "content",
       "text": "知道中华优秀传统文化的",
-      "source_page": 26,
-      "source_pdf_page": 33,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-x2-con-24128302",
-      "seq": 119,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "列举我国古代具有代表性的科技成主要代表性成果，初步感果、文艺作品等，感受中华文化源受中华优秀传统文化的远流长、博大精深，萌发民族自豪魅力。感，树立文化自信。中华优秀",
       "source_page": 26,
       "source_pdf_page": 33,
       "source_id": "moe-cn-2022-politics"
@@ -1464,36 +1389,6 @@
       "text": "以“开天辟地大事变”为议题，观这是开天辟地的大事变，看建党题材的影视剧或专题片，例理解伟大建党精神的内举中国共产党人的精神谱系的主要涵，领悟伟大建党精神是内容，理解在党和人民伟大斗争中中国共产党的精神之源。孕育的社会主义先进文化和革命文化，积淀着中华民族最深层的精神追求，代表着中华民族独特的精神标识，坚定“四个自信”，讨论新时代青少年应该如何弘扬光荣传统、续红色基因。",
       "source_page": 39,
       "source_pdf_page": 46,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-j1-con-dc645e76",
-      "seq": 246,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "以“不忘初心，牢记使命”为议题，浴血奋战、百折不揽，创从党史展览中的某件展品说起，回造了新民主主义革命的伟顾中国共产党百年来艰苦卓绝的奋革命传统大成就，实现了从几千年斗历程，体会“幸福都是奋斗出教育封建专制政治向人民民主来的”。的伟大飞跃，理解中国人民从此站起来了，中国发展从此开启了新纪元。，了解中国共产党领导人民",
-      "source_page": 39,
-      "source_pdf_page": 46,
-      "source_id": "moe-cn-2022-politics"
-    },
-    {
-      "uid": "po-j1-con-8aaae94d",
-      "seq": 249,
-      "subject": "道德与法治",
-      "subject_key": "politics",
-      "stage": "初中（7-9年级）",
-      "stage_key": "j1",
-      "domain": "课程内容",
-      "topic": "content",
-      "type": "content",
-      "text": "以“改革开放铸就伟大改革开放精解放思想、锐意进取，创神”为议题，举办主题班会或展览，造了改革开放和社会主义了解中国特色社会主义道路的开辟现代化建设的伟大成就，过程，举例说明伟大改革开放精神实现了人民生活从温饱不的作用。足到总体小康、奔向全面小康的历史性跨越，推进了中华民族从站起来到富起来的伟大飞跃，理解中国特色社会主义道路是指引中国发展繁荣的正确道路。革命传统",
-      "source_page": 40,
-      "source_pdf_page": 47,
       "source_id": "moe-cn-2022-politics"
     },
     {

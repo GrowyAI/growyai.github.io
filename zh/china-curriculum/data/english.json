@@ -36,8 +36,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "保留含数字、可观察动作与具体对象的条目；剔除概念定义、教学口吻、笼统目标表述与 OCR 表格碎片。",
-      "kept": 1915,
-      "excluded": 2460
+      "kept": 1893,
+      "excluded": 2481
     }
   },
   "items": [
@@ -927,21 +927,6 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-x2-con-b617bdb8",
-      "seq": 201,
-      "subject": "英语",
-      "subject_key": "english",
-      "stage": "小学中段（3-4年级）",
-      "stage_key": "x2",
-      "domain": "语言技能",
-      "topic": "语言技能内容要求（一级、一级+）",
-      "type": "content",
-      "text": "简单介绍自己的学校和学校生活，如学校设施、课程、活动，以及同学、老师等；语言技能",
-      "source_page": 25,
-      "source_pdf_page": 32,
-      "source_id": "moe-cn-2022-english"
-    },
-    {
       "uid": "en-x2-con-711f5cc9",
       "seq": 205,
       "subject": "英语",
@@ -1077,7 +1062,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-x3-con-6d342fa8",
+      "uid": "en-x3-con-203ea2ea",
       "seq": 218,
       "subject": "英语",
       "subject_key": "english",
@@ -1086,7 +1071,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（二级、二级+）",
       "type": "content",
-      "text": "课外阅读量累计达到4000～5000词。+阅读有配图的简单章节书，理解大意，对所读内容进行简单的口头概括与描述。语言技能",
+      "text": "课外阅读量累计达到4000～5000词。+阅读有配图的简单章节书，理解大意，对所读内容进行简单的口头概括与描述。",
       "source_page": 26,
       "source_pdf_page": 33,
       "source_id": "moe-cn-2022-english"
@@ -1272,7 +1257,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-j1-con-7ef5f264",
+      "uid": "en-j1-con-1d9f1413",
       "seq": 238,
       "subject": "英语",
       "subject_key": "english",
@@ -1281,7 +1266,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（三级一7年级）",
       "type": "content",
-      "text": "识别和判断书面语篇中句子之间的逻辑关系；语言技能",
+      "text": "识别和判断书面语篇中句子之间的逻辑关系；",
       "source_page": 27,
       "source_pdf_page": 34,
       "source_id": "moe-cn-2022-english"
@@ -1377,7 +1362,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-j1-con-349e88e2",
+      "uid": "en-j1-con-431357cc",
       "seq": 257,
       "subject": "英语",
       "subject_key": "english",
@@ -1386,7 +1371,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（三级—8年级）",
       "type": "content",
-      "text": "在收听或观看主题相关、语速较慢的广播、电视、网络节目时，识别主题，理解大意，获取主要信息；技能",
+      "text": "在收听或观看主题相关、语速较慢的广播、电视、网络节目时，识别主题，理解大意，获取主要信息；",
       "source_page": 28,
       "source_pdf_page": 35,
       "source_id": "moe-cn-2022-english"
@@ -1767,7 +1752,7 @@
       "source_id": "moe-cn-2022-english"
     },
     {
-      "uid": "en-j1-con-b9bcad2d",
+      "uid": "en-j1-con-258d15b0",
       "seq": 298,
       "subject": "英语",
       "subject_key": "english",
@@ -1776,7 +1761,7 @@
       "domain": "语言技能",
       "topic": "语言技能内容要求（三级一9年级、三级+）",
       "type": "content",
-      "text": "为所给图表或自己创作的图片写出简单的说明；语言技能",
+      "text": "为所给图表或自己创作的图片写出简单的说明；",
       "source_page": 30,
       "source_pdf_page": 37,
       "source_id": "moe-cn-2022-english"

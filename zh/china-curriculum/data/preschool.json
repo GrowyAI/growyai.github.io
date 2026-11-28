@@ -37,8 +37,8 @@
     "filter": {
       "version": "concrete-v1",
       "rule": "发展目标全部保留；教育建议带具体举例，或建议本身给出具体行动时展示。",
-      "kept": 420,
-      "excluded": 5
+      "kept": 408,
+      "excluded": 1
     }
   },
   "items": [
@@ -1380,7 +1380,11 @@
       "uid": "ps-h-a3-g1-s-02",
       "type": "suggestion",
       "text": "帮助幼儿养成良好的饮食习惯。如：",
-      "examples": []
+      "examples": [
+        "合理安排餐点，帮助幼儿养成定点、定时、定量进餐的习惯。",
+        "帮助幼儿了解食物的营养价值，引导他们不偏食不挑食、少吃或不吃不利于健康的食品；多喝白开水，少喝饮料。",
+        "吃饭时不过分催促，提醒幼儿细嚼慢咽，不要边吃边玩。"
+      ]
     },
     {
       "domain": "健康",
@@ -1391,8 +1395,12 @@
       "source_page": 9,
       "uid": "ps-h-a3-g1-s-03",
       "type": "suggestion",
-      "text": "合理安排餐点，帮助幼儿养成定点、定时、定量进餐的习惯。",
-      "examples": []
+      "text": "帮助幼儿养成良好的个人卫生习惯。如：",
+      "examples": [
+        "早晚刷牙、饭后漱口。",
+        "勤为幼儿洗澡、换衣服、剪指甲。",
+        "提醒幼儿保护五官，如不乱挖耳朵、鼻孔，看电视时保持3米左右的距离等。"
+      ]
     },
     {
       "domain": "健康",
@@ -1403,92 +1411,12 @@
       "source_page": 9,
       "uid": "ps-h-a3-g1-s-04",
       "type": "suggestion",
-      "text": "帮助幼儿了解食物的营养价值，引导他们不偏食不挑食、少吃或不吃不利于健康的食品；多喝白开水，少喝饮料。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-05",
-      "type": "suggestion",
-      "text": "吃饭时不过分催促，提醒幼儿细嚼慢咽，不要边吃边玩。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-07",
-      "type": "suggestion",
-      "text": "早晚刷牙、饭后漱口。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-08",
-      "type": "suggestion",
-      "text": "勤为幼儿洗澡、换衣服、剪指甲。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-09",
-      "type": "suggestion",
-      "text": "提醒幼儿保护五官，如不乱挖耳朵、鼻孔，看电视时保持3米左右的距离等。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-11",
-      "type": "suggestion",
-      "text": "为幼儿准备多种体育活动材料，鼓励他选择自己喜欢的材料开展活动。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-12",
-      "type": "suggestion",
-      "text": "经常和幼儿一起在户外运动和游戏，鼓励幼儿和同伴一起开展体育活动。",
-      "examples": []
-    },
-    {
-      "domain": "健康",
-      "aspect": "生活习惯与生活能力",
-      "goal_no": 1,
-      "goal": "具有良好的生活与卫生习惯",
-      "source_id": "moe-preschool-2012",
-      "source_page": 9,
-      "uid": "ps-h-a3-g1-s-13",
-      "type": "suggestion",
-      "text": "和幼儿一起观看体育比赛或有关体育赛事的电视节目，培养他对体育活动的兴趣。",
-      "examples": []
+      "text": "激发幼儿参加体育活动的兴趣，养成锻炼的习惯。如：",
+      "examples": [
+        "为幼儿准备多种体育活动材料，鼓励他选择自己喜欢的材料开展活动。",
+        "经常和幼儿一起在户外运动和游戏，鼓励幼儿和同伴一起开展体育活动。",
+        "和幼儿一起观看体育比赛或有关体育赛事的电视节目，培养他对体育活动的兴趣。"
+      ]
     },
     {
       "domain": "健康",
@@ -1935,70 +1863,29 @@
       "goal": "认真听并能听懂常用语言",
       "source_id": "moe-preschool-2012",
       "source_page": 14,
+      "uid": "ps-l-a1-g1-s-02",
+      "type": "suggestion",
+      "text": "引导幼儿学会认真倾听。如：",
+      "examples": [
+        "成人要耐心倾听别人（包括幼儿）的讲话，等别人讲完再表达自己的观点。",
+        "与幼儿交谈时，要用幼儿能听得懂的语言。",
+        "对幼儿提要求和布置任务时要求他注意听，鼓励他主动提问。"
+      ]
+    },
+    {
+      "domain": "语言",
+      "aspect": "倾听与表达",
+      "goal_no": 1,
+      "goal": "认真听并能听懂常用语言",
+      "source_id": "moe-preschool-2012",
+      "source_page": 14,
       "uid": "ps-l-a1-g1-s-03",
       "type": "suggestion",
-      "text": "成人要耐心倾听别人（包括幼儿）的讲话，等别人讲完再表达自己的观点。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-04",
-      "type": "suggestion",
-      "text": "与幼儿交谈时，要用幼儿能听得懂的语言。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-05",
-      "type": "suggestion",
-      "text": "对幼儿提要求和布置任务时要求他注意听，鼓励他主动提问。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-06",
-      "type": "suggestion",
       "text": "对幼儿讲话时，注意结合情境使用丰富的语言，以便于幼儿理解。如：",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-07",
-      "type": "suggestion",
-      "text": "说话时注意语气、语调，让幼儿感受语气、语调的作用。如对幼儿的不合理要求以比较坚定的语气表示不同意；讲故事时，尽量把故事人物高兴、悲伤的心情用不同的语气、语调表现出来。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "倾听与表达",
-      "goal_no": 1,
-      "goal": "认真听并能听懂常用语言",
-      "source_id": "moe-preschool-2012",
-      "source_page": 14,
-      "uid": "ps-l-a1-g1-s-08",
-      "type": "suggestion",
-      "text": "根据幼儿的理解水平有意识地使用一些反映因果、假设、条件等关系的句子。",
-      "examples": []
+      "examples": [
+        "说话时注意语气、语调，让幼儿感受语气、语调的作用。如对幼儿的不合理要求以比较坚定的语气表示不同意；讲故事时，尽量把故事人物高兴、悲伤的心情用不同的语气、语调表现出来。",
+        "根据幼儿的理解水平有意识地使用一些反映因果、假设、条件等关系的句子。"
+      ]
     },
     {
       "domain": "语言",
@@ -2779,7 +2666,11 @@
       "uid": "ps-l-a2-g3-s-01",
       "type": "suggestion",
       "text": "让幼儿在写写画画的过程中体验文字符号的功能，培养书写兴趣。如：",
-      "examples": []
+      "examples": [
+        "准备供幼儿随时取放的纸、笔等材料，也可利用沙地、树枝等自然材料，满足幼儿自由涂画的需要。",
+        "鼓励幼儿将自己感兴趣的事情或故事画下来并讲给别人听，让幼儿体会写写画画的方式可以表达自己的想法和情感。",
+        "把幼儿讲过的事情用文字记录下来，并念给他听，使幼儿知道说的话可以用文字记录下来，从中体会文字的用途。"
+      ]
     },
     {
       "domain": "语言",
@@ -2790,80 +2681,12 @@
       "source_page": 18,
       "uid": "ps-l-a2-g3-s-02",
       "type": "suggestion",
-      "text": "准备供幼儿随时取放的纸、笔等材料，也可利用沙地、树枝等自然材料，满足幼儿自由涂画的需要。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "阅读与书写准备",
-      "goal_no": 3,
-      "goal": "具有书面表达的愿望和初步技能",
-      "source_id": "moe-preschool-2012",
-      "source_page": 18,
-      "uid": "ps-l-a2-g3-s-03",
-      "type": "suggestion",
-      "text": "鼓励幼儿将自己感兴趣的事情或故事画下来并讲给别人听，让幼儿体会写写画画的方式可以表达自己的想法和情感。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "阅读与书写准备",
-      "goal_no": 3,
-      "goal": "具有书面表达的愿望和初步技能",
-      "source_id": "moe-preschool-2012",
-      "source_page": 18,
-      "uid": "ps-l-a2-g3-s-04",
-      "type": "suggestion",
-      "text": "把幼儿讲过的事情用文字记录下来，并念给他听，使幼儿知道说的话可以用文字记录下来，从中体会文字的用途。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "阅读与书写准备",
-      "goal_no": 3,
-      "goal": "具有书面表达的愿望和初步技能",
-      "source_id": "moe-preschool-2012",
-      "source_page": 18,
-      "uid": "ps-l-a2-g3-s-05",
-      "type": "suggestion",
       "text": "在绘画和游戏中做必要的书写准备，如：",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "阅读与书写准备",
-      "goal_no": 3,
-      "goal": "具有书面表达的愿望和初步技能",
-      "source_id": "moe-preschool-2012",
-      "source_page": 18,
-      "uid": "ps-l-a2-g3-s-06",
-      "type": "suggestion",
-      "text": "通过把虚线画出的图形轮廓连成实线等游戏，促进手眼协调，同时帮助幼儿学习由上至下、由左至右的运笔技能。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "阅读与书写准备",
-      "goal_no": 3,
-      "goal": "具有书面表达的愿望和初步技能",
-      "source_id": "moe-preschool-2012",
-      "source_page": 18,
-      "uid": "ps-l-a2-g3-s-07",
-      "type": "suggestion",
-      "text": "鼓励幼儿学习书写自己的名字。",
-      "examples": []
-    },
-    {
-      "domain": "语言",
-      "aspect": "阅读与书写准备",
-      "goal_no": 3,
-      "goal": "具有书面表达的愿望和初步技能",
-      "source_id": "moe-preschool-2012",
-      "source_page": 18,
-      "uid": "ps-l-a2-g3-s-08",
-      "type": "suggestion",
-      "text": "提醒幼儿写画时保持正确姿势。",
-      "examples": []
+      "examples": [
+        "通过把虚线画出的图形轮廓连成实线等游戏，促进手眼协调，同时帮助幼儿学习由上至下、由左至右的运笔技能。",
+        "鼓励幼儿学习书写自己的名字。",
+        "提醒幼儿写画时保持正确姿势。"
+      ]
     },
     {
       "domain": "社会",
@@ -3538,6 +3361,22 @@
       "source_page": 22,
       "uid": "ps-s-a1-g4-s-01",
       "type": "suggestion",
+      "text": "成人以身作则，以尊重、关心的态度对待自己的父母、长辈和其他人。如：",
+      "examples": [
+        "经常问候父母，主动做家务。",
+        "礼貌地对待老年人，如坐车时主动为老人让座。",
+        "看到别人有困难能主动关心并给予一定的帮助。"
+      ]
+    },
+    {
+      "domain": "社会",
+      "aspect": "人际交往",
+      "goal_no": 4,
+      "goal": "关心尊重他人",
+      "source_id": "moe-preschool-2012",
+      "source_page": 22,
+      "uid": "ps-s-a1-g4-s-02",
+      "type": "suggestion",
       "text": "引导幼儿尊重、关心长辈和身边的人，尊重他人劳动及成果。如：",
       "examples": [
         "提醒幼儿关心身边的人，如妈妈累了，知道让她安静休息一会儿。",
@@ -3553,7 +3392,7 @@
       "goal": "关心尊重他人",
       "source_id": "moe-preschool-2012",
       "source_page": 22,
-      "uid": "ps-s-a1-g4-s-02",
+      "uid": "ps-s-a1-g4-s-03",
       "type": "suggestion",
       "text": "引导幼儿学习用平等、接纳和尊重的态度对待差异。如：",
       "examples": [
@@ -3853,6 +3692,18 @@
       "source_page": 27,
       "uid": "ps-s-a2-g2-s-01",
       "type": "suggestion",
+      "text": "成人要遵守社会行为规则，为幼儿树立良好的榜样。如：答应幼儿的事一定要做到、尊老爱幼、爱护公共环境，节约水电等。",
+      "examples": []
+    },
+    {
+      "domain": "社会",
+      "aspect": "社会适应",
+      "goal_no": 2,
+      "goal": "遵守基本的行为规范",
+      "source_id": "moe-preschool-2012",
+      "source_page": 27,
+      "uid": "ps-s-a2-g2-s-02",
+      "type": "suggestion",
       "text": "结合社会生活实际，帮助幼儿了解基本行为规则或其它游戏规则，体会规则的重要性，学习自觉遵守规则。如：",
       "examples": [
         "经常和幼儿玩带有规则的游戏，遵守共同约定的游戏规则。",
@@ -3868,7 +3719,7 @@
       "goal": "遵守基本的行为规范",
       "source_id": "moe-preschool-2012",
       "source_page": 27,
-      "uid": "ps-s-a2-g2-s-02",
+      "uid": "ps-s-a2-g2-s-03",
       "type": "suggestion",
       "text": "教育幼儿要诚实守信。如：",
       "examples": [
@@ -4044,6 +3895,21 @@
       "source_page": 27,
       "uid": "ps-s-a2-g3-s-01",
       "type": "suggestion",
+      "text": "亲切地对待幼儿，关心幼儿，让他感到长辈是可亲、可近、可信赖的，家庭和幼儿园是温暖的。如：",
+      "examples": [
+        "多和孩子一起游戏、谈笑，尽量在家庭和班级中营造温馨的氛围。",
+        "通过和幼儿一起翻阅照片、讲幼儿成长的故事等，让幼儿感受到家庭和幼儿园的温暖，老师的和蔼可亲，对养育自己的人产生感激之情。"
+      ]
+    },
+    {
+      "domain": "社会",
+      "aspect": "社会适应",
+      "goal_no": 3,
+      "goal": "具有初步的归属感",
+      "source_id": "moe-preschool-2012",
+      "source_page": 27,
+      "uid": "ps-s-a2-g3-s-02",
+      "type": "suggestion",
       "text": "吸引和鼓励幼儿参加集体活动，萌发集体意识。如：",
       "examples": [
         "幼儿园和班级里的重大事情和计划，请幼儿集体讨论决定。",
@@ -4057,14 +3923,13 @@
       "goal": "具有初步的归属感",
       "source_id": "moe-preschool-2012",
       "source_page": 27,
-      "uid": "ps-s-a2-g3-s-02",
+      "uid": "ps-s-a2-g3-s-03",
       "type": "suggestion",
       "text": "运用幼儿喜闻乐见和能够理解的方式激发幼儿爱家乡、爱祖国的情感。如：",
       "examples": [
         "和幼儿说一说或在地图上找一找自己家所在的省、市、县（区）名称。",
         "和幼儿一起外出游玩，一起看有关的电视节目或画报等；和他们一起收集有关家乡、祖国各地的风景名胜、著名的建筑、独特物产的图片等，在观看和欣赏的过程中激发幼儿的自豪感和热爱之情。",
-        "利用电视节目或参加升旗等活动，向幼儿介绍国旗、国歌以及观看升旗、奏国歌的礼仪。",
-        "向幼儿介绍反映中国人聪明才智的发明和创造，激发幼儿的民族自豪感。"
+        "利用电视节目或参加升旗等活动，向幼儿介绍国旗、国歌以及观看升旗、奏国歌的礼仪。"
       ]
     },
     {
@@ -4654,6 +4519,19 @@
       "source_id": "moe-preschool-2012",
       "source_page": 37,
       "uid": "ps-c-a2-g1-z-01",
+      "type": "goal",
+      "stage": "中班",
+      "age": "4-5岁",
+      "text": "在指导下，感知和体会有些事物可以用形状来描述。"
+    },
+    {
+      "domain": "科学",
+      "aspect": "数学认知",
+      "goal_no": 1,
+      "goal": "初步感知生活中数学的有用和有趣",
+      "source_id": "moe-preschool-2012",
+      "source_page": 37,
+      "uid": "ps-c-a2-g1-z-02",
       "type": "goal",
       "stage": "中班",
       "age": "4-5岁",
@@ -5626,6 +5504,18 @@
       "uid": "ps-a-a2-g2-s-03",
       "type": "suggestion",
       "text": "提供丰富的材料，如图书、照片、绘画或音乐作品等，让幼儿自主选择，用自己喜欢的方式去模仿或创作，成人不做过多要求。",
+      "examples": []
+    },
+    {
+      "domain": "艺术",
+      "aspect": "表现与创造",
+      "goal_no": 2,
+      "goal": "具有初步的艺术表现与创造能力",
+      "source_id": "moe-preschool-2012",
+      "source_page": 45,
+      "uid": "ps-a-a2-g2-s-04",
+      "type": "suggestion",
+      "text": "根据幼儿的生活经验，与幼儿共同确定艺术表达表现的主题，引导幼儿围绕主题展开想象，进行艺术表现。",
       "examples": []
     },
     {

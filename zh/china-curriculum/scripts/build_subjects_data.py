@@ -203,6 +203,7 @@ TABLE_CELL_LABELS = {
     "生活与学习", "做人与做事", "社会服务与人际", "沟通", "文学、艺术与体育",
     "历史、社会与文化", "科学与技术", "自然生态", "环境保护", "灾害防范", "宇宙探索",
     "学习主题", "主题", "学段", "年级", "领域", "学习任务", "学习活动",
+    "语言", "技能", "7年级", "8年级", "9年级",
 }
 
 CORRECTIONS = {
@@ -225,6 +226,50 @@ CORRECTIONS = {
     "新兴体育类运助": "新兴体育类运动",
     "不解奋斗": "不懈奋斗",
 }
+
+# Audited corrections for items where OCR damage or parser boundaries made the
+# displayed text unsafe. Garbled two-column rows and table fragments are
+# archived; short truncated rows are restored from the scanned columns.
+AUDIT_ARCHIVE_UIDS = {
+    "po-j1-con-dc645e76", "po-j1-con-8aaae94d", "po-x1-con-b8bdb5ab",
+    "po-x2-con-4259a05e", "po-x1-con-0baf204e", "po-x2-con-24128302",
+    "po-x1-con-0beb7c0b", "pe-j1-con-ea93f1cd", "pe-x3-con-7f6ed999",
+    "ar-j1-tip-c6bff36a", "ar-j1-tip-68dff1c3", "ar-j1-tip-22b07443",
+    "ar-all-con-9029b855", "ar-all-con-ab4877da", "ar-all-con-cec3cc47",
+    "pe-x2-con-3920bb62", "en-x3-con-6d342fa8", "ja-j1-con-7d6bcd50",
+    "la-j1-con-6ac6528a",
+}
+
+AUDIT_TEXT_OVERRIDES = {
+    "ch-x3-not-935935bd": (
+        "在落实以上要求过程中，注重了解中华优秀传统文化的源远流长、丰富多彩，"
+        "提升自身中华优秀传统文化修养；感受先贤志士的人格魅力，感悟老一辈无产阶级革命家的英雄气概、"
+        "优良作风和高尚品质，体会捍卫民族尊严、维护国家利益和世界和平的伟大精神。"
+    ),
+    "ch-j1-not-7d1f22c6": (
+        "在落实以上要求过程中，注重理解中华优秀传统文化蕴含的核心思想理念、中华人文精神和传统美德，"
+        "表达自己作为中华民族一员的归属感和自豪感；体会中国共产党在长期奋斗历程中培育形成的崇高精神和人格风范，"
+        "体认英雄模范忠于祖国和人民的优秀品质，培育民族气节和爱国主义情怀。"
+    ),
+    "sc-all-con-080ba741": (
+        "体验1～2年级：通过视觉、听觉、嗅觉、味觉、触觉分别感受不同的食物或物体，了解不同感觉器官的功能。"
+    ),
+    "po-x1-con-3a397429": "合理制订学习和作息计划，生活有规律。",
+    "po-x1-con-fd90e8c6": "乐于探究，在学习与生活中遇到问题时能够想办法解决，提高动脑动手能力。",
+    "po-x1-con-c9edfd47": "了解家乡的风景名胜和主要物产，关注家乡的发展变化。",
+    "po-x1-con-1f9b25b7": "能够识别公共环境中的安全标识，安全有序使用和爱护公共设施。",
+    "po-x1-con-9511b074": "知道学校生活有规则，树立规则意识。",
+    "en-x2-con-b617bdb8": (
+        "简单介绍自己的学校和学校生活，如学校设施、课程、活动，以及同学、老师等；"
+    ),
+}
+
+AUDIT_STAGE_OVERRIDES = {
+    "ar-j1-tip-c0a7af55": ("x1", "小学低段（1-2年级）"),
+    "sc-all-con-080ba741": ("x1", "小学低段（1-2年级）"),
+}
+
+AUDIT_KEEP_UIDS = {"po-x1-con-c9edfd47"}
 
 
 # --- Appendix data -------------------------------------------------------
@@ -474,6 +519,10 @@ def clean_lines(lines: list[str]) -> list[str]:
         if re.fullmatch(r"\d{1,3}", line):
             continue
         if line in TABLE_CELL_LABELS:
+            continue
+        # Some Russian table headers merge into the preceding sentence.
+        line = re.sub(r"(?<=[。；！？])\s*[789]年级\s*$", "", line).strip()
+        if not line:
             continue
         if re.fullmatch(r"[—–\-\s]*PAGE\s*\d+[—–\-\s]*", line):
             continue
@@ -1449,6 +1498,14 @@ def filter_items(items: list[dict]) -> tuple[list[dict], list[dict]]:
     kept: list[dict] = []
     excluded: list[dict] = []
     for item in items:
+        if item.get("uid") in AUDIT_ARCHIVE_UIDS:
+            archived = dict(item)
+            archived["filter_reason"] = "audit-archived"
+            excluded.append(archived)
+            continue
+        if item.get("uid") in AUDIT_KEEP_UIDS:
+            kept.append(item)
+            continue
         decision, reason = classify_concrete(item)
         if decision == "keep":
             kept.append(item)
@@ -1468,6 +1525,14 @@ def build() -> tuple[dict, list[dict]]:
         if (OCR / f"{key}.txt").exists():
             all_items.extend(parse_generic(key))
     all_items.extend(parse_appendix_chinese())
+    for item in all_items:
+        uid = item.get("uid")
+        if uid in AUDIT_TEXT_OVERRIDES:
+            item["text"] = AUDIT_TEXT_OVERRIDES[uid]
+        if uid in AUDIT_STAGE_OVERRIDES:
+            stage_key, stage_label = AUDIT_STAGE_OVERRIDES[uid]
+            item["stage_key"] = stage_key
+            item["stage"] = stage_label
     # Classify the original OCR items first; stage splitting and line breaks
     # are presentation-level transforms of items that already passed.
     kept, excluded = filter_items(all_items)
